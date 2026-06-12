@@ -21,6 +21,7 @@
 		762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */; };
 		77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F9729CED642EBCF472BAC1 /* ContentView.swift */; };
 		84DF67E7F26FB52ADF4008D2 /* OutputNameAllocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */; };
+		8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */; };
 		89B7A985CBCE01645C7BB27C /* AppleFixtureCompressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */; };
 		8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */; };
 		8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */; };
@@ -79,6 +80,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetPresenter.swift; sourceTree = "<group>"; };
 		238810C4DF3FE71683DC9479 /* InputFilePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFilePanel.swift; sourceTree = "<group>"; };
 		2845AD061C173BB07CE9F82B /* DesktopPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetView.swift; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */,
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
+				14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */,
 				573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */,
 				A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */,
 				7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */,
@@ -383,6 +386,7 @@
 				89B7A985CBCE01645C7BB27C /* AppleFixtureCompressionTests.swift in Sources */,
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,
+				8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */,
 				1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */,
 				16C83F11840628567F5DF785 /* PerformanceAndRobustnessTests.swift in Sources */,
 				4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */,
