@@ -144,4 +144,72 @@ final class ImageCompressorTests: XCTestCase {
             return
         }
     }
+
+    func testJPGCompressionFallbackWhenCompressedSizeIsLarger() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.jpg")
+        // Write a tiny, low-quality JPG
+        try Self.writeSampleJPG(to: inputURL, quality: 0.05)
+        let originalSize = try FileManager.default.attributesOfItem(atPath: inputURL.path)[.size] as! Int64
+
+        let compressor = ImageCompressor()
+        let result = try await compressor.compress(
+            inputURL: inputURL,
+            outputDirectory: directory,
+            preset: .high // 0.9 quality, which is much higher than 0.05, and will make the compressed size larger
+        )
+
+        XCTAssertEqual(result.outputURL.pathExtension.lowercased(), "jpg")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.outputURL.path))
+        
+        // The result size must not be larger than original size because it should fall back to copying the original
+        XCTAssertEqual(result.compressedSize, originalSize)
+        
+        let finalSize = try FileManager.default.attributesOfItem(atPath: result.outputURL.path)[.size] as! Int64
+        XCTAssertEqual(finalSize, originalSize)
+    }
+
+    private static func writeSampleJPG(to url: URL, quality: Double) throws {
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        guard let context = CGContext(
+            data: nil,
+            width: 16,
+            height: 16,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else {
+            XCTFail("Failed to create bitmap context")
+            return
+        }
+
+        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 16, height: 16))
+
+        guard let image = context.makeImage(),
+              let destination = CGImageDestinationCreateWithURL(
+                url as CFURL,
+                UTType.jpeg.identifier as CFString,
+                1,
+                nil
+              ) else {
+            XCTFail("Failed to create JPEG destination")
+            return
+        }
+
+        let properties: [CFString: Any] = [
+            kCGImageDestinationLossyCompressionQuality: quality
+        ]
+        CGImageDestinationAddImage(destination, image, properties as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else {
+            XCTFail("Failed to write JPEG")
+            return
+        }
+    }
 }
+

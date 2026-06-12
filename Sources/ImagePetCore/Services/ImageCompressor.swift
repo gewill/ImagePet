@@ -97,7 +97,18 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToWriteOutputFile
         }
 
-        let compressedSize = try fileSize(for: outputURL)
+        var compressedSize = try fileSize(for: outputURL)
+
+        // Fallback for JPG/JPEG input: if the compressed output is larger or equal in size,
+        // copy the original file to outputURL to avoid increasing the size.
+        let inputExtension = inputURL.pathExtension.lowercased()
+        if inputExtension == "jpg" || inputExtension == "jpeg" {
+            if compressedSize >= originalSize {
+                try? FileManager.default.removeItem(at: outputURL)
+                try FileManager.default.copyItem(at: inputURL, to: outputURL)
+                compressedSize = originalSize
+            }
+        }
 
         return CompressionResult(
             inputURL: inputURL,
@@ -108,12 +119,21 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
     }
 
     private static func makeStandardSRGBImage(from source: CGImageSource) throws -> CGImage {
-        guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] else {
-            throw CompressionError.failedToDecodeImage
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+
+        var width = (properties?[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
+        var height = (properties?[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue ?? 0
+
+        // Fallback: If properties are missing, try creating a direct CGImage to query dimensions
+        var directImage: CGImage? = nil
+        if width == 0 || height == 0 {
+            directImage = CGImageSourceCreateImageAtIndex(source, 0, nil)
+            if let image = directImage {
+                width = image.width
+                height = image.height
+            }
         }
 
-        let width = (properties[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
-        let height = (properties[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue ?? 0
         let maxPixelSize = max(width, height)
 
         guard maxPixelSize > 0 else {
@@ -127,11 +147,17 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             kCGImageSourceShouldCacheImmediately: true
         ]
 
-        guard let transformedImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+        var transformedImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+        if transformedImage == nil {
+            // Fallback: If thumbnail generation failed, use the direct image if already created, or load it
+            transformedImage = directImage ?? CGImageSourceCreateImageAtIndex(source, 0, nil)
+        }
+
+        guard let finalImage = transformedImage else {
             throw CompressionError.failedToDecodeImage
         }
 
-        return try flattenToSRGB(transformedImage)
+        return try flattenToSRGB(finalImage)
     }
 
     private static func flattenToSRGB(_ image: CGImage) throws -> CGImage {
