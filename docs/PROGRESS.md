@@ -12,6 +12,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 - `ImagePetCore` 压缩核心
 - GUI 拖拽、队列、状态展示和输出目录选择
 - `Add Images` 菜单/按钮输入入口
+- 桌面宠物小窗第一版
 - 单张压缩结果显示原始大小、输出大小和节省比例
 - App Sandbox entitlements
 - committed `ImagePet.xcodeproj`
@@ -45,6 +46,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 | maxConcurrentJobs = 2 | 已实现 | `ImagePetStore` 队列 worker 限制 | 性能测试时观察吞吐和内存 |
 | autoreleasepool | 已实现 | `ImageCompressor` decode/encode/write 包裹 | 压测确认峰值内存 |
 | 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态、size 和 saved ratio | GUI 手工检查状态变化 |
+| 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
 | 不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突 | 覆盖同名真实文件场景 |
 | Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；格式边界测试锁定 GIF/WebP/PDF 不支持 | GUI 混合批次仍需手工验证 |
 | 总计 Ate / Pooped / Saved | 已实现 | `ImagePetStore` 汇总，GUI 展示 | 手工核对展示 |
@@ -121,6 +123,7 @@ org.gewill.ImagePet
   - Saved
 - 点击 `Reveal in Finder`，确认输出目录可打开。
 - 点击 `Compress More`，确认队列清空，quality 和输出目录保留。
+- 点击 `Show Pet`，确认桌面宠物小窗可显示、可拖动、可隐藏，并跟随压缩状态变化。
 
 ### 失败路径验收
 

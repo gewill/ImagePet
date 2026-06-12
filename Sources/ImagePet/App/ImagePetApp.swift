@@ -22,6 +22,11 @@ struct ImagePetApp: App {
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
 
+                Button(store.isDesktopPetVisible ? "Hide Desktop Pet" : "Show Desktop Pet") {
+                    store.toggleDesktopPet()
+                }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
+
                 Button("Compress More") {
                     store.compressMore()
                 }

@@ -11,20 +11,30 @@ final class ImagePetStore: ObservableObject {
     @Published var isDropTargeted = false
     @Published var isProcessing = false
     @Published var outputFolderMessage: String?
+    @Published var isDesktopPetVisible = false {
+        didSet {
+            defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
+        }
+    }
 
     let maxConcurrentJobs = 2
 
     private let compressor: ImageCompressor
     private let bookmarkStore: OutputDirectoryBookmarkStore
+    private let defaults: UserDefaults
     private var processingTask: Task<Void, Never>?
     private var didPromptForInitialFolder = false
+    private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
 
     init(
         compressor: ImageCompressor = ImageCompressor(),
-        bookmarkStore: OutputDirectoryBookmarkStore? = nil
+        bookmarkStore: OutputDirectoryBookmarkStore? = nil,
+        defaults: UserDefaults = .standard
     ) {
         self.compressor = compressor
-        self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore()
+        self.defaults = defaults
+        self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
+        self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
         restoreOutputDirectory()
     }
 
@@ -163,6 +173,18 @@ final class ImagePetStore: ObservableObject {
         }
 
         NSWorkspace.shared.open(outputDirectory)
+    }
+
+    func toggleDesktopPet() {
+        isDesktopPetVisible.toggle()
+    }
+
+    func showDesktopPet() {
+        isDesktopPetVisible = true
+    }
+
+    func hideDesktopPet() {
+        isDesktopPetVisible = false
     }
 
     private func restoreOutputDirectory() {

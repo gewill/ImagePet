@@ -23,6 +23,9 @@ struct ContentView: View {
         .task {
             store.promptForOutputFolderOnFirstLaunch()
         }
+        .background {
+            DesktopPetPresenter(store: store)
+        }
     }
 }
 
@@ -121,6 +124,12 @@ private struct ControlsView: View {
                     .frame(minWidth: 70, alignment: .leading)
 
                 Spacer()
+
+                Button {
+                    store.toggleDesktopPet()
+                } label: {
+                    Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
+                }
 
                 Button {
                     store.chooseOutputDirectory()
