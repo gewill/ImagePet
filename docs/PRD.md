@@ -38,6 +38,7 @@ ImagePet 是一个 macOS 本地图片压缩小工具。
 ## 核心功能
 
 - 拖拽图片到窗口
+- 通过 `Add Images` 选择图片，作为拖拽之外的桌面入口
 - 支持批量图片
 - 支持选择输出目录
 - 支持 3 个压缩预设：
@@ -365,7 +366,7 @@ UI 必须显示失败文件名和简短原因。
 作者自己可以完成：
 
 ```text
-拖入 20 张 iPhone HEIC / PNG / JPG
+拖入或通过 Add Images 选择 20 张 iPhone HEIC / PNG / JPG
 -> 选择 Balanced
 -> 输出 JPG 到授权目录
 -> 看到每张图压缩结果

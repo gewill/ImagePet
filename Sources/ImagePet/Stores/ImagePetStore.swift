@@ -93,7 +93,15 @@ final class ImagePetStore: ObservableObject {
         }
     }
 
+    func chooseInputImages() {
+        addInputURLs(InputFilePanel.chooseImages())
+    }
+
     func addDroppedURLs(_ urls: [URL]) {
+        addInputURLs(urls)
+    }
+
+    private func addInputURLs(_ urls: [URL]) {
         guard !urls.isEmpty else { return }
 
         let newJobs = urls.map { url in

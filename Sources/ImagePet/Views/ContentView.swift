@@ -110,6 +110,12 @@ private struct ControlsView: View {
                 .frame(width: 280)
                 .disabled(store.isProcessing)
 
+                Button {
+                    store.chooseInputImages()
+                } label: {
+                    Label("Add Images", systemImage: "photo.badge.plus")
+                }
+
                 Label("JPG", systemImage: "photo")
                     .foregroundStyle(.secondary)
                     .frame(minWidth: 70, alignment: .leading)
@@ -206,8 +212,8 @@ private struct JobListView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text("Status")
                     .frame(width: 160, alignment: .leading)
-                Text("Size")
-                    .frame(width: 190, alignment: .trailing)
+                Text("Size / Saved")
+                    .frame(width: 240, alignment: .trailing)
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
@@ -261,7 +267,8 @@ private struct JobRowView: View {
                 .font(.system(.callout, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .frame(width: 190, alignment: .trailing)
+                .minimumScaleFactor(0.82)
+                .frame(width: 240, alignment: .trailing)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -322,7 +329,8 @@ private struct JobRowView: View {
             guard let compressedSize = job.compressedSize else {
                 return FileSizeFormatting.string(from: job.originalSize)
             }
-            return "\(FileSizeFormatting.string(from: job.originalSize)) -> \(FileSizeFormatting.string(from: compressedSize))"
+            let savedPercent = job.savedRatio.map(FileSizeFormatting.percent) ?? "0.0%"
+            return "\(FileSizeFormatting.string(from: job.originalSize)) -> \(FileSizeFormatting.string(from: compressedSize)) / \(savedPercent)"
         case .failed:
             return FileSizeFormatting.string(from: job.originalSize)
         default:

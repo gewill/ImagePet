@@ -11,6 +11,7 @@
 		1C5E346C8DCC4094FE8C6689 /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
+		4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */; };
 		53882A231CD77781C8F98CB9 /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 		55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A0E344263EE215722E53D3 /* CompressionPreset.swift */; };
 		5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */; };
@@ -23,6 +24,7 @@
 		8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */; };
 		8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */; };
 		945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463A9B12B098CEDA557F6100 /* CompressionError.swift */; };
+		B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238810C4DF3FE71683DC9479 /* InputFilePanel.swift */; };
 		B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1510894ED17C31329941EA /* CompressionResult.swift */; };
 		B9CAC9DBC573955EBDA5A0CA /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */; };
@@ -73,6 +75,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		238810C4DF3FE71683DC9479 /* InputFilePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFilePanel.swift; sourceTree = "<group>"; };
 		2B48DF5E09E5C0639460FB28 /* ImagePet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagePet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
 		45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocator.swift; sourceTree = "<group>"; };
@@ -82,6 +85,7 @@
 		58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputDirectoryBookmarkStore.swift; sourceTree = "<group>"; };
 		60F9729CED642EBCF472BAC1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFixtureCompressionTests.swift; sourceTree = "<group>"; };
+		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
@@ -167,6 +171,7 @@
 		7DB36FA47B78B6234C07F479 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				238810C4DF3FE71683DC9479 /* InputFilePanel.swift */,
 				58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */,
 				B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */,
 			);
@@ -188,6 +193,7 @@
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
 				573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */,
+				7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */,
 			);
 			path = ImagePetTests;
 			sourceTree = "<group>";
@@ -349,6 +355,7 @@
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,
 				0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */,
 				C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */,
+				B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */,
 				D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */,
 				762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */,
 			);
@@ -362,6 +369,7 @@
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,
 				1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */,
+				4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

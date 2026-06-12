@@ -11,6 +11,8 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 - SwiftUI macOS app scaffold
 - `ImagePetCore` 压缩核心
 - GUI 拖拽、队列、状态展示和输出目录选择
+- `Add Images` 菜单/按钮输入入口
+- 单张压缩结果显示原始大小、输出大小和节省比例
 - App Sandbox entitlements
 - committed `ImagePet.xcodeproj`
 - SwiftPM 和 Xcode build/test 路径
@@ -36,14 +38,15 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 | JPG 输出 | 已实现 | `ImageCompressor` 统一写出 JPG | 检查输出色彩和方向样本 |
 | WebP / AVIF 不做 | 已锁定 | PRD 和 README 明确排除 | 保持范围，不引入新格式 |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
-| 批量拖拽 | 已实现 | SwiftUI drop destination 接收多 URL | 需要手工拖拽验证 |
+| 批量拖拽 / Add Images | 已实现 | SwiftUI drop destination 接收多 URL；`NSOpenPanel` 选择多张支持格式图片 | 需要手工拖拽和菜单选择验证 |
 | 输出目录选择 | 已实现 | `NSOpenPanel` 选择目录 | 验证 bookmark 失效后的提示 |
 | Security-scoped bookmark | 已实现 | `OutputDirectoryBookmarkStore` | 手工验证跨启动恢复 |
 | App Sandbox | 已实现并验证 | entitlements 包含 sandbox + user-selected read-write | 保持 CI 检查 |
 | maxConcurrentJobs = 2 | 已实现 | `ImagePetStore` 队列 worker 限制 | 性能测试时观察吞吐和内存 |
 | autoreleasepool | 已实现 | `ImageCompressor` decode/encode/write 包裹 | 压测确认峰值内存 |
-| 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态和 size | GUI 手工检查状态变化 |
+| 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态、size 和 saved ratio | GUI 手工检查状态变化 |
 | 不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突 | 覆盖同名真实文件场景 |
+| Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；格式边界测试锁定 GIF/WebP/PDF 不支持 | GUI 混合批次仍需手工验证 |
 | 总计 Ate / Pooped / Saved | 已实现 | `ImagePetStore` 汇总，GUI 展示 | 手工核对展示 |
 | Reveal in Finder | 已实现 | GUI 调用 Finder reveal/open | 手工点击验证 |
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
@@ -57,7 +60,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 ```text
 swift test
 结果：通过
-测试数：5
+测试数：10
 ```
 
 ```text
@@ -68,7 +71,7 @@ xcodebuild -project ImagePet.xcodeproj \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：5
+测试数：10
 ```
 
 ```text
@@ -104,7 +107,7 @@ org.gewill.ImagePet
 
 - 启动 app。
 - 首次选择输出目录，建议命名为 `ImagePet Output`。
-- 拖入 20 张 iPhone HEIC / PNG / JPG。
+- 拖入或通过 `Add Images` 选择 20 张 iPhone HEIC / PNG / JPG。
 - 选择 Balanced。
 - 确认每张图显示：
   - 原始大小

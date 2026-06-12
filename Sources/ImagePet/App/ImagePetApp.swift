@@ -12,6 +12,11 @@ struct ImagePetApp: App {
         }
         .commands {
             CommandGroup(after: .newItem) {
+                Button("Add Images...") {
+                    store.chooseInputImages()
+                }
+                .keyboardShortcut("o", modifiers: [.command])
+
                 Button("Choose Output Folder...") {
                     store.chooseOutputDirectory()
                 }

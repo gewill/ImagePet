@@ -6,9 +6,7 @@ import XCTest
 
 final class ImageCompressorTests: XCTestCase {
     func testCompressesPNGToJPGOutput() async throws {
-        let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let directory = try Self.makeTemporaryDirectory()
         defer {
             try? FileManager.default.removeItem(at: directory)
         }
@@ -28,6 +26,80 @@ final class ImageCompressorTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: result.outputURL.path))
         XCTAssertGreaterThan(result.originalSize, 0)
         XCTAssertGreaterThan(result.compressedSize, 0)
+    }
+
+    func testRejectsUnsupportedInputFormat() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.gif")
+        try Data("not an MVP input".utf8).write(to: inputURL)
+
+        do {
+            _ = try await ImageCompressor().compress(
+                inputURL: inputURL,
+                outputDirectory: directory,
+                preset: .balanced
+            )
+            XCTFail("Expected unsupported input to fail")
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .unsupportedImageFormat)
+        }
+    }
+
+    func testReportsCorruptImageAsDecodeFailure() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("broken.png")
+        try Data("not image data".utf8).write(to: inputURL)
+
+        do {
+            _ = try await ImageCompressor().compress(
+                inputURL: inputURL,
+                outputDirectory: directory,
+                preset: .balanced
+            )
+            XCTFail("Expected corrupt image to fail")
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .failedToDecodeImage)
+            let outputURL = directory.appendingPathComponent("broken-png_compressed.jpg")
+            XCTAssertFalse(FileManager.default.fileExists(atPath: outputURL.path))
+        }
+    }
+
+    func testReportsUnavailableOutputFolder() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.png")
+        try Self.writeSamplePNG(to: inputURL)
+
+        let missingOutputDirectory = directory.appendingPathComponent("missing", isDirectory: true)
+
+        do {
+            _ = try await ImageCompressor().compress(
+                inputURL: inputURL,
+                outputDirectory: missingOutputDirectory,
+                preset: .balanced
+            )
+            XCTFail("Expected unavailable output folder to fail")
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .outputFolderUnavailable)
+        }
+    }
+
+    private static func makeTemporaryDirectory() throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
     }
 
     private static func writeSamplePNG(to url: URL) throws {
