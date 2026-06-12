@@ -47,6 +47,7 @@ public enum JobStatus: Equatable, Sendable {
     case processing
     case done
     case failed
+    case skipped
 }
 
 public enum PetState: Equatable, Sendable {

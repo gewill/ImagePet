@@ -24,6 +24,7 @@ final class ModelTests: XCTestCase {
             .failedToDecodeImage,
             .failedToWriteOutputFile,
             .notEnoughDiskSpace,
+            .skipped,
             .unknown
         ]
 
@@ -83,5 +84,14 @@ final class ModelTests: XCTestCase {
         zeroSizeJob.originalSize = 0
         zeroSizeJob.compressedSize = 0
         XCTAssertNil(zeroSizeJob.savedRatio)
+
+        var skippedJob = job
+        skippedJob.status = .skipped
+        skippedJob.errorMessage = "Compression skipped"
+        XCTAssertEqual(skippedJob.status, .skipped)
+        XCTAssertEqual(skippedJob.errorMessage, "Compression skipped")
+        XCTAssertNil(skippedJob.compressedSize)
+        XCTAssertNil(skippedJob.savedSize)
+        XCTAssertNil(skippedJob.savedRatio)
     }
 }

@@ -154,23 +154,20 @@ final class ImageCompressorTests: XCTestCase {
         let inputURL = directory.appendingPathComponent("sample.jpg")
         // Write a tiny, low-quality JPG
         try Self.writeSampleJPG(to: inputURL, quality: 0.05)
-        let originalSize = try FileManager.default.attributesOfItem(atPath: inputURL.path)[.size] as! Int64
 
         let compressor = ImageCompressor()
-        let result = try await compressor.compress(
-            inputURL: inputURL,
-            outputDirectory: directory,
-            preset: .high // 0.9 quality, which is much higher than 0.05, and will make the compressed size larger
-        )
-
-        XCTAssertEqual(result.outputURL.pathExtension.lowercased(), "jpg")
-        XCTAssertTrue(FileManager.default.fileExists(atPath: result.outputURL.path))
-        
-        // The result size must not be larger than original size because it should fall back to copying the original
-        XCTAssertEqual(result.compressedSize, originalSize)
-        
-        let finalSize = try FileManager.default.attributesOfItem(atPath: result.outputURL.path)[.size] as! Int64
-        XCTAssertEqual(finalSize, originalSize)
+        do {
+            _ = try await compressor.compress(
+                inputURL: inputURL,
+                outputDirectory: directory,
+                preset: .high // 0.9 quality, which is much higher than 0.05, and will make the compressed size larger
+            )
+            XCTFail("Expected compression to be skipped when compressed size is larger")
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .skipped)
+            let expectedOutputURL = directory.appendingPathComponent("sample-jpg_compressed.jpg")
+            XCTAssertFalse(FileManager.default.fileExists(atPath: expectedOutputURL.path))
+        }
     }
 
     private static func writeSampleJPG(to url: URL, quality: Double) throws {

@@ -7,6 +7,7 @@ public enum CompressionError: Error, Equatable, LocalizedError, Sendable {
     case failedToDecodeImage
     case failedToWriteOutputFile
     case notEnoughDiskSpace
+    case skipped
     case unknown
 
     public var errorDescription: String? {
@@ -23,6 +24,8 @@ public enum CompressionError: Error, Equatable, LocalizedError, Sendable {
             return "Failed to write output file"
         case .notEnoughDiskSpace:
             return "Not enough disk space"
+        case .skipped:
+            return "Compression skipped (size would increase)"
         case .unknown:
             return "Unknown error"
         }

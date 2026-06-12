@@ -33,14 +33,19 @@ final class AppleFixtureCompressionTests: XCTestCase {
 
         let compressor = ImageCompressor()
         var results: [CompressionResult] = []
+        var skippedCount = 0
 
         for input in inputs {
-            let result = try await compressor.compress(
-                inputURL: input,
-                outputDirectory: outputDirectory,
-                preset: .balanced
-            )
-            results.append(result)
+            do {
+                let result = try await compressor.compress(
+                    inputURL: input,
+                    outputDirectory: outputDirectory,
+                    preset: .balanced
+                )
+                results.append(result)
+            } catch let error as CompressionError where error == .skipped {
+                skippedCount += 1
+            }
         }
 
         let originalTotal = results.reduce(Int64(0)) { $0 + $1.originalSize }
@@ -51,7 +56,7 @@ final class AppleFixtureCompressionTests: XCTestCase {
         let formatCounts = Dictionary(grouping: inputs, by: { $0.pathExtension.lowercased() })
             .mapValues(\.count)
 
-        XCTAssertEqual(results.count, inputs.count)
+        XCTAssertEqual(results.count + skippedCount, inputs.count)
         XCTAssertGreaterThan(originalTotal, 0)
         XCTAssertGreaterThan(compressedTotal, 0)
 

@@ -97,17 +97,11 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToWriteOutputFile
         }
 
-        var compressedSize = try fileSize(for: outputURL)
+        let compressedSize = try fileSize(for: outputURL)
 
-        // Fallback for JPG/JPEG input: if the compressed output is larger or equal in size,
-        // copy the original file to outputURL to avoid increasing the size.
-        let inputExtension = inputURL.pathExtension.lowercased()
-        if inputExtension == "jpg" || inputExtension == "jpeg" {
-            if compressedSize >= originalSize {
-                try? FileManager.default.removeItem(at: outputURL)
-                try FileManager.default.copyItem(at: inputURL, to: outputURL)
-                compressedSize = originalSize
-            }
+        if compressedSize >= originalSize {
+            try? FileManager.default.removeItem(at: outputURL)
+            throw CompressionError.skipped
         }
 
         return CompressionResult(

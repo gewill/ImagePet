@@ -45,7 +45,7 @@ final class ImagePetStore: ObservableObject {
     }
 
     var completedCount: Int {
-        jobs.filter { $0.status == .done || $0.status == .failed }.count
+        jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
     }
 
     var succeededCount: Int {
@@ -56,12 +56,16 @@ final class ImagePetStore: ObservableObject {
         jobs.filter { $0.status == .failed }.count
     }
 
+    var skippedCount: Int {
+        jobs.filter { $0.status == .skipped }.count
+    }
+
     var hasFailedJobs: Bool {
         failedCount > 0
     }
 
     var isCompleted: Bool {
-        !jobs.isEmpty && jobs.allSatisfy { $0.status == .done || $0.status == .failed }
+        !jobs.isEmpty && jobs.allSatisfy { $0.status == .done || $0.status == .failed || $0.status == .skipped }
     }
 
     var successfulOriginalTotal: Int64 {
@@ -278,8 +282,13 @@ final class ImagePetStore: ObservableObject {
         } catch {
             let mapped = CompressionError.map(error)
             updateJob(job.id) { updated in
-                updated.status = .failed
-                updated.errorMessage = mapped.localizedDescription
+                if mapped == .skipped {
+                    updated.status = .skipped
+                    updated.errorMessage = mapped.localizedDescription
+                } else {
+                    updated.status = .failed
+                    updated.errorMessage = mapped.localizedDescription
+                }
             }
         }
     }

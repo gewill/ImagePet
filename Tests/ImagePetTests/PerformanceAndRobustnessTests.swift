@@ -56,6 +56,7 @@ final class PerformanceAndRobustnessTests: XCTestCase {
         let syncQueue = DispatchQueue(label: "org.gewill.ImagePet.testSync")
         var completedCount = 0
         var successCount = 0
+        var skippedCount = 0
         var failureCount = 0
 
         func recordMemory() {
@@ -104,6 +105,11 @@ final class PerformanceAndRobustnessTests: XCTestCase {
                     completedCount += 1
                     successCount += 1
                 }
+            } catch let error as CompressionError where error == .skipped {
+                syncQueue.sync {
+                    completedCount += 1
+                    skippedCount += 1
+                }
             } catch {
                 syncQueue.sync {
                     completedCount += 1
@@ -126,7 +132,7 @@ final class PerformanceAndRobustnessTests: XCTestCase {
 
         // Assertions matching verification criteria
         XCTAssertEqual(completedCount, 21, "Should process all 20 images + 1 invalid image")
-        XCTAssertEqual(successCount, 20, "Should successfully compress 20 valid images")
+        XCTAssertEqual(successCount + skippedCount, 20, "Should successfully process (compress or skip) 20 valid images")
         XCTAssertEqual(failureCount, 1, "Should fail exactly 1 invalid image (robustness test)")
         XCTAssertLessThan(duration, 30.0, "Compression should complete in under 30 seconds")
 

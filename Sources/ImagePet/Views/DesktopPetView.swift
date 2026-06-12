@@ -118,6 +118,9 @@ struct DesktopPetView: View {
         case .happy:
             return "Saved \(FileSizeFormatting.string(from: store.savedTotal))"
         case .error:
+            if store.skippedCount > 0 {
+                return "\(store.succeededCount) ok, \(store.skippedCount) skip, \(store.failedCount) fail"
+            }
             return "\(store.succeededCount) ok, \(store.failedCount) failed"
         }
     }

@@ -96,9 +96,19 @@ private struct HeaderView: View {
         case .eating:
             return "Processing \(store.completedCount) / \(store.jobs.count)"
         case .happy:
-            return "Ate \(FileSizeFormatting.string(from: store.successfulOriginalTotal)); pooped \(FileSizeFormatting.string(from: store.compressedTotal))."
+            let mainStr = "Ate \(FileSizeFormatting.string(from: store.successfulOriginalTotal)); pooped \(FileSizeFormatting.string(from: store.compressedTotal))."
+            if store.skippedCount > 0 {
+                return mainStr + " (Skipped \(store.skippedCount))"
+            }
+            return mainStr
         case .error:
-            return "\(store.succeededCount) succeeded, \(store.failedCount) failed"
+            var parts: [String] = []
+            parts.append("\(store.succeededCount) succeeded")
+            if store.skippedCount > 0 {
+                parts.append("\(store.skippedCount) skipped")
+            }
+            parts.append("\(store.failedCount) failed")
+            return parts.joined(separator: ", ")
         }
     }
 }
@@ -314,6 +324,8 @@ private struct JobRowView: View {
             return "checkmark.circle.fill"
         case .failed:
             return "xmark.octagon.fill"
+        case .skipped:
+            return "arrow.right.circle"
         }
     }
 
@@ -327,6 +339,8 @@ private struct JobRowView: View {
             return .green
         case .failed:
             return .red
+        case .skipped:
+            return .orange
         }
     }
 
@@ -340,6 +354,8 @@ private struct JobRowView: View {
             return "Done"
         case .failed:
             return "Failed: \(job.errorMessage ?? "Unknown error")"
+        case .skipped:
+            return "Skipped"
         }
     }
 
@@ -347,6 +363,8 @@ private struct JobRowView: View {
         switch job.status {
         case .failed:
             return .red
+        case .skipped:
+            return .orange
         default:
             return .secondary
         }
@@ -360,6 +378,8 @@ private struct JobRowView: View {
             }
             let savedPercent = job.savedRatio.map(FileSizeFormatting.percent) ?? "0.0%"
             return "\(FileSizeFormatting.string(from: job.originalSize)) -> \(FileSizeFormatting.string(from: compressedSize)) / \(savedPercent)"
+        case .skipped:
+            return "\(FileSizeFormatting.string(from: job.originalSize)) -> Skipped"
         case .failed:
             return FileSizeFormatting.string(from: job.originalSize)
         default:
