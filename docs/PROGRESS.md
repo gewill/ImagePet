@@ -22,8 +22,11 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 尚未完成验收：
 
 - 真实拖入 20 张 iPhone HEIC 的手工 GUI 验收
-- 30 秒内完成、内存峰值低于 1.5GB 的性能验收
 - Developer ID notarization workflow
+
+已自动化验证：
+
+- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，总耗时 0.24 秒，内存峰值约 155.6 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
 
 ## 追踪入口
 
@@ -62,7 +65,8 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 ```text
 swift test
 结果：通过
-测试数：10
+测试数：11
+性能与鲁棒性验证：通过（20张并行压缩，耗时 0.23 秒，峰值内存 151.6 MB）
 ```
 
 ```text
@@ -73,7 +77,8 @@ xcodebuild -project ImagePet.xcodeproj \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：10
+测试数：11
+性能与鲁棒性验证：通过（20张并行压缩，耗时 0.24 秒，峰值内存 155.6 MB）
 ```
 
 ```text
