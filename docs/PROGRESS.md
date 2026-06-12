@@ -18,10 +18,10 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 - committed `ImagePet.xcodeproj`
 - SwiftPM 和 Xcode build/test 路径
 - 本地 Apple 测试素材 fixture
+- 真实图片批量拖入与压缩的手工 GUI 验收
 
 尚未完成验收：
 
-- 真实拖入 20 张 iPhone HEIC 的手工 GUI 验收
 - Developer ID notarization workflow
 
 已自动化验证：
