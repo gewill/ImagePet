@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */; };
+		16C83F11840628567F5DF785 /* PerformanceAndRobustnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */; };
 		1C5E346C8DCC4094FE8C6689 /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
@@ -94,6 +95,7 @@
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
+		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
 		B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormat.swift; sourceTree = "<group>"; };
 		B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputFolderPanel.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
 				573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */,
+				A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */,
 				7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */,
 			);
 			path = ImagePetTests;
@@ -381,6 +384,7 @@
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,
 				1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */,
+				16C83F11840628567F5DF785 /* PerformanceAndRobustnessTests.swift in Sources */,
 				4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
