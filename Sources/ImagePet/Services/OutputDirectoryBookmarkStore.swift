@@ -51,7 +51,7 @@ final class OutputDirectoryBookmarkStore {
         defaults.removeObject(forKey: key)
     }
 
-    func saveMulti(_ url: URL) throws {
+    func saveMulti(_ url: URL, for keyURL: URL? = nil) throws {
         let access = url.startAccessingSecurityScopedResource()
         defer {
             if access {
@@ -64,13 +64,13 @@ final class OutputDirectoryBookmarkStore {
             relativeTo: nil
         )
         var dict = defaults.dictionary(forKey: "ImagePet.folderBookmarks") as? [String: Data] ?? [:]
-        dict[url.path] = bookmark
+        dict[(keyURL ?? url).standardizedFileURL.path] = bookmark
         defaults.set(dict, forKey: "ImagePet.folderBookmarks")
     }
 
     func restoreMulti(for url: URL) -> URL? {
         guard let dict = defaults.dictionary(forKey: "ImagePet.folderBookmarks") as? [String: Data],
-              let data = dict[url.path] else {
+              let data = dict[url.standardizedFileURL.path] else {
             return nil
         }
         var isStale = false

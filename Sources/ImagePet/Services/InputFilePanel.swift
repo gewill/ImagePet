@@ -30,10 +30,15 @@ enum InputFilePanel {
                 try pngData.write(to: url)
             }
             
-            try? writeSamplePNG(to: sample1)
-            try? writeSamplePNG(to: sample2)
-            
-            return [sample1, sample2]
+            var urls: [URL] = []
+            if (try? writeSamplePNG(to: sample1)) != nil {
+                urls.append(sample1)
+            }
+            if (try? writeSamplePNG(to: sample2)) != nil {
+                urls.append(sample2)
+            }
+
+            return urls
         }
 
         let panel = NSOpenPanel()

@@ -40,7 +40,7 @@ struct DesktopPetView: View {
                 .font(.system(size: 54))
                 .frame(width: 68, height: 58)
                 .scaleEffect(store.petState == .eating ? 1.08 : 1)
-                .animation(.easeInOut(duration: 0.6).repeatCount(store.petState == .eating ? 8 : 1, autoreverses: true), value: store.petState)
+                .animation(.easeInOut(duration: 0.6).repeatCount(store.petState == .eating ? 8 : 0, autoreverses: true), value: store.petState)
                 .accessibilityIdentifier("desktopPetEmoji")
 
             Text(title)

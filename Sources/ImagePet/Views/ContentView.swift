@@ -2,6 +2,7 @@ import ImagePetCore
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.openWindow) private var openWindow
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
@@ -22,6 +23,11 @@ struct ContentView: View {
         }
         .task {
             store.promptForOutputFolderOnFirstLaunch()
+        }
+        .onAppear {
+            store.setMainWindowOpener {
+                openWindow(id: "main")
+            }
         }
         .background {
             DesktopPetPresenter(store: store)
@@ -197,7 +203,7 @@ private struct ControlsView: View {
                     }
                     .pickerStyle(.segmented)
                     .frame(width: 280)
-                    .disabled(store.isProcessing)
+                    .disabled(store.isProcessing || store.saveLocationMode == .overwrite)
                     .accessibilityIdentifier("formatPicker")
                 }
 
@@ -223,7 +229,7 @@ private struct ControlsView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(.red)
-                        Text("Mode Overwrite will replace your source files directly. This action cannot be undone.")
+                        Text("Mode Overwrite will replace your source files directly and keep each file's original format. This action cannot be undone.")
                             .font(.callout)
                             .foregroundStyle(.red.opacity(0.85))
                             .fontWeight(.semibold)
@@ -241,6 +247,9 @@ private struct ControlsView: View {
                                 .frame(width: 130)
                                 .disabled(store.isProcessing)
                                 .accessibilityIdentifier("filenameSuffixField")
+                                .onChange(of: store.filenameSuffix) { _ in
+                                    store.sanitizeFilenameSuffix()
+                                }
                         }
                         
                         Text(store.filenamePreview)
@@ -546,7 +555,7 @@ private struct SummaryView: View {
                 Spacer()
             } else {
                 SummaryMetric(title: "Quality", value: store.preset.displayName)
-                SummaryMetric(title: "Output", value: "JPG")
+                SummaryMetric(title: "Output", value: store.outputFormat.displayName)
                 Spacer()
             }
         }

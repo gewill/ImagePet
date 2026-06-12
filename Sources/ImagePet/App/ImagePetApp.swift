@@ -12,6 +12,11 @@ struct ImagePetApp: App {
         }
         .commands {
             CommandGroup(after: .newItem) {
+                Button("Show Main Window") {
+                    store.activateMainWindow()
+                }
+                .keyboardShortcut("1", modifiers: [.command])
+
                 Button("Add Images...") {
                     store.chooseInputImages()
                 }
@@ -33,6 +38,10 @@ struct ImagePetApp: App {
                 .keyboardShortcut("n", modifiers: [.command])
                 .disabled(store.isProcessing)
             }
+        }
+
+        Window("ImagePet", id: "main") {
+            ContentView(store: store)
         }
     }
 }

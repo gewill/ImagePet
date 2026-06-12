@@ -14,6 +14,7 @@ final class ImagePetStore: ObservableObject {
     @Published var isDesktopPetVisible = false {
         didSet {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
+            desktopPetWindowController?.setVisible(isDesktopPetVisible)
         }
     }
     @Published var outputFormat: OutputFormat = .original {
@@ -24,6 +25,9 @@ final class ImagePetStore: ObservableObject {
     @Published var saveLocationMode: SaveLocationMode = .designated {
         didSet {
             defaults.set(saveLocationMode.rawValue, forKey: saveLocationModeKey)
+            if saveLocationMode == .overwrite, outputFormat != .original {
+                outputFormat = .original
+            }
         }
     }
     @Published var filenameSuffix: String = "_compressed" {
@@ -50,6 +54,8 @@ final class ImagePetStore: ObservableObject {
     private let bookmarkStore: OutputDirectoryBookmarkStore
     private let defaults: UserDefaults
     private var processingTask: Task<Void, Never>?
+    private var openMainWindow: (() -> Void)?
+    private var desktopPetWindowController: DesktopPetWindowController?
     private var didPromptForInitialFolder = false
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
@@ -88,7 +94,7 @@ final class ImagePetStore: ObservableObject {
                 self.saveLocationMode = mode
             }
             if let savedSuffix = defaults.string(forKey: filenameSuffixKey) {
-                self.filenameSuffix = savedSuffix
+                self.filenameSuffix = OutputNameAllocator.sanitizedSuffix(savedSuffix)
             }
             if let savedDimension = defaults.string(forKey: maxDimensionKey), let limit = MaxDimensionLimit(rawValue: savedDimension) {
                 self.maxDimension = limit
@@ -118,14 +124,43 @@ final class ImagePetStore: ObservableObject {
         return "photo.png -> \(outputName)"
     }
 
+    func sanitizeFilenameSuffix() {
+        let sanitized = OutputNameAllocator.sanitizedSuffix(filenameSuffix)
+        if filenameSuffix != sanitized {
+            filenameSuffix = sanitized
+        }
+    }
+
+    func setMainWindowOpener(_ opener: @escaping () -> Void) {
+        openMainWindow = opener
+    }
+
     func activateMainWindow() {
         NSApp.activate(ignoringOtherApps: true)
+        if focusMainWindowIfPresent() {
+            return
+        }
+
+        openMainWindow?()
+
+        Task { @MainActor in
+            await Task.yield()
+            self.focusMainWindowIfPresent()
+        }
+    }
+
+    @discardableResult
+    private func focusMainWindowIfPresent() -> Bool {
         for window in NSApp.windows {
             if window.title == "ImagePet" || window.identifier?.rawValue == "main" || window.frameAutosaveName == "ImagePet" {
+                if window.isMiniaturized {
+                    window.deminiaturize(nil)
+                }
                 window.makeKeyAndOrderFront(nil)
-                return
+                return true
             }
         }
+        return false
     }
 
     var succeededCount: Int {
@@ -270,6 +305,13 @@ final class ImagePetStore: ObservableObject {
         isDesktopPetVisible.toggle()
     }
 
+    func attachDesktopPetControllerIfNeeded() {
+        if desktopPetWindowController == nil {
+            desktopPetWindowController = DesktopPetWindowController(store: self)
+        }
+        desktopPetWindowController?.setVisible(isDesktopPetVisible)
+    }
+
     func showDesktopPet() {
         isDesktopPetVisible = true
     }
@@ -385,9 +427,11 @@ final class ImagePetStore: ObservableObject {
             panel.message = "ImagePet needs permission to write compressed files to this folder:\n\(folder.path)"
             
             let response = panel.runModal()
-            if response == .OK, let url = panel.url {
+            if response == .OK,
+               let url = panel.url,
+               isAuthorizedFolderSelection(url, for: folder) {
                 do {
-                    try bookmarkStore.saveMulti(url)
+                    try bookmarkStore.saveMulti(url, for: folder)
                     continuation.resume(returning: true)
                 } catch {
                     continuation.resume(returning: false)
@@ -396,6 +440,23 @@ final class ImagePetStore: ObservableObject {
                 continuation.resume(returning: false)
             }
         }
+    }
+
+    private func isAuthorizedFolderSelection(_ selectedURL: URL, for requestedFolder: URL) -> Bool {
+        let selectedComponents = selectedURL
+            .standardizedFileURL
+            .resolvingSymlinksInPath()
+            .pathComponents
+        let requestedComponents = requestedFolder
+            .standardizedFileURL
+            .resolvingSymlinksInPath()
+            .pathComponents
+
+        guard selectedComponents.count <= requestedComponents.count else {
+            return false
+        }
+
+        return zip(selectedComponents, requestedComponents).allSatisfy(==)
     }
 
     private func runQueue(outputDirectory: URL?) async {
@@ -442,7 +503,7 @@ final class ImagePetStore: ObservableObject {
             preset: preset,
             format: outputFormat,
             locationMode: saveLocationMode,
-            suffix: filenameSuffix,
+            suffix: OutputNameAllocator.sanitizedSuffix(filenameSuffix),
             maxDimension: maxDimension,
             stripMetadata: stripMetadata
         )
@@ -453,7 +514,7 @@ final class ImagePetStore: ObservableObject {
         if saveLocationMode == .originalFolder {
             let parentFolder = job.inputURL.deletingLastPathComponent()
             restoredBookmarkURL = bookmarkStore.restoreMulti(for: parentFolder)
-            targetOutputDir = restoredBookmarkURL
+            targetOutputDir = parentFolder
         }
 
         let access = restoredBookmarkURL?.startAccessingSecurityScopedResource() ?? false
@@ -501,6 +562,7 @@ final class ImagePetStore: ObservableObject {
             jobs[index].errorMessage = error.localizedDescription
         }
 
+        processingTask = nil
         isProcessing = false
         petState = .error
     }

@@ -55,6 +55,16 @@ public actor OutputNameAllocator {
         reservations.removeAll()
     }
 
+    public static func sanitizedSuffix(_ suffix: String) -> String {
+        var sanitized = ""
+        for scalar in suffix.unicodeScalars where isAllowedSuffixScalar(scalar) {
+            sanitized.unicodeScalars.append(scalar)
+        }
+        return sanitized
+    }
+
+    /// `suffix` may be empty. `targetExtension` should not include a leading dot;
+    /// this function strips one defensively for callers outside the app UI.
     public static func outputFileName(
         for inputURL: URL,
         suffix: String,
@@ -62,8 +72,8 @@ public actor OutputNameAllocator {
         duplicateIndex: Int = 0
     ) -> String {
         let originalName = inputURL.deletingPathExtension().lastPathComponent
-        let baseName = "\(originalName)\(suffix)"
-        let ext = targetExtension.lowercased()
+        let baseName = "\(originalName)\(sanitizedSuffix(suffix))"
+        let ext = sanitizedExtension(targetExtension)
 
         if duplicateIndex == 0 {
             return ext.isEmpty ? baseName : "\(baseName).\(ext)"
@@ -92,5 +102,28 @@ public actor OutputNameAllocator {
 
     private static func key(for url: URL) -> String {
         url.standardizedFileURL.path
+    }
+
+    private static func sanitizedExtension(_ targetExtension: String) -> String {
+        let trimmed = targetExtension.trimmingCharacters(in: .whitespacesAndNewlines)
+        let withoutLeadingDots = trimmed.drop { $0 == "." }
+        var sanitized = ""
+        for scalar in withoutLeadingDots.lowercased().unicodeScalars where isASCIILetterOrDigit(scalar) {
+            sanitized.unicodeScalars.append(scalar)
+        }
+        return sanitized
+    }
+
+    private static func isAllowedSuffixScalar(_ scalar: UnicodeScalar) -> Bool {
+        isASCIILetterOrDigit(scalar) || scalar == "_" || scalar == "-"
+    }
+
+    private static func isASCIILetterOrDigit(_ scalar: UnicodeScalar) -> Bool {
+        switch scalar.value {
+        case 48...57, 65...90, 97...122:
+            return true
+        default:
+            return false
+        }
     }
 }

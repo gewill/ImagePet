@@ -31,4 +31,21 @@ final class OutputNameAllocatorTests: XCTestCase {
         XCTAssertEqual(first.lastPathComponent, "photo-png_compressed-2.jpg")
         XCTAssertEqual(second.lastPathComponent, "photo-png_compressed-3.jpg")
     }
+
+    func testSanitizesCustomSuffixAndTargetExtension() {
+        let input = URL(fileURLWithPath: "/tmp/photo.png")
+
+        XCTAssertEqual(
+            OutputNameAllocator.sanitizedSuffix("_min-01/../中文 "),
+            "_min-01"
+        )
+        XCTAssertEqual(
+            OutputNameAllocator.outputFileName(
+                for: input,
+                suffix: "_ok/../../bad",
+                targetExtension: ".JPG"
+            ),
+            "photo_okbad.jpg"
+        )
+    }
 }

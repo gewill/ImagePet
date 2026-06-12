@@ -106,8 +106,11 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             try validateOutputDirectory(resolvedOutputDirectory)
         }
 
-        // Determine target UTType
-        let targetUTType = options.format.targetUTType(for: inputURL)
+        // Overwrite keeps the original extension, so the encoded bytes must keep
+        // the original file type as well.
+        let targetUTType = options.locationMode == .overwrite
+            ? OutputFormat.original.targetUTType(for: inputURL)
+            : options.format.targetUTType(for: inputURL)
         let targetExtension = targetUTType.preferredFilenameExtension ?? "jpg"
 
         // Resolve output URL

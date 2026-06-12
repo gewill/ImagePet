@@ -13,7 +13,7 @@ enum OutputFolderPanel {
 
         let panel = NSOpenPanel()
         panel.title = "Choose Output Folder"
-        panel.message = "Choose where ImagePet writes compressed JPG files. You can create a folder named ImagePet Output."
+        panel.message = "Choose where ImagePet writes compressed images. You can create a folder named ImagePet Output."
         panel.prompt = "Choose Folder"
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
