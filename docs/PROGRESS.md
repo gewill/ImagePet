@@ -27,6 +27,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 已自动化验证：
 
 - 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，总耗时 0.24 秒，内存峰值约 155.6 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
+- UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、以及批量压缩完整流程（由 `ImagePetUITests` 验证）。
 
 ## 追踪入口
 
@@ -57,6 +58,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
 | Compress More | 已实现 | 清空队列并保留设置 | 手工验证设置保留 |
 | Committed Xcode project | 已完成 | `ImagePet.xcodeproj` 已入库 | CI 后续直接用 Xcode project |
+| 自动化 UI 测试 | 已实现 | `ImagePetUITests` 覆盖 4 个核心交互与功能用例 | 持续集成持续验证 |
 
 ## 已验证
 
@@ -65,7 +67,7 @@ MVP 工程骨架和核心 workflow 已经实现，当前更适合进入手工验
 ```text
 swift test
 结果：通过
-测试数：11
+测试数：14
 性能与鲁棒性验证：通过（20张并行压缩，耗时 0.23 秒，峰值内存 151.6 MB）
 ```
 
@@ -77,7 +79,7 @@ xcodebuild -project ImagePet.xcodeproj \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：11
+测试数：18 (14 Unit Tests + 4 UI Tests)
 性能与鲁棒性验证：通过（20张并行压缩，耗时 0.24 秒，峰值内存 155.6 MB）
 ```
 
