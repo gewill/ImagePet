@@ -38,15 +38,20 @@ private struct HeaderView: View {
                 .font(.system(size: 64))
                 .frame(width: 86, height: 86)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                .accessibilityIdentifier("petEmojiLabel")
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.system(size: 28, weight: .semibold))
                     .lineLimit(1)
+                    .accessibilityIdentifier("petTitleLabel")
+                    .accessibilityLabel(title)
 
                 Text(subtitle)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .accessibilityIdentifier("petSubtitleLabel")
+                    .accessibilityLabel(subtitle)
 
                 if store.isProcessing {
                     ProgressView(value: Double(store.completedCount), total: Double(max(store.jobs.count, 1)))
@@ -112,12 +117,14 @@ private struct ControlsView: View {
                 .pickerStyle(.segmented)
                 .frame(width: 280)
                 .disabled(store.isProcessing)
+                .accessibilityIdentifier("presetPicker")
 
                 Button {
                     store.chooseInputImages()
                 } label: {
                     Label("Add Images", systemImage: "photo.badge.plus")
                 }
+                .accessibilityIdentifier("addImagesButton")
 
                 Label("JPG", systemImage: "photo")
                     .foregroundStyle(.secondary)
@@ -130,6 +137,7 @@ private struct ControlsView: View {
                 } label: {
                     Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
                 }
+                .accessibilityIdentifier("togglePetButton")
 
                 Button {
                     store.chooseOutputDirectory()
@@ -137,6 +145,7 @@ private struct ControlsView: View {
                     Label("Choose Folder", systemImage: "folder")
                 }
                 .disabled(store.isProcessing)
+                .accessibilityIdentifier("chooseFolderButton")
             }
 
             HStack(spacing: 8) {
@@ -147,6 +156,8 @@ private struct ControlsView: View {
                     .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
                     .lineLimit(1)
                     .truncationMode(.middle)
+                    .accessibilityIdentifier("outputFolderLabel")
+                    .accessibilityLabel(outputFolderText)
 
                 Spacer()
             }
@@ -250,6 +261,8 @@ private struct EmptyJobListView: View {
             .foregroundStyle(.tertiary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 34)
+            .accessibilityIdentifier("emptyJobsLabel")
+            .accessibilityLabel("No images yet")
     }
 }
 
@@ -261,16 +274,21 @@ private struct JobRowView: View {
             Image(systemName: iconName)
                 .foregroundStyle(iconColor)
                 .frame(width: 18)
+                .accessibilityIdentifier("jobIcon_\(job.fileName)")
 
             Text(job.fileName)
                 .lineLimit(1)
                 .truncationMode(.middle)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("jobFileName_\(job.fileName)")
+                .accessibilityLabel(job.fileName)
 
             Text(statusText)
                 .foregroundStyle(statusColor)
                 .lineLimit(1)
                 .frame(width: 160, alignment: .leading)
+                .accessibilityIdentifier("jobStatusText_\(job.fileName)")
+                .accessibilityLabel(statusText)
 
             Text(sizeText)
                 .font(.system(.callout, design: .monospaced))
@@ -278,6 +296,8 @@ private struct JobRowView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
                 .frame(width: 240, alignment: .trailing)
+                .accessibilityIdentifier("jobSizeText_\(job.fileName)")
+                .accessibilityLabel(sizeText)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -368,6 +388,7 @@ private struct SummaryView: View {
                 } label: {
                     Label("Reveal in Finder", systemImage: "folder")
                 }
+                .accessibilityIdentifier("revealInFinderButton")
 
                 if store.hasFailedJobs {
                     Button {
@@ -376,6 +397,7 @@ private struct SummaryView: View {
                         Label("Retry Failed", systemImage: "arrow.clockwise")
                     }
                     .keyboardShortcut("r", modifiers: [.command])
+                    .accessibilityIdentifier("retryFailedButton")
                 }
 
                 Button {
@@ -384,6 +406,7 @@ private struct SummaryView: View {
                     Label("Compress More", systemImage: "plus")
                 }
                 .keyboardShortcut("n", modifiers: [.command])
+                .accessibilityIdentifier("compressMoreButton")
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
                 Spacer()
@@ -406,10 +429,13 @@ private struct SummaryMetric: View {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .accessibilityIdentifier("summaryMetricTitle_\(title)")
             Text(value)
                 .font(.system(.callout, design: .rounded, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
+                .accessibilityIdentifier("summaryMetricValue_\(title)")
+                .accessibilityLabel(value)
         }
         .frame(minWidth: 110, alignment: .leading)
     }

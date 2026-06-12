@@ -13,6 +13,7 @@
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
 		4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */; };
+		52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */; };
 		53882A231CD77781C8F98CB9 /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 		55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A0E344263EE215722E53D3 /* CompressionPreset.swift */; };
 		5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */; };
@@ -52,6 +53,13 @@
 			remoteGlobalIDString = C549986B87E6D639535F456A;
 			remoteInfo = ImagePetCore;
 		};
+		D5751BD8A42DB7D3629F555A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2F45178F0BC925D3EDD35424 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B0695F4D36DAB05D3A1E9A69;
+			remoteInfo = ImagePet;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -80,6 +88,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1051C6BE4E181089F9924A7E /* ImagePetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImagePetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetPresenter.swift; sourceTree = "<group>"; };
 		238810C4DF3FE71683DC9479 /* InputFilePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFilePanel.swift; sourceTree = "<group>"; };
@@ -104,6 +113,7 @@
 		CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ImagePetCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6E9A10CEBCF1D610F452175 /* ImageJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageJob.swift; sourceTree = "<group>"; };
 		ED2484081B356D0CD0BAE4CD /* ImagePetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImagePetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetUITests.swift; sourceTree = "<group>"; };
 		EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressorTests.swift; sourceTree = "<group>"; };
 		F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetApp.swift; sourceTree = "<group>"; };
 		F23678BFAD16795886D53796 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
@@ -129,6 +139,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0069B126A3DDCFC978705477 /* ImagePetUITests */ = {
+			isa = PBXGroup;
+			children = (
+				EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */,
+			);
+			path = ImagePetUITests;
+			sourceTree = "<group>";
+		};
 		086B80E87D840BEB44CFA27C /* ImagePet */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +175,7 @@
 				2B48DF5E09E5C0639460FB28 /* ImagePet.app */,
 				CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */,
 				ED2484081B356D0CD0BAE4CD /* ImagePetTests.xctest */,
+				1051C6BE4E181089F9924A7E /* ImagePetUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -215,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				9FAFB5EC108443292ED48EDC /* ImagePetTests */,
+				0069B126A3DDCFC978705477 /* ImagePetUITests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -269,6 +289,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		641A748387C30D9499A89C26 /* ImagePetUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 51BF65602EE53CEBB4E085FF /* Build configuration list for PBXNativeTarget "ImagePetUITests" */;
+			buildPhases = (
+				744040ACA311E7D51669363A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F147F3C960D1E44B00A82202 /* PBXTargetDependency */,
+			);
+			name = ImagePetUITests;
+			packageProductDependencies = (
+			);
+			productName = ImagePetUITests;
+			productReference = 1051C6BE4E181089F9924A7E /* ImagePetUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		B0695F4D36DAB05D3A1E9A69 /* ImagePet */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6F85C88C7A893CC6A47BFC80 /* Build configuration list for PBXNativeTarget "ImagePet" */;
@@ -335,6 +373,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					641A748387C30D9499A89C26 = {
+						TestTargetID = B0695F4D36DAB05D3A1E9A69;
+					};
 					B0695F4D36DAB05D3A1E9A69 = {
 						ProvisioningStyle = Automatic;
 					};
@@ -357,6 +398,7 @@
 				B0695F4D36DAB05D3A1E9A69 /* ImagePet */,
 				C549986B87E6D639535F456A /* ImagePetCore */,
 				CC40E5DDAFA5E6B0AC3C2D1D /* ImagePetTests */,
+				641A748387C30D9499A89C26 /* ImagePetUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -393,6 +435,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		744040ACA311E7D51669363A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CBD27EA55B95DB68E0633673 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -419,6 +469,11 @@
 			isa = PBXTargetDependency;
 			target = C549986B87E6D639535F456A /* ImagePetCore */;
 			targetProxy = 039876C6861A906C5E814A6A /* PBXContainerItemProxy */;
+		};
+		F147F3C960D1E44B00A82202 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B0695F4D36DAB05D3A1E9A69 /* ImagePet */;
+			targetProxy = D5751BD8A42DB7D3629F555A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -583,6 +638,23 @@
 			};
 			name = Release;
 		};
+		4DD6A7A4567906FF1DDEDBF6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.ImagePetUITests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = ImagePet;
+			};
+			name = Release;
+		};
 		54375A2C67C43435D9760DE6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -660,6 +732,23 @@
 			};
 			name = Debug;
 		};
+		E7B4262A5B1F4F1C8BE98E78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.ImagePetUITests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = ImagePet;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -677,6 +766,15 @@
 			buildConfigurations = (
 				D70394536563404E72E9E353 /* Debug */,
 				4BBDB6E84893C1104FF07094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		51BF65602EE53CEBB4E085FF /* Build configuration list for PBXNativeTarget "ImagePetUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7B4262A5B1F4F1C8BE98E78 /* Debug */,
+				4DD6A7A4567906FF1DDEDBF6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

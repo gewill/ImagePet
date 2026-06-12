@@ -18,6 +18,7 @@ struct DesktopPetView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .help("Hide Desktop Pet")
+                .accessibilityIdentifier("closePetButton")
             }
             .frame(height: 16)
 
@@ -26,17 +27,20 @@ struct DesktopPetView: View {
                 .frame(width: 68, height: 58)
                 .scaleEffect(store.petState == .eating ? 1.08 : 1)
                 .animation(.easeInOut(duration: 0.6).repeatCount(store.petState == .eating ? 8 : 1, autoreverses: true), value: store.petState)
+                .accessibilityIdentifier("desktopPetEmoji")
 
             Text(title)
                 .font(.system(.callout, design: .rounded, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .accessibilityIdentifier("desktopPetTitle")
 
             Text(detail)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
+                .accessibilityIdentifier("desktopPetDetail")
 
             HStack(spacing: 10) {
                 Button {
@@ -45,6 +49,7 @@ struct DesktopPetView: View {
                     Image(systemName: "photo.badge.plus")
                 }
                 .help("Add Images")
+                .accessibilityIdentifier("desktopPetAddImagesButton")
 
                 if store.isCompleted {
                     Button {
@@ -53,6 +58,7 @@ struct DesktopPetView: View {
                         Image(systemName: "folder")
                     }
                     .help("Reveal in Finder")
+                    .accessibilityIdentifier("desktopPetRevealButton")
                 }
             }
             .buttonStyle(.borderless)

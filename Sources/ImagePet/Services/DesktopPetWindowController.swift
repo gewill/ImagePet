@@ -49,6 +49,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
+        window.identifier = NSUserInterfaceItemIdentifier("DesktopPetWindow")
         window.contentView = NSHostingView(rootView: DesktopPetView(store: store))
         window.backgroundColor = .clear
         window.isOpaque = false

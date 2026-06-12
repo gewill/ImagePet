@@ -34,8 +34,14 @@ final class ImagePetStore: ObservableObject {
         self.compressor = compressor
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
-        self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
-        restoreOutputDirectory()
+        
+        if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
+            self.isDesktopPetVisible = false
+            self.outputDirectory = nil
+        } else {
+            self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
+            restoreOutputDirectory()
+        }
     }
 
     var completedCount: Int {

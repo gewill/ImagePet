@@ -56,15 +56,29 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetTests
         GENERATE_INFOPLIST_FILE: YES
+  ImagePetUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: Tests/ImagePetUITests
+    dependencies:
+      - target: ImagePet
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetUITests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: ImagePet
 schemes:
   ImagePet:
     build:
       targets:
         ImagePet: all
         ImagePetTests: [test]
+        ImagePetUITests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
         - ImagePetTests
+        - ImagePetUITests
