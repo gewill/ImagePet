@@ -7,6 +7,20 @@ struct DesktopPetView: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack {
+                Button {
+                    store.activateMainWindow()
+                } label: {
+                    HStack(spacing: 3) {
+                        Image(systemName: "arrow.up.right.square")
+                        Text("App")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help("Show Main Application")
+                .accessibilityIdentifier("desktopPetReturnToAppButton")
+
                 Spacer()
 
                 Button {

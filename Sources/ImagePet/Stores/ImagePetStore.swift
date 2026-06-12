@@ -16,6 +16,33 @@ final class ImagePetStore: ObservableObject {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
         }
     }
+    @Published var outputFormat: OutputFormat = .original {
+        didSet {
+            defaults.set(outputFormat.rawValue, forKey: outputFormatKey)
+        }
+    }
+    @Published var saveLocationMode: SaveLocationMode = .designated {
+        didSet {
+            defaults.set(saveLocationMode.rawValue, forKey: saveLocationModeKey)
+        }
+    }
+    @Published var filenameSuffix: String = "_compressed" {
+        didSet {
+            defaults.set(filenameSuffix, forKey: filenameSuffixKey)
+        }
+    }
+    @Published var maxDimension: MaxDimensionLimit = .none {
+        didSet {
+            defaults.set(maxDimension.rawValue, forKey: maxDimensionKey)
+        }
+    }
+    @Published var stripMetadata: Bool = true {
+        didSet {
+            defaults.set(stripMetadata, forKey: stripMetadataKey)
+        }
+    }
+    @Published var showOverwriteConfirmation = false
+    var didConfirmOverwrite = false
 
     let maxConcurrentJobs = 2
 
@@ -25,6 +52,11 @@ final class ImagePetStore: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var didPromptForInitialFolder = false
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
+    private let outputFormatKey = "ImagePet.outputFormat"
+    private let saveLocationModeKey = "ImagePet.saveLocationMode"
+    private let filenameSuffixKey = "ImagePet.filenameSuffix"
+    private let maxDimensionKey = "ImagePet.maxDimension"
+    private let stripMetadataKey = "ImagePet.stripMetadata"
 
     init(
         compressor: ImageCompressor = ImageCompressor(),
@@ -35,17 +67,65 @@ final class ImagePetStore: ObservableObject {
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
         
+        // Default values
+        self.outputFormat = .original
+        self.saveLocationMode = .designated
+        self.filenameSuffix = "_compressed"
+        self.maxDimension = .none
+        self.stripMetadata = true
+
         if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
             self.isDesktopPetVisible = false
             self.outputDirectory = nil
         } else {
             self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
             restoreOutputDirectory()
+            
+            if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
+                self.outputFormat = format
+            }
+            if let savedMode = defaults.string(forKey: saveLocationModeKey), let mode = SaveLocationMode(rawValue: savedMode) {
+                self.saveLocationMode = mode
+            }
+            if let savedSuffix = defaults.string(forKey: filenameSuffixKey) {
+                self.filenameSuffix = savedSuffix
+            }
+            if let savedDimension = defaults.string(forKey: maxDimensionKey), let limit = MaxDimensionLimit(rawValue: savedDimension) {
+                self.maxDimension = limit
+            }
+            if defaults.object(forKey: stripMetadataKey) != nil {
+                self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
+            }
         }
     }
 
     var completedCount: Int {
         jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
+    }
+
+    var filenamePreview: String {
+        let dummyInput = URL(fileURLWithPath: "/tmp/photo.png")
+        let targetFormat = outputFormat
+        let targetUTType = targetFormat.targetUTType(for: dummyInput)
+        let targetExtension = targetUTType.preferredFilenameExtension ?? "png"
+        
+        let outputName = OutputNameAllocator.outputFileName(
+            for: dummyInput,
+            suffix: filenameSuffix,
+            targetExtension: targetExtension,
+            duplicateIndex: 0
+        )
+        return "photo.png -> \(outputName)"
+    }
+
+    func activateMainWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        for window in NSApp.windows {
+            if window.title == "ImagePet" || window.identifier?.rawValue == "main" || window.frameAutosaveName == "ImagePet" {
+                window.makeKeyAndOrderFront(nil)
+                return
+            }
+        }
     }
 
     var succeededCount: Int {
@@ -167,11 +247,12 @@ final class ImagePetStore: ObservableObject {
         jobs.removeAll()
         petState = .idle
         outputFolderMessage = nil
+        didConfirmOverwrite = false
         Task {
             await compressor.resetReservations()
         }
 
-        if outputDirectory == nil {
+        if outputDirectory == nil && saveLocationMode == .designated {
             chooseOutputDirectory()
         }
     }
@@ -207,15 +288,23 @@ final class ImagePetStore: ObservableObject {
         }
     }
 
+    func confirmOverwriteAndStart() {
+        showOverwriteConfirmation = false
+        didConfirmOverwrite = true
+        startProcessingIfPossible()
+    }
+
+    func cancelOverwrite() {
+        showOverwriteConfirmation = false
+        didConfirmOverwrite = false
+        failPendingJobs(with: .permissionDenied)
+    }
+
     private func startProcessingIfPossible() {
         guard processingTask == nil else { return }
 
-        if outputDirectory == nil {
-            chooseOutputDirectory()
-        }
-
-        guard let outputDirectory else {
-            failPendingJobs(with: .outputFolderUnavailable)
+        if saveLocationMode == .overwrite && !didConfirmOverwrite {
+            showOverwriteConfirmation = true
             return
         }
 
@@ -223,11 +312,93 @@ final class ImagePetStore: ObservableObject {
         petState = .eating
 
         processingTask = Task { [weak self] in
-            await self?.runQueue(outputDirectory: outputDirectory)
+            guard let self = self else { return }
+
+            if self.saveLocationMode == .designated {
+                if self.outputDirectory == nil {
+                    self.chooseOutputDirectory()
+                }
+                guard let outputDirectory = self.outputDirectory else {
+                    self.failPendingJobs(with: .outputFolderUnavailable)
+                    return
+                }
+                await self.runQueue(outputDirectory: outputDirectory)
+            } else if self.saveLocationMode == .originalFolder {
+                let hasPermission = await self.checkAndRequestParentFolderPermissions()
+                guard hasPermission else {
+                    self.failPendingJobs(with: .permissionDenied)
+                    return
+                }
+                await self.runQueue(outputDirectory: nil)
+            } else { // overwrite
+                await self.runQueue(outputDirectory: nil)
+            }
         }
     }
 
-    private func runQueue(outputDirectory: URL) async {
+    private func checkAndRequestParentFolderPermissions() async -> Bool {
+        let pendingJobs = jobs.filter { $0.status == .pending }
+        var unauthorizedFolders: Set<URL> = []
+        
+        for job in pendingJobs {
+            let parentFolder = job.inputURL.deletingLastPathComponent()
+            
+            if let restoredURL = bookmarkStore.restoreMulti(for: parentFolder) {
+                let access = restoredURL.startAccessingSecurityScopedResource()
+                let isWritable = FileManager.default.isWritableFile(atPath: parentFolder.path)
+                if access {
+                    restoredURL.stopAccessingSecurityScopedResource()
+                }
+                if isWritable {
+                    continue
+                }
+            }
+            
+            let testURL = parentFolder.appendingPathComponent(".imagepet_sandbox_test_\(UUID().uuidString)")
+            do {
+                try Data().write(to: testURL)
+                try FileManager.default.removeItem(at: testURL)
+                try bookmarkStore.saveMulti(parentFolder)
+            } catch {
+                unauthorizedFolders.insert(parentFolder)
+            }
+        }
+        
+        for folder in unauthorizedFolders {
+            let success = await showFolderPermissionPanel(for: folder)
+            if !success {
+                return false
+            }
+        }
+        
+        return true
+    }
+
+    private func showFolderPermissionPanel(for folder: URL) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            let panel = NSOpenPanel()
+            panel.directoryURL = folder
+            panel.canChooseDirectories = true
+            panel.canChooseFiles = false
+            panel.allowsMultipleSelection = false
+            panel.prompt = "Authorize"
+            panel.message = "ImagePet needs permission to write compressed files to this folder:\n\(folder.path)"
+            
+            let response = panel.runModal()
+            if response == .OK, let url = panel.url {
+                do {
+                    try bookmarkStore.saveMulti(url)
+                    continuation.resume(returning: true)
+                } catch {
+                    continuation.resume(returning: false)
+                }
+            } else {
+                continuation.resume(returning: false)
+            }
+        }
+    }
+
+    private func runQueue(outputDirectory: URL?) async {
         await withTaskGroup(of: Void.self) { group in
             let workerCount = min(maxConcurrentJobs, max(1, jobs.count))
 
@@ -253,6 +424,7 @@ final class ImagePetStore: ObservableObject {
 
         isProcessing = false
         petState = hasFailedJobs ? .error : .happy
+        didConfirmOverwrite = false
     }
 
     private func claimNextPendingJob() -> ImageJob? {
@@ -265,12 +437,37 @@ final class ImagePetStore: ObservableObject {
         return jobs[index]
     }
 
-    private func process(_ job: ImageJob, outputDirectory: URL) async {
+    private func process(_ job: ImageJob, outputDirectory: URL?) async {
+        let options = CompressionOptions(
+            preset: preset,
+            format: outputFormat,
+            locationMode: saveLocationMode,
+            suffix: filenameSuffix,
+            maxDimension: maxDimension,
+            stripMetadata: stripMetadata
+        )
+
+        var targetOutputDir = outputDirectory
+        var restoredBookmarkURL: URL? = nil
+        
+        if saveLocationMode == .originalFolder {
+            let parentFolder = job.inputURL.deletingLastPathComponent()
+            restoredBookmarkURL = bookmarkStore.restoreMulti(for: parentFolder)
+            targetOutputDir = restoredBookmarkURL
+        }
+
+        let access = restoredBookmarkURL?.startAccessingSecurityScopedResource() ?? false
+        defer {
+            if access {
+                restoredBookmarkURL?.stopAccessingSecurityScopedResource()
+            }
+        }
+
         do {
             let result = try await compressor.compress(
                 inputURL: job.inputURL,
-                outputDirectory: outputDirectory,
-                preset: preset
+                outputDirectory: targetOutputDir,
+                options: options
             )
             updateJob(job.id) { updated in
                 updated.outputURL = result.outputURL

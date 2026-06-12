@@ -8,6 +8,28 @@ public actor OutputNameAllocator {
         self.fileManager = fileManager
     }
 
+    public func reserveOutputURL(
+        for inputURL: URL,
+        in outputDirectory: URL,
+        suffix: String,
+        targetExtension: String
+    ) -> URL {
+        var index = 0
+
+        while true {
+            let fileName = Self.outputFileName(for: inputURL, suffix: suffix, targetExtension: targetExtension, duplicateIndex: index)
+            let candidate = outputDirectory.appendingPathComponent(fileName, isDirectory: false)
+            let key = Self.key(for: candidate)
+
+            if !reservations.contains(key), !fileManager.fileExists(atPath: candidate.path) {
+                reservations.insert(key)
+                return candidate
+            }
+
+            index += 1
+        }
+    }
+
     public func reserveOutputURL(for inputURL: URL, in outputDirectory: URL) -> URL {
         var index = 0
 
@@ -31,6 +53,23 @@ public actor OutputNameAllocator {
 
     public func reset() {
         reservations.removeAll()
+    }
+
+    public static func outputFileName(
+        for inputURL: URL,
+        suffix: String,
+        targetExtension: String,
+        duplicateIndex: Int = 0
+    ) -> String {
+        let originalName = inputURL.deletingPathExtension().lastPathComponent
+        let baseName = "\(originalName)\(suffix)"
+        let ext = targetExtension.lowercased()
+
+        if duplicateIndex == 0 {
+            return ext.isEmpty ? baseName : "\(baseName).\(ext)"
+        }
+
+        return ext.isEmpty ? "\(baseName)-\(duplicateIndex + 1)" : "\(baseName)-\(duplicateIndex + 1).\(ext)"
     }
 
     public static func outputFileName(for inputURL: URL, duplicateIndex: Int = 0) -> String {

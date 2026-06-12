@@ -26,6 +26,20 @@ struct ContentView: View {
         .background {
             DesktopPetPresenter(store: store)
         }
+        .confirmationDialog(
+            "Overwrite Original Files?",
+            isPresented: $store.showOverwriteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Overwrite", role: .destructive) {
+                store.confirmOverwriteAndStart()
+            }
+            Button("Cancel", role: .cancel) {
+                store.cancelOverwrite()
+            }
+        } message: {
+            Text("Are you sure you want to overwrite the original images? This will replace your original files and cannot be undone.")
+        }
     }
 }
 
@@ -117,31 +131,41 @@ private struct ControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 16) {
-                Picker("Quality", selection: $store.preset) {
-                    ForEach(CompressionPreset.allCases) { preset in
-                        Text(preset.displayName).tag(preset)
+        VStack(alignment: .leading, spacing: 14) {
+            // First Row: Quality and Max Dimension
+            HStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Quality Preset")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Picker("Quality", selection: $store.preset) {
+                        ForEach(CompressionPreset.allCases) { preset in
+                            Text(preset.displayName).tag(preset)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .frame(width: 250)
+                    .disabled(store.isProcessing || store.outputFormat == .png)
+                    .accessibilityIdentifier("presetPicker")
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 280)
-                .disabled(store.isProcessing)
-                .accessibilityIdentifier("presetPicker")
 
-                Button {
-                    store.chooseInputImages()
-                } label: {
-                    Label("Add Images", systemImage: "photo.badge.plus")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Max Edge Limit")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Picker("Max Dimension", selection: $store.maxDimension) {
+                        ForEach(MaxDimensionLimit.allCases) { limit in
+                            Text(limit.displayName).tag(limit)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 150)
+                    .disabled(store.isProcessing)
+                    .accessibilityIdentifier("maxDimensionPicker")
                 }
-                .accessibilityIdentifier("addImagesButton")
-
-                Label("JPG", systemImage: "photo")
-                    .foregroundStyle(.secondary)
-                    .frame(minWidth: 70, alignment: .leading)
-
+                
                 Spacer()
-
+                
                 Button {
                     store.toggleDesktopPet()
                 } label: {
@@ -150,44 +174,134 @@ private struct ControlsView: View {
                 .accessibilityIdentifier("togglePetButton")
 
                 Button {
-                    store.chooseOutputDirectory()
+                    store.chooseInputImages()
                 } label: {
-                    Label("Choose Folder", systemImage: "folder")
+                    Label("Add Images", systemImage: "photo.badge.plus")
                 }
-                .disabled(store.isProcessing)
-                .accessibilityIdentifier("chooseFolderButton")
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("addImagesButton")
             }
 
-            HStack(spacing: 8) {
-                Image(systemName: "folder.badge.gearshape")
+            Divider()
+
+            // Second Row: Output Format and Save Destination
+            HStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Output Format")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Picker("Format", selection: $store.outputFormat) {
+                        ForEach(OutputFormat.allCases) { format in
+                            Text(format.displayName).tag(format)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 280)
+                    .disabled(store.isProcessing)
+                    .accessibilityIdentifier("formatPicker")
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Save Location")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Picker("Location", selection: $store.saveLocationMode) {
+                        ForEach(SaveLocationMode.allCases) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 320)
+                    .disabled(store.isProcessing)
+                    .accessibilityIdentifier("locationModePicker")
+                }
+            }
+
+            // Options details based on selection
+            Group {
+                if store.saveLocationMode == .overwrite {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                        Text("Mode Overwrite will replace your source files directly. This action cannot be undone.")
+                            .font(.callout)
+                            .foregroundStyle(.red.opacity(0.85))
+                            .fontWeight(.semibold)
+                    }
+                    .padding(8)
+                    .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                } else {
+                    HStack(alignment: .center, spacing: 20) {
+                        // Suffix configurations
+                        HStack(spacing: 8) {
+                            Text("Filename Suffix:")
+                                .font(.callout)
+                            TextField("Suffix", text: $store.filenameSuffix)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 130)
+                                .disabled(store.isProcessing)
+                                .accessibilityIdentifier("filenameSuffixField")
+                        }
+                        
+                        Text(store.filenamePreview)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .accessibilityIdentifier("filenamePreviewLabel")
+                    }
+                    
+                    if store.saveLocationMode == .designated {
+                        HStack(spacing: 8) {
+                            Image(systemName: "folder.badge.gearshape")
+                                .foregroundStyle(.secondary)
+
+                            Text(outputFolderText)
+                                .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .accessibilityIdentifier("outputFolderLabel")
+
+                            Button("Choose Folder") {
+                                store.chooseOutputDirectory()
+                            }
+                            .disabled(store.isProcessing)
+                            .accessibilityIdentifier("chooseFolderButton")
+
+                            Spacer()
+                        }
+                        .font(.callout)
+                    }
+                }
+            }
+
+            // Option Toggles (Metadata and PNG Lossless notice)
+            HStack(spacing: 24) {
+                Toggle("Strip Metadata (GPS/EXIF/Camera Info)", isOn: $store.stripMetadata)
+                    .disabled(store.isProcessing)
+                    .accessibilityIdentifier("stripMetadataToggle")
+
+                if store.outputFormat == .png {
+                    Label("PNG is compressed losslessly", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Label(
+                        "HDR or wide-gamut images will be exported as standard sRGB.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-
-                Text(outputFolderText)
-                    .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .accessibilityIdentifier("outputFolderLabel")
-                    .accessibilityLabel(outputFolderText)
-
-                Spacer()
+                }
             }
-            .font(.callout)
-
-            if let message = store.outputFolderMessage {
+            
+            if let message = store.outputFolderMessage, store.saveLocationMode == .designated {
                 Label(message, systemImage: "exclamationmark.triangle")
                     .font(.callout)
                     .foregroundStyle(.orange)
             }
-
-            Label(
-                "HDR or wide-gamut images will be exported as standard sRGB JPG.",
-                systemImage: "info.circle"
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
-        .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .padding(16)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 
     private var outputFolderText: String {

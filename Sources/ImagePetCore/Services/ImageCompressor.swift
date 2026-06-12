@@ -6,8 +6,8 @@ import UniformTypeIdentifiers
 public protocol ImageCompressing: Sendable {
     func compress(
         inputURL: URL,
-        outputDirectory: URL,
-        preset: CompressionPreset
+        outputDirectory: URL?,
+        options: CompressionOptions
     ) async throws -> CompressionResult
 }
 
@@ -52,7 +52,8 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
                         outputURL: outputURL,
-                        preset: preset
+                        options: CompressionOptions(preset: preset, format: .jpeg, locationMode: .designated, suffix: "_compressed", maxDimension: .none, stripMetadata: true),
+                        targetUTType: .jpeg
                     )
                 }
             }.value
@@ -63,10 +64,112 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         }
     }
 
+    public func compress(
+        inputURL: URL,
+        outputDirectory: URL?,
+        options: CompressionOptions
+    ) async throws -> CompressionResult {
+        guard SupportedImageFormat.isSupported(inputURL) else {
+            throw CompressionError.unsupportedImageFormat
+        }
+
+        let inputAccess = inputURL.startAccessingSecurityScopedResource()
+        defer {
+            if inputAccess {
+                inputURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        // Determine output directory based on location mode
+        let resolvedOutputDirectory: URL
+        switch options.locationMode {
+        case .overwrite:
+            resolvedOutputDirectory = FileManager.default.temporaryDirectory
+        case .originalFolder:
+            resolvedOutputDirectory = inputURL.deletingLastPathComponent()
+        case .designated:
+            guard let dir = outputDirectory else {
+                throw CompressionError.outputFolderUnavailable
+            }
+            resolvedOutputDirectory = dir
+        }
+
+        // Output directory access if not overwriting and not temp
+        let outputAccess = (options.locationMode != .overwrite) ? resolvedOutputDirectory.startAccessingSecurityScopedResource() : false
+        defer {
+            if outputAccess {
+                resolvedOutputDirectory.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        if options.locationMode != .overwrite {
+            try validateOutputDirectory(resolvedOutputDirectory)
+        }
+
+        // Determine target UTType
+        let targetUTType = options.format.targetUTType(for: inputURL)
+        let targetExtension = targetUTType.preferredFilenameExtension ?? "jpg"
+
+        // Resolve output URL
+        let outputURL: URL
+        if options.locationMode == .overwrite {
+            outputURL = resolvedOutputDirectory.appendingPathComponent(UUID().uuidString, isDirectory: false).appendingPathExtension(targetExtension)
+        } else {
+            outputURL = await allocator.reserveOutputURL(
+                for: inputURL,
+                in: resolvedOutputDirectory,
+                suffix: options.suffix,
+                targetExtension: targetExtension
+            )
+        }
+
+        do {
+            let result = try await Task.detached(priority: .userInitiated) {
+                try autoreleasepool {
+                    try Self.compressSynchronously(
+                        inputURL: inputURL,
+                        outputURL: outputURL,
+                        options: options,
+                        targetUTType: targetUTType
+                    )
+                }
+            }.value
+
+            if options.locationMode == .overwrite {
+                let finalURL = inputURL
+                let originalSize = try Self.fileSize(for: inputURL)
+                
+                let fileManager = FileManager.default
+                if fileManager.fileExists(atPath: finalURL.path) {
+                    _ = try fileManager.replaceItemAt(finalURL, withItemAt: outputURL, backupItemName: nil, options: [])
+                } else {
+                    try fileManager.moveItem(at: outputURL, to: finalURL)
+                }
+                
+                let compressedSize = try Self.fileSize(for: finalURL)
+                return CompressionResult(
+                    inputURL: inputURL,
+                    outputURL: finalURL,
+                    originalSize: originalSize,
+                    compressedSize: compressedSize
+                )
+            } else {
+                return result
+            }
+        } catch {
+            try? FileManager.default.removeItem(at: outputURL)
+            if options.locationMode != .overwrite {
+                await allocator.release(outputURL)
+            }
+            throw CompressionError.map(error)
+        }
+    }
+
     private static func compressSynchronously(
         inputURL: URL,
         outputURL: URL,
-        preset: CompressionPreset
+        options: CompressionOptions,
+        targetUTType: UTType
     ) throws -> CompressionResult {
         let originalSize = try fileSize(for: inputURL)
         try ensureLikelyDiskCapacity(for: originalSize, at: outputURL.deletingLastPathComponent())
@@ -75,21 +178,36 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToDecodeImage
         }
 
-        let image = try makeStandardSRGBImage(from: source)
+        let image = try makeStandardImage(from: source, maxDimension: options.maxDimension.intValue, targetUTType: targetUTType)
 
         guard let destination = CGImageDestinationCreateWithURL(
             outputURL as CFURL,
-            UTType.jpeg.identifier as CFString,
+            targetUTType.identifier as CFString,
             1,
             nil
         ) else {
             throw CompressionError.failedToWriteOutputFile
         }
 
-        let properties: [CFString: Any] = [
-            kCGImageDestinationLossyCompressionQuality: preset.quality,
-            kCGImagePropertyColorModel: kCGImagePropertyColorModelRGB
-        ]
+        var properties: [CFString: Any] = [:]
+
+        // Quality applies to lossy formats (JPEG and HEIC)
+        if targetUTType == .jpeg || targetUTType == .heic {
+            properties[kCGImageDestinationLossyCompressionQuality] = options.preset.quality
+        }
+
+        if !options.stripMetadata {
+            if let originalProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] {
+                for (key, val) in originalProperties {
+                    properties[key] = val
+                }
+                if targetUTType == .jpeg || targetUTType == .heic {
+                    properties[kCGImageDestinationLossyCompressionQuality] = options.preset.quality
+                }
+            }
+        } else {
+            properties[kCGImagePropertyColorModel] = kCGImagePropertyColorModelRGB
+        }
 
         CGImageDestinationAddImage(destination, image, properties as CFDictionary)
 
@@ -112,13 +230,12 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         )
     }
 
-    private static func makeStandardSRGBImage(from source: CGImageSource) throws -> CGImage {
+    private static func makeStandardImage(from source: CGImageSource, maxDimension: Int?, targetUTType: UTType) throws -> CGImage {
         let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
 
         var width = (properties?[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
         var height = (properties?[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue ?? 0
 
-        // Fallback: If properties are missing, try creating a direct CGImage to query dimensions
         var directImage: CGImage? = nil
         if width == 0 || height == 0 {
             directImage = CGImageSourceCreateImageAtIndex(source, 0, nil)
@@ -128,22 +245,27 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             }
         }
 
-        let maxPixelSize = max(width, height)
-
-        guard maxPixelSize > 0 else {
+        let originalMaxPixelSize = max(width, height)
+        guard originalMaxPixelSize > 0 else {
             throw CompressionError.failedToDecodeImage
+        }
+
+        let targetMaxPixelSize: Int
+        if let maxDimension = maxDimension {
+            targetMaxPixelSize = min(originalMaxPixelSize, maxDimension)
+        } else {
+            targetMaxPixelSize = originalMaxPixelSize
         }
 
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+            kCGImageSourceThumbnailMaxPixelSize: targetMaxPixelSize,
             kCGImageSourceShouldCacheImmediately: true
         ]
 
         var transformedImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
         if transformedImage == nil {
-            // Fallback: If thumbnail generation failed, use the direct image if already created, or load it
             transformedImage = directImage ?? CGImageSourceCreateImageAtIndex(source, 0, nil)
         }
 
@@ -151,12 +273,22 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToDecodeImage
         }
 
-        return try flattenToSRGB(finalImage)
+        let targetHasAlpha = (targetUTType == .png || targetUTType == .heic)
+        return try flattenToSRGB(finalImage, preserveAlpha: targetHasAlpha)
     }
 
-    private static func flattenToSRGB(_ image: CGImage) throws -> CGImage {
+    private static func flattenToSRGB(_ image: CGImage, preserveAlpha: Bool) throws -> CGImage {
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGImageAlphaInfo.noneSkipLast.rawValue
+        
+        let hasAlpha = image.alphaInfo != .none && image.alphaInfo != .noneSkipFirst && image.alphaInfo != .noneSkipLast
+        let targetHasAlpha = preserveAlpha && hasAlpha
+        
+        let bitmapInfo: UInt32
+        if targetHasAlpha {
+            bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+        } else {
+            bitmapInfo = CGImageAlphaInfo.noneSkipLast.rawValue
+        }
 
         guard let context = CGContext(
             data: nil,
@@ -171,8 +303,10 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         }
 
         let rect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
-        context.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
-        context.fill(rect)
+        if !targetHasAlpha {
+            context.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+            context.fill(rect)
+        }
         context.interpolationQuality = .high
         context.draw(image, in: rect)
 
@@ -182,6 +316,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
 
         return outputImage
     }
+
 
     private static func fileSize(for url: URL) throws -> Int64 {
         do {

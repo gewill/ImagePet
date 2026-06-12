@@ -1,6 +1,6 @@
 import Foundation
 
-public enum CompressionPreset: String, CaseIterable, Identifiable, Sendable {
+public enum CompressionPreset: String, CaseIterable, Identifiable, Codable, Sendable {
     case high
     case balanced
     case small

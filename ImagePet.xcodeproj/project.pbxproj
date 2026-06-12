@@ -27,6 +27,7 @@
 		8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */; };
 		8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */; };
 		945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463A9B12B098CEDA557F6100 /* CompressionError.swift */; };
+		98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */; };
 		B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238810C4DF3FE71683DC9479 /* InputFilePanel.swift */; };
 		B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1510894ED17C31329941EA /* CompressionResult.swift */; };
 		B9CAC9DBC573955EBDA5A0CA /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -96,6 +97,7 @@
 		2B48DF5E09E5C0639460FB28 /* ImagePet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagePet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
 		41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetWindowController.swift; sourceTree = "<group>"; };
+		42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptions.swift; sourceTree = "<group>"; };
 		45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocator.swift; sourceTree = "<group>"; };
 		463A9B12B098CEDA557F6100 /* CompressionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionError.swift; sourceTree = "<group>"; };
 		4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetStore.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 		3355D505310B8559E88D3640 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */,
 				92A0E344263EE215722E53D3 /* CompressionPreset.swift */,
 				AD1510894ED17C31329941EA /* CompressionResult.swift */,
 				D6E9A10CEBCF1D610F452175 /* ImageJob.swift */,
@@ -448,6 +451,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */,
+				98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */,
 				55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */,
 				B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */,
 				60E30EA5590352744B7ED864 /* ImageCompressor.swift in Sources */,

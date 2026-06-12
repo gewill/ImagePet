@@ -208,5 +208,106 @@ final class ImageCompressorTests: XCTestCase {
             return
         }
     }
+
+    func testCompressesWithMaxDimensionConstraint() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("large.png")
+        
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        let context = CGContext(
+            data: nil,
+            width: 2000,
+            height: 1200,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )!
+        context.setFillColor(CGColor(red: 0, green: 0, blue: 1, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 2000, height: 1200))
+        let image = context.makeImage()!
+        let destination = CGImageDestinationCreateWithURL(inputURL as CFURL, UTType.png.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, image, nil)
+        CGImageDestinationFinalize(destination)
+
+        let compressor = ImageCompressor()
+        let options = CompressionOptions(
+            preset: .balanced,
+            format: .jpeg,
+            locationMode: .designated,
+            suffix: "_resized",
+            maxDimension: .p1024,
+            stripMetadata: true
+        )
+
+        let result = try await compressor.compress(
+            inputURL: inputURL,
+            outputDirectory: directory,
+            options: options
+        )
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.outputURL.path))
+        
+        let outputSource = CGImageSourceCreateWithURL(result.outputURL as CFURL, nil)!
+        let outputProperties = CGImageSourceCopyPropertiesAtIndex(outputSource, 0, nil) as? [CFString: Any]
+        let outputWidth = (outputProperties?[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
+        let outputHeight = (outputProperties?[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue ?? 0
+        
+        XCTAssertEqual(max(outputWidth, outputHeight), 1024)
+        XCTAssertEqual(min(outputWidth, outputHeight), 614)
+    }
+
+    func testFormatsConversionHEICAndPNG() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.png")
+        try Self.writeSamplePNG(to: inputURL)
+
+        let compressor = ImageCompressor()
+        
+        let heicOptions = CompressionOptions(
+            preset: .balanced,
+            format: .heic,
+            locationMode: .designated,
+            suffix: "_to_heic",
+            maxDimension: .none,
+            stripMetadata: true
+        )
+        let heicResult = try await compressor.compress(
+            inputURL: inputURL,
+            outputDirectory: directory,
+            options: heicOptions
+        )
+        XCTAssertEqual(heicResult.outputURL.pathExtension.lowercased(), "heic")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: heicResult.outputURL.path))
+
+        let pngOptions = CompressionOptions(
+            preset: .balanced,
+            format: .png,
+            locationMode: .designated,
+            suffix: "_to_png",
+            maxDimension: .none,
+            stripMetadata: true
+        )
+        
+        do {
+            let pngResult = try await compressor.compress(
+                inputURL: inputURL,
+                outputDirectory: directory,
+                options: pngOptions
+            )
+            XCTAssertEqual(pngResult.outputURL.pathExtension.lowercased(), "png")
+            XCTAssertTrue(FileManager.default.fileExists(atPath: pngResult.outputURL.path))
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .skipped)
+        }
+    }
 }
 
