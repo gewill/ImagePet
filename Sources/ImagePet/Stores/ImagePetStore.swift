@@ -76,7 +76,6 @@ final class ImagePetStore: ObservableObject {
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
         
-        // Default values
         self.outputFormat = .original
         self.saveLocationMode = .designated
         self.filenameSuffix = "_compressed"
@@ -309,7 +308,6 @@ final class ImagePetStore: ObservableObject {
             }
             NSWorkspace.shared.open(outputDirectory)
         } else {
-            // In .originalFolder or .overwrite mode, open the directory of the first successful job
             if let firstSuccess = jobs.first(where: { $0.status == .done && $0.outputURL != nil }),
                let outputURL = firstSuccess.outputURL {
                 let parentDir = outputURL.deletingLastPathComponent()
@@ -321,7 +319,6 @@ final class ImagePetStore: ObservableObject {
     }
 
     var petSnapshot: DesktopPetSnapshot {
-        // 1. Needs Setup
         if saveLocationMode == .designated && outputDirectory == nil {
             return DesktopPetSnapshot(
                 state: .needsSetup,
@@ -334,7 +331,6 @@ final class ImagePetStore: ObservableObject {
             )
         }
 
-        // 2. Overwrite Confirmation Pending
         if saveLocationMode == .overwrite && showOverwriteConfirmation {
             return DesktopPetSnapshot(
                 state: .confirm,
@@ -347,7 +343,6 @@ final class ImagePetStore: ObservableObject {
             )
         }
 
-        // 3. Permission Issue
         let hasPermissionDenied = jobs.contains { $0.status == .failed && $0.errorMessage == CompressionError.permissionDenied.localizedDescription }
         let hasFolderDenied = outputFolderMessage == CompressionError.permissionDenied.localizedDescription
         if hasPermissionDenied || hasFolderDenied {
@@ -362,7 +357,6 @@ final class ImagePetStore: ObservableObject {
             )
         }
 
-        // 4. Processing / Eating
         if isProcessing {
             return DesktopPetSnapshot(
                 state: .eating,
@@ -375,7 +369,6 @@ final class ImagePetStore: ObservableObject {
             )
         }
 
-        // 5. Done / Completed
         if isCompleted {
             if failedCount == 0 {
                 let hasSuccess = jobs.contains { $0.status == .done }
@@ -395,7 +388,6 @@ final class ImagePetStore: ObservableObject {
                     canAcceptDrop: true
                 )
             } else {
-                // 6. Issues
                 let detailText: String
                 if skippedCount > 0 {
                     detailText = "\(succeededCount) ok, \(skippedCount) skip, \(failedCount) fail"
@@ -414,7 +406,6 @@ final class ImagePetStore: ObservableObject {
             }
         }
 
-        // 7. Idle / Ready
         return DesktopPetSnapshot(
             state: .idle,
             emoji: "🐡",
@@ -481,7 +472,7 @@ final class ImagePetStore: ObservableObject {
     func cancelOverwrite() {
         showOverwriteConfirmation = false
         didConfirmOverwrite = false
-        failPendingJobs(with: .permissionDenied)
+        failPendingJobs(message: "Canceled")
     }
 
     private func startProcessingIfPossible() {
@@ -490,6 +481,7 @@ final class ImagePetStore: ObservableObject {
         }
 
         if saveLocationMode == .overwrite && !didConfirmOverwrite {
+            activateMainWindow()
             showOverwriteConfirmation = true
             return
         }
@@ -607,7 +599,7 @@ final class ImagePetStore: ObservableObject {
         await withTaskGroup(of: Void.self) { group in
             let workerCount = min(maxConcurrentJobs, max(1, jobs.count))
 
-            for i in 0..<workerCount {
+            for _ in 0..<workerCount {
                 group.addTask { [weak self] in
                     while !Task.isCancelled {
                         guard let job = await self?.claimNextPendingJob() else {
@@ -669,6 +661,10 @@ final class ImagePetStore: ObservableObject {
         }
 
         do {
+            let environment = ProcessInfo.processInfo.environment
+            if environment["IS_UI_TESTING"] == "1", environment["UI_TEST_SLOW_PROCESS"] == "1" {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
             let result = try await compressor.compress(
                 inputURL: job.inputURL,
                 outputDirectory: targetOutputDir,
@@ -701,9 +697,13 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func failPendingJobs(with error: CompressionError) {
+        failPendingJobs(message: error.localizedDescription)
+    }
+
+    private func failPendingJobs(message: String) {
         for index in jobs.indices where jobs[index].status == .pending {
             jobs[index].status = .failed
-            jobs[index].errorMessage = error.localizedDescription
+            jobs[index].errorMessage = message
         }
 
         processingTask = nil

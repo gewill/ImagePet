@@ -29,11 +29,11 @@ enum InputFilePanel {
                 }
                 try pngData.write(to: url)
             }
-            
+
             if ProcessInfo.processInfo.environment["UI_TEST_FAIL"] == "1" {
-                let txtFile = tempDir.appendingPathComponent("badfile.txt")
-                try? "hello".write(to: txtFile, atomically: true, encoding: .utf8)
-                return [txtFile]
+                let corruptPNG = tempDir.appendingPathComponent("badfile.png")
+                try? "not image".write(to: corruptPNG, atomically: true, encoding: .utf8)
+                return [corruptPNG]
             }
 
             var urls: [URL] = []

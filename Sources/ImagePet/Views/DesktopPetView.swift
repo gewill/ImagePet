@@ -8,7 +8,6 @@ struct DesktopPetView: View {
         let snapshot = store.petSnapshot
 
         VStack(spacing: 8) {
-            // Top Bar
             HStack {
                 Button {
                     store.handlePetAction(.openMainApp)
@@ -39,7 +38,6 @@ struct DesktopPetView: View {
             }
             .frame(height: 16)
 
-            // Center Avatar
             Text(snapshot.emoji)
                 .font(.system(size: 54))
                 .frame(width: 68, height: 58)
@@ -52,14 +50,12 @@ struct DesktopPetView: View {
                 )
                 .accessibilityIdentifier("desktopPetEmoji")
 
-            // Title
             Text(snapshot.title)
                 .font(.system(.callout, design: .rounded, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .accessibilityIdentifier("desktopPetTitle")
 
-            // Detail Text with dynamic tooltip
             Text(snapshot.detail)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -68,7 +64,6 @@ struct DesktopPetView: View {
                 .help(tooltipText(for: snapshot))
                 .accessibilityIdentifier("desktopPetDetail")
 
-            // Bottom Actions Bar
             HStack(spacing: 12) {
                 let bottomActions = snapshot.secondaryActions.filter { $0 != .hidePet && $0 != .openMainApp }
                 ForEach(bottomActions, id: \.self) { action in
@@ -105,30 +100,6 @@ struct DesktopPetView: View {
                 self.isDropTargeted = isTargeted
             } else {
                 self.isDropTargeted = false
-            }
-        }
-        .onChange(of: store.showOverwriteConfirmation) { newValue in
-            if newValue {
-                let isMainKey = NSApp.windows.contains { w in
-                    (w.title == "ImagePet" || w.identifier?.rawValue == "main") && w.isKeyWindow
-                }
-                if !isMainKey {
-                    if let window = NSApp.windows.first(where: { w in w.identifier?.rawValue == "DesktopPetWindow" && w.isVisible }) {
-                        let alert = NSAlert()
-                        alert.messageText = "Overwrite Original Files?"
-                        alert.informativeText = "Are you sure you want to overwrite the original images? This will replace your original files and cannot be undone."
-                        alert.addButton(withTitle: "Overwrite")
-                        alert.addButton(withTitle: "Cancel")
-                        
-                        alert.beginSheetModal(for: window) { response in
-                            if response == .alertFirstButtonReturn {
-                                store.confirmOverwriteAndStart()
-                            } else {
-                                store.cancelOverwrite()
-                            }
-                        }
-                    }
-                }
             }
         }
     }

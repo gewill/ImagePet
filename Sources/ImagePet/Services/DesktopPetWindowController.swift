@@ -60,12 +60,28 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window.isMovableByWindowBackground = true
         window.delegate = self
 
-        if !window.setFrameUsingName(Self.frameAutosaveName) {
-            window.setFrame(NSRect(origin: defaultOrigin(for: size), size: size), display: false)
+        if window.setFrameUsingName(Self.frameAutosaveName) {
+            ensureFrameIsVisible(window, fallbackSize: size)
+        } else {
+            window.setFrame(defaultFrame(for: size), display: false)
         }
         window.setFrameAutosaveName(Self.frameAutosaveName)
 
         return window
+    }
+
+    private func ensureFrameIsVisible(_ window: NSWindow, fallbackSize: NSSize) {
+        let isVisibleOnAnyScreen = NSScreen.screens.contains { screen in
+            window.frame.intersects(screen.visibleFrame)
+        }
+
+        if !isVisibleOnAnyScreen {
+            window.setFrame(defaultFrame(for: fallbackSize), display: false)
+        }
+    }
+
+    private func defaultFrame(for size: NSSize) -> NSRect {
+        NSRect(origin: defaultOrigin(for: size), size: size)
     }
 
     private func defaultOrigin(for size: NSSize) -> NSPoint {

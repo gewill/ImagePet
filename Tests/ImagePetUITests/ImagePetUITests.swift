@@ -199,7 +199,7 @@ final class ImagePetUITests: XCTestCase {
         // Wait until pet title is "Done"
         let petTitle = petWindow.staticTexts["desktopPetTitle"]
         XCTAssertTrue(petTitle.exists)
-        
+
         let doneExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Done' OR value == 'Done'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [doneExpectation], timeout: 5.0), .completed)
 
@@ -224,6 +224,7 @@ final class ImagePetUITests: XCTestCase {
         app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
         app.launchEnvironment["IS_UI_TESTING"] = "1"
         app.launchEnvironment["UI_TEST_FAIL"] = "1"
+        app.launchEnvironment["UI_TEST_SLOW_PROCESS"] = "1"
         app.launch()
 
         let window = mainWindow()
@@ -246,14 +247,22 @@ final class ImagePetUITests: XCTestCase {
         let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 5.0), .completed)
 
+        let failedStatus = window.staticTexts.matching(identifier: "jobStatusText_badfile.png").firstMatch
+        XCTAssertTrue(failedStatus.waitForExistence(timeout: 2.0))
+        XCTAssertTrue(failedStatus.textContent.hasPrefix("Failed"))
+
         // Verify Retry Failed button exists
         let retryButton = petWindow.buttons["desktopPetRetryFailedButton"]
         XCTAssertTrue(retryButton.exists)
-        
+
         retryButton.click()
-        
+
+        let eatingExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Eating' OR value == 'Eating'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [eatingExpectation], timeout: 2.0), .completed)
+
         let issuesExpectation2 = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation2], timeout: 5.0), .completed)
+        XCTAssertTrue(failedStatus.textContent.hasPrefix("Failed"))
     }
 
     func testDesktopPetOverwritesDialog() throws {
@@ -275,7 +284,7 @@ final class ImagePetUITests: XCTestCase {
         let petWindow = app.windows["DesktopPetWindow"]
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
-        // We close the main window so that the alert is forced to display on the Pet window
+        // Close the main window so the Pet must route destructive confirmation back through the app.
         let closeButton = window.buttons["Close"]
         if closeButton.exists {
             closeButton.click()
@@ -288,6 +297,8 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(addImagesButton.exists)
         addImagesButton.click()
 
+        XCTAssertTrue(mainWindow(timeout: 3.0).exists)
+
         // Verify alert sheet/dialog is displayed
         let sheet = app.sheets.firstMatch
         XCTAssertTrue(sheet.waitForExistence(timeout: 3.0))
@@ -297,11 +308,12 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(cancelButton.exists)
         cancelButton.click()
 
-        // Pet should show Permission needed because the jobs were canceled/failed with permission error
+        // Canceling a destructive overwrite is a normal failed batch, not a permission problem.
         let petTitle = petWindow.staticTexts["desktopPetTitle"]
         XCTAssertTrue(petTitle.exists)
-        let permissionExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Permission needed' OR value == 'Permission needed'"), object: petTitle)
-        XCTAssertEqual(XCTWaiter.wait(for: [permissionExpectation], timeout: 3.0), .completed)
+        let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 3.0), .completed)
+        XCTAssertTrue(petWindow.buttons["desktopPetCompressMoreButton"].exists)
     }
 }
 
