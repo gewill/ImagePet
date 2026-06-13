@@ -36,6 +36,7 @@
 		D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
+		F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */; };
 		F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 /* End PBXBuildFile section */
 
@@ -103,6 +104,7 @@
 		4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetStore.swift; sourceTree = "<group>"; };
 		573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocatorTests.swift; sourceTree = "<group>"; };
 		58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputDirectoryBookmarkStore.swift; sourceTree = "<group>"; };
+		5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetSnapshot.swift; sourceTree = "<group>"; };
 		60F9729CED642EBCF472BAC1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFixtureCompressionTests.swift; sourceTree = "<group>"; };
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 		C2088D75CBC5FC8132489975 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */,
 				4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */,
 			);
 			path = Stores;
@@ -413,6 +416,7 @@
 			files = (
 				77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */,
 				BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */,
+				F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */,
 				EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */,
 				EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */,
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,

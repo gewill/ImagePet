@@ -178,6 +178,131 @@ final class ImagePetUITests: XCTestCase {
         let emptyLabel = window.staticTexts["emptyJobsLabel"]
         XCTAssertTrue(emptyLabel.exists)
     }
+
+    func testDesktopPetDoneActions() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        // Show Desktop Pet
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        // Trigger Add Images from Pet
+        let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        // Wait until pet title is "Done"
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        XCTAssertTrue(petTitle.exists)
+        
+        let doneExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Done' OR value == 'Done'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [doneExpectation], timeout: 5.0), .completed)
+
+        // Verify Reveal and Compress More buttons exist
+        let revealButton = petWindow.buttons["desktopPetRevealButton"]
+        let compressMoreButton = petWindow.buttons["desktopPetCompressMoreButton"]
+        XCTAssertTrue(revealButton.exists)
+        XCTAssertTrue(compressMoreButton.exists)
+
+        // Click Compress More to reset state
+        compressMoreButton.click()
+
+        // Verify title resets to Ready
+        let readyExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Ready' OR value == 'Ready'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [readyExpectation], timeout: 2.0), .completed)
+    }
+
+    func testDesktopPetRetryAction() throws {
+        // Relaunch app with UI_TEST_FAIL environment variable
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["UI_TEST_FAIL"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        // Wait until pet title is "Issues"
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        XCTAssertTrue(petTitle.exists)
+        let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 5.0), .completed)
+
+        // Verify Retry Failed button exists
+        let retryButton = petWindow.buttons["desktopPetRetryFailedButton"]
+        XCTAssertTrue(retryButton.exists)
+        
+        retryButton.click()
+        
+        let issuesExpectation2 = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation2], timeout: 5.0), .completed)
+    }
+
+    func testDesktopPetOverwritesDialog() throws {
+        // Relaunch app with UI_TEST_OVERWRITE environment variable
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["UI_TEST_OVERWRITE"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        // We close the main window so that the alert is forced to display on the Pet window
+        let closeButton = window.buttons["Close"]
+        if closeButton.exists {
+            closeButton.click()
+        } else {
+            window.click()
+            app.typeKey("w", modifierFlags: [.command])
+        }
+
+        let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        // Verify alert sheet/dialog is displayed
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 3.0))
+
+        // Click Cancel on the sheet
+        let cancelButton = sheet.buttons["Cancel"]
+        XCTAssertTrue(cancelButton.exists)
+        cancelButton.click()
+
+        // Pet should show Permission needed because the jobs were canceled/failed with permission error
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        XCTAssertTrue(petTitle.exists)
+        let permissionExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Permission needed' OR value == 'Permission needed'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [permissionExpectation], timeout: 3.0), .completed)
+    }
 }
 
 private extension XCUIElement {

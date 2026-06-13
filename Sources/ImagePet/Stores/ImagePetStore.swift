@@ -14,6 +14,9 @@ final class ImagePetStore: ObservableObject {
     @Published var isDesktopPetVisible = false {
         didSet {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
+            if isDesktopPetVisible && desktopPetWindowController == nil {
+                desktopPetWindowController = DesktopPetWindowController(store: self)
+            }
             desktopPetWindowController?.setVisible(isDesktopPetVisible)
         }
     }
@@ -83,6 +86,9 @@ final class ImagePetStore: ObservableObject {
         if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
             self.isDesktopPetVisible = false
             self.outputDirectory = nil
+            if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
+                self.saveLocationMode = .overwrite
+            }
         } else {
             self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
             restoreOutputDirectory()
@@ -229,7 +235,8 @@ final class ImagePetStore: ObservableObject {
     }
 
     func chooseInputImages() {
-        addInputURLs(InputFilePanel.chooseImages())
+        let urls = InputFilePanel.chooseImages()
+        addInputURLs(urls)
     }
 
     func addDroppedURLs(_ urls: [URL]) {
@@ -237,7 +244,9 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func addInputURLs(_ urls: [URL]) {
-        guard !urls.isEmpty else { return }
+        guard !urls.isEmpty else {
+            return
+        }
 
         let newJobs = urls.map { url in
             let size = Self.fileSize(for: url)
@@ -293,12 +302,145 @@ final class ImagePetStore: ObservableObject {
     }
 
     func revealOutputDirectory() {
-        guard let outputDirectory else {
-            chooseOutputDirectory()
-            return
+        if saveLocationMode == .designated {
+            guard let outputDirectory else {
+                chooseOutputDirectory()
+                return
+            }
+            NSWorkspace.shared.open(outputDirectory)
+        } else {
+            // In .originalFolder or .overwrite mode, open the directory of the first successful job
+            if let firstSuccess = jobs.first(where: { $0.status == .done && $0.outputURL != nil }),
+               let outputURL = firstSuccess.outputURL {
+                let parentDir = outputURL.deletingLastPathComponent()
+                NSWorkspace.shared.open(parentDir)
+            } else if let outputDirectory {
+                NSWorkspace.shared.open(outputDirectory)
+            }
+        }
+    }
+
+    var petSnapshot: DesktopPetSnapshot {
+        // 1. Needs Setup
+        if saveLocationMode == .designated && outputDirectory == nil {
+            return DesktopPetSnapshot(
+                state: .needsSetup,
+                emoji: "🐡",
+                title: "Needs folder",
+                detail: "Choose output folder in app",
+                primaryAction: .openMainApp,
+                secondaryActions: [.hidePet],
+                canAcceptDrop: false
+            )
         }
 
-        NSWorkspace.shared.open(outputDirectory)
+        // 2. Overwrite Confirmation Pending
+        if saveLocationMode == .overwrite && showOverwriteConfirmation {
+            return DesktopPetSnapshot(
+                state: .confirm,
+                emoji: "🐡",
+                title: "Confirm overwrite",
+                detail: "Review in app",
+                primaryAction: .openMainApp,
+                secondaryActions: [.hidePet],
+                canAcceptDrop: false
+            )
+        }
+
+        // 3. Permission Issue
+        let hasPermissionDenied = jobs.contains { $0.status == .failed && $0.errorMessage == CompressionError.permissionDenied.localizedDescription }
+        let hasFolderDenied = outputFolderMessage == CompressionError.permissionDenied.localizedDescription
+        if hasPermissionDenied || hasFolderDenied {
+            return DesktopPetSnapshot(
+                state: .permission,
+                emoji: "😵",
+                title: "Permission needed",
+                detail: "Open app to authorize",
+                primaryAction: .openMainApp,
+                secondaryActions: [.hidePet],
+                canAcceptDrop: false
+            )
+        }
+
+        // 4. Processing / Eating
+        if isProcessing {
+            return DesktopPetSnapshot(
+                state: .eating,
+                emoji: "😋",
+                title: "Eating",
+                detail: "\(completedCount) / \(jobs.count)",
+                primaryAction: nil,
+                secondaryActions: [.hidePet],
+                canAcceptDrop: true
+            )
+        }
+
+        // 5. Done / Completed
+        if isCompleted {
+            if failedCount == 0 {
+                let hasSuccess = jobs.contains { $0.status == .done }
+                let secondary: [DesktopPetAction]
+                if hasSuccess {
+                    secondary = [.addImages, .revealOutput, .compressMore, .hidePet]
+                } else {
+                    secondary = [.addImages, .compressMore, .hidePet]
+                }
+                return DesktopPetSnapshot(
+                    state: .done,
+                    emoji: "🥳",
+                    title: "Done",
+                    detail: "Saved \(FileSizeFormatting.string(from: savedTotal))",
+                    primaryAction: hasSuccess ? .revealOutput : .addImages,
+                    secondaryActions: secondary,
+                    canAcceptDrop: true
+                )
+            } else {
+                // 6. Issues
+                let detailText: String
+                if skippedCount > 0 {
+                    detailText = "\(succeededCount) ok, \(skippedCount) skip, \(failedCount) fail"
+                } else {
+                    detailText = "\(succeededCount) ok, \(failedCount) fail"
+                }
+                return DesktopPetSnapshot(
+                    state: .issues,
+                    emoji: "😵",
+                    title: "Issues",
+                    detail: detailText,
+                    primaryAction: .retryFailed,
+                    secondaryActions: [.addImages, .retryFailed, .compressMore, .hidePet],
+                    canAcceptDrop: true
+                )
+            }
+        }
+
+        // 7. Idle / Ready
+        return DesktopPetSnapshot(
+            state: .idle,
+            emoji: "🐡",
+            title: "Ready",
+            detail: "Drop images here",
+            primaryAction: .addImages,
+            secondaryActions: [.addImages, .hidePet],
+            canAcceptDrop: true
+        )
+    }
+
+    func handlePetAction(_ action: DesktopPetAction) {
+        switch action {
+        case .openMainApp:
+            activateMainWindow()
+        case .hidePet:
+            hideDesktopPet()
+        case .addImages:
+            chooseInputImages()
+        case .revealOutput:
+            revealOutputDirectory()
+        case .retryFailed:
+            retryFailed()
+        case .compressMore:
+            compressMore()
+        }
     }
 
     func toggleDesktopPet() {
@@ -343,7 +485,9 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func startProcessingIfPossible() {
-        guard processingTask == nil else { return }
+        guard processingTask == nil else {
+            return
+        }
 
         if saveLocationMode == .overwrite && !didConfirmOverwrite {
             showOverwriteConfirmation = true
@@ -463,7 +607,7 @@ final class ImagePetStore: ObservableObject {
         await withTaskGroup(of: Void.self) { group in
             let workerCount = min(maxConcurrentJobs, max(1, jobs.count))
 
-            for _ in 0..<workerCount {
+            for i in 0..<workerCount {
                 group.addTask { [weak self] in
                     while !Task.isCancelled {
                         guard let job = await self?.claimNextPendingJob() else {

@@ -5,10 +5,13 @@ struct DesktopPetView: View {
     @State private var isDropTargeted = false
 
     var body: some View {
+        let snapshot = store.petSnapshot
+
         VStack(spacing: 8) {
+            // Top Bar
             HStack {
                 Button {
-                    store.activateMainWindow()
+                    store.handlePetAction(.openMainApp)
                 } label: {
                     HStack(spacing: 3) {
                         Image(systemName: "arrow.up.right.square")
@@ -24,7 +27,7 @@ struct DesktopPetView: View {
                 Spacer()
 
                 Button {
-                    store.hideDesktopPet()
+                    store.handlePetAction(.hidePet)
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                 }
@@ -36,45 +39,49 @@ struct DesktopPetView: View {
             }
             .frame(height: 16)
 
-            Text(petEmoji)
+            // Center Avatar
+            Text(snapshot.emoji)
                 .font(.system(size: 54))
                 .frame(width: 68, height: 58)
-                .scaleEffect(store.petState == .eating ? 1.08 : 1)
-                .animation(.easeInOut(duration: 0.6).repeatCount(store.petState == .eating ? 8 : 0, autoreverses: true), value: store.petState)
+                .scaleEffect(snapshot.state == .eating ? 1.08 : 1)
+                .animation(
+                    snapshot.state == .eating ?
+                        .easeInOut(duration: 0.6).repeatForever(autoreverses: true) :
+                        .default,
+                    value: snapshot.state
+                )
                 .accessibilityIdentifier("desktopPetEmoji")
 
-            Text(title)
+            // Title
+            Text(snapshot.title)
                 .font(.system(.callout, design: .rounded, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .accessibilityIdentifier("desktopPetTitle")
 
-            Text(detail)
+            // Detail Text with dynamic tooltip
+            Text(snapshot.detail)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
+                .help(tooltipText(for: snapshot))
                 .accessibilityIdentifier("desktopPetDetail")
 
-            HStack(spacing: 10) {
-                Button {
-                    store.chooseInputImages()
-                } label: {
-                    Image(systemName: "photo.badge.plus")
-                }
-                .help("Add Images")
-                .accessibilityIdentifier("desktopPetAddImagesButton")
-
-                if store.isCompleted {
+            // Bottom Actions Bar
+            HStack(spacing: 12) {
+                let bottomActions = snapshot.secondaryActions.filter { $0 != .hidePet && $0 != .openMainApp }
+                ForEach(bottomActions, id: \.self) { action in
                     Button {
-                        store.revealOutputDirectory()
+                        store.handlePetAction(action)
                     } label: {
-                        Image(systemName: "folder")
+                        Image(systemName: symbol(for: action))
                     }
-                    .help("Reveal in Finder")
-                    .accessibilityIdentifier("desktopPetRevealButton")
+                    .help(helpText(for: action))
+                    .accessibilityIdentifier(accessibilityId(for: action))
                 }
             }
+            .frame(height: 24)
             .buttonStyle(.borderless)
             .font(.system(size: 15, weight: .semibold))
         }
@@ -90,52 +97,107 @@ struct DesktopPetView: View {
                 .stroke(isDropTargeted ? Color.accentColor : .secondary.opacity(0.18), lineWidth: isDropTargeted ? 2 : 1)
         )
         .dropDestination(for: URL.self) { urls, _ in
+            guard snapshot.canAcceptDrop else { return false }
             store.addDroppedURLs(urls)
             return true
         } isTargeted: { isTargeted in
-            self.isDropTargeted = isTargeted
-        }
-    }
-
-    private var petEmoji: String {
-        switch store.petState {
-        case .idle:
-            return "🐡"
-        case .eating:
-            return "😋"
-        case .happy:
-            return "🥳"
-        case .error:
-            return "😵"
-        }
-    }
-
-    private var title: String {
-        switch store.petState {
-        case .idle:
-            return "Ready"
-        case .eating:
-            return "Eating"
-        case .happy:
-            return "Done"
-        case .error:
-            return "Issues"
-        }
-    }
-
-    private var detail: String {
-        switch store.petState {
-        case .idle:
-            return "Waiting for images"
-        case .eating:
-            return "\(store.completedCount) / \(store.jobs.count)"
-        case .happy:
-            return "Saved \(FileSizeFormatting.string(from: store.savedTotal))"
-        case .error:
-            if store.skippedCount > 0 {
-                return "\(store.succeededCount) ok, \(store.skippedCount) skip, \(store.failedCount) fail"
+            if snapshot.canAcceptDrop {
+                self.isDropTargeted = isTargeted
+            } else {
+                self.isDropTargeted = false
             }
-            return "\(store.succeededCount) ok, \(store.failedCount) failed"
         }
+        .onChange(of: store.showOverwriteConfirmation) { newValue in
+            if newValue {
+                let isMainKey = NSApp.windows.contains { w in
+                    (w.title == "ImagePet" || w.identifier?.rawValue == "main") && w.isKeyWindow
+                }
+                if !isMainKey {
+                    if let window = NSApp.windows.first(where: { w in w.identifier?.rawValue == "DesktopPetWindow" && w.isVisible }) {
+                        let alert = NSAlert()
+                        alert.messageText = "Overwrite Original Files?"
+                        alert.informativeText = "Are you sure you want to overwrite the original images? This will replace your original files and cannot be undone."
+                        alert.addButton(withTitle: "Overwrite")
+                        alert.addButton(withTitle: "Cancel")
+                        
+                        alert.beginSheetModal(for: window) { response in
+                            if response == .alertFirstButtonReturn {
+                                store.confirmOverwriteAndStart()
+                            } else {
+                                store.cancelOverwrite()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func symbol(for action: DesktopPetAction) -> String {
+        switch action {
+        case .openMainApp:
+            return "arrow.up.right.square"
+        case .hidePet:
+            return "xmark.circle"
+        case .addImages:
+            return "photo.badge.plus"
+        case .revealOutput:
+            return "folder"
+        case .retryFailed:
+            return "arrow.counterclockwise"
+        case .compressMore:
+            return "plus.circle"
+        }
+    }
+
+    private func helpText(for action: DesktopPetAction) -> String {
+        switch action {
+        case .openMainApp:
+            return "Show Main Application"
+        case .hidePet:
+            return "Hide Desktop Pet"
+        case .addImages:
+            return "Add Images"
+        case .revealOutput:
+            if let outputDir = store.outputDirectory {
+                return "Reveal in Finder: \(outputDir.path)"
+            }
+            return "Reveal in Finder"
+        case .retryFailed:
+            return "Retry Failed"
+        case .compressMore:
+            return "Compress More"
+        }
+    }
+
+    private func accessibilityId(for action: DesktopPetAction) -> String {
+        switch action {
+        case .openMainApp:
+            return "desktopPetReturnToAppButton"
+        case .hidePet:
+            return "closePetButton"
+        case .addImages:
+            return "desktopPetAddImagesButton"
+        case .revealOutput:
+            return "desktopPetRevealButton"
+        case .retryFailed:
+            return "desktopPetRetryFailedButton"
+        case .compressMore:
+            return "desktopPetCompressMoreButton"
+        }
+    }
+
+    private func tooltipText(for snapshot: DesktopPetSnapshot) -> String {
+        if snapshot.state == .idle {
+            let formatText = store.outputFormat == .original ? "Original Format" : store.outputFormat.rawValue.uppercased()
+            if store.saveLocationMode == .designated, let dir = store.outputDirectory {
+                return "Saving as \(formatText) to \(dir.lastPathComponent)"
+            } else if store.saveLocationMode == .overwrite {
+                return "Overwriting original files"
+            } else {
+                return "Saving to original folder"
+            }
+        }
+        return snapshot.detail
     }
 }
