@@ -33,6 +33,8 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 ## 追踪入口
 
 - 产品需求基线：[PRD.md](PRD.md)
+- V0.3 扩展需求：[PRD_v0.3.md](PRD_v0.3.md)
+- V0.4 桌面 Pet 规划：[PRD_v0.4_desktop_pet.md](PRD_v0.4_desktop_pet.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -171,6 +173,7 @@ org.gewill.ImagePet
 - Developer ID signing / notarization
 - Mac App Store packaging
 - App icon
+- V0.4 桌面 Pet 产品化实现
 - 更复杂宠物动画
 - Finder Extension
 - Raycast Extension
