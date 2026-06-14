@@ -829,6 +829,8 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func runQueue(outputDirectory: URL?) async {
+        let batchJobIDs = Set(jobs.filter { $0.status == .pending }.map { $0.id })
+
         await withTaskGroup(of: Void.self) { group in
             let workerCount = min(maxConcurrentJobs, max(1, jobs.count))
 
@@ -856,7 +858,11 @@ final class ImagePetStore: ObservableObject {
         petState = hasFailedJobs ? .error : .happy
         didConfirmOverwrite = false
 
-        if failedCount == 0 && jobs.count > 0 && enableSuccessSound {
+        let processedJobs = jobs.filter { batchJobIDs.contains($0.id) }
+        let batchHasFailures = processedJobs.contains { $0.status == .failed }
+        let batchHasSuccess = processedJobs.contains { $0.status == .done }
+
+        if !batchHasFailures && batchHasSuccess && enableSuccessSound {
             SoundManager.shared.playSuccessSound()
         }
     }
