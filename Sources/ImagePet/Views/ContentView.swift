@@ -107,7 +107,9 @@ private struct HeaderView: View {
                 } label: {
                     Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
                 }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
                 .disabled(!store.isDesktopPetEnabled)
+                .help("Toggle Desktop Pet (⇧⌘P)")
                 .accessibilityIdentifier("togglePetButton")
 
                 Button {
@@ -115,7 +117,9 @@ private struct HeaderView: View {
                 } label: {
                     Label("Add Images", systemImage: "photo.badge.plus")
                 }
+                .keyboardShortcut("o", modifiers: [.command])
                 .buttonStyle(.borderedProminent)
+                .help("Add Images (⌘O)")
                 .accessibilityIdentifier("addImagesButton")
             }
         }
@@ -304,7 +308,9 @@ private struct ControlsView: View {
                             Button("Choose Folder") {
                                 store.chooseOutputDirectory()
                             }
+                            .keyboardShortcut("o", modifiers: [.command, .shift])
                             .disabled(store.isProcessing)
+                            .help("Choose Output Folder (⇧⌘O)")
                             .accessibilityIdentifier("chooseFolderButton")
 
                             Spacer()
@@ -578,6 +584,7 @@ private struct SummaryView: View {
                 } label: {
                     Label("Reveal in Finder", systemImage: "folder")
                 }
+                .help("Reveal in Finder")
                 .accessibilityIdentifier("revealInFinderButton")
 
                 if store.hasFailedJobs {
@@ -587,6 +594,7 @@ private struct SummaryView: View {
                         Label("Retry Failed", systemImage: "arrow.clockwise")
                     }
                     .keyboardShortcut("r", modifiers: [.command])
+                    .help("Retry Failed (⌘R)")
                     .accessibilityIdentifier("retryFailedButton")
                 }
 
@@ -596,6 +604,7 @@ private struct SummaryView: View {
                     Label("Compress More", systemImage: "plus")
                 }
                 .keyboardShortcut("n", modifiers: [.command])
+                .help("Compress More (⌘N)")
                 .accessibilityIdentifier("compressMoreButton")
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
