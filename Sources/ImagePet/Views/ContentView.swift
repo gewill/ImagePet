@@ -100,6 +100,24 @@ private struct HeaderView: View {
             }
 
             Spacer()
+
+            HStack(spacing: 12) {
+                Button {
+                    store.toggleDesktopPet()
+                } label: {
+                    Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
+                }
+                .disabled(!store.isDesktopPetEnabled)
+                .accessibilityIdentifier("togglePetButton")
+
+                Button {
+                    store.chooseInputImages()
+                } label: {
+                    Label("Add Images", systemImage: "photo.badge.plus")
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("addImagesButton")
+            }
         }
     }
 
@@ -159,92 +177,78 @@ private struct ControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // First Row: Quality and Max Dimension
-            HStack(spacing: 20) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Quality Preset")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Picker("Quality", selection: $store.preset) {
-                        ForEach(CompressionPreset.allCases) { preset in
-                            Text(preset.displayName).tag(preset)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 24) {
+                // Column 1: Quality Preset & Output Format
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Quality Preset")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Picker("Quality", selection: $store.preset) {
+                            ForEach(CompressionPreset.allCases) { preset in
+                                Text(preset.displayName).tag(preset)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .frame(width: 250)
+                        .disabled(store.isProcessing || store.outputFormat == .png)
+                        .accessibilityIdentifier("presetPicker")
                     }
-                    .pickerStyle(.segmented)
-                    .frame(width: 250)
-                    .disabled(store.isProcessing || store.outputFormat == .png)
-                    .accessibilityIdentifier("presetPicker")
-                }
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Max Edge Limit")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Picker("Max Dimension", selection: $store.maxDimension) {
-                        ForEach(MaxDimensionLimit.allCases) { limit in
-                            Text(limit.displayName).tag(limit)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Output Format")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Picker("Format", selection: $store.outputFormat) {
+                            ForEach(OutputFormat.allCases) { format in
+                                Text(format.displayName).tag(format)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .frame(width: 280)
+                        .disabled(store.isProcessing || store.saveLocationMode == .overwrite)
+                        .accessibilityIdentifier("formatPicker")
                     }
-                    .pickerStyle(.menu)
-                    .frame(width: 150)
-                    .disabled(store.isProcessing)
-                    .accessibilityIdentifier("maxDimensionPicker")
                 }
 
                 Spacer()
 
-                Button {
-                    store.toggleDesktopPet()
-                } label: {
-                    Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
-                }
-                .disabled(!store.isDesktopPetEnabled)
-                .accessibilityIdentifier("togglePetButton")
+                // Column 2: Max Edge Limit & Save Location
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Max Edge Limit")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Picker("Max Dimension", selection: $store.maxDimension) {
+                            ForEach(MaxDimensionLimit.allCases) { limit in
+                                Text(limit.displayName).tag(limit)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 380)
+                        .disabled(store.isProcessing)
+                        .accessibilityIdentifier("maxDimensionPicker")
+                    }
 
-                Button {
-                    store.chooseInputImages()
-                } label: {
-                    Label("Add Images", systemImage: "photo.badge.plus")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Save Location")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Picker("Location", selection: $store.saveLocationMode) {
+                            ForEach(SaveLocationMode.allCases) { mode in
+                                Text(mode.displayName).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 380)
+                        .disabled(store.isProcessing)
+                        .accessibilityIdentifier("locationModePicker")
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("addImagesButton")
             }
 
             Divider()
-
-            // Second Row: Output Format and Save Destination
-            HStack(spacing: 20) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Output Format")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Picker("Format", selection: $store.outputFormat) {
-                        ForEach(OutputFormat.allCases) { format in
-                            Text(format.displayName).tag(format)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 280)
-                    .disabled(store.isProcessing || store.saveLocationMode == .overwrite)
-                    .accessibilityIdentifier("formatPicker")
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Save Location")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Picker("Location", selection: $store.saveLocationMode) {
-                        ForEach(SaveLocationMode.allCases) { mode in
-                            Text(mode.displayName).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 320)
-                    .disabled(store.isProcessing)
-                    .accessibilityIdentifier("locationModePicker")
-                }
-            }
 
             // Options details based on selection
             Group {

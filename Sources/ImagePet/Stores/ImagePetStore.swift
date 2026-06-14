@@ -19,7 +19,11 @@ final class ImagePetStore: ObservableObject {
             checkDoneTimeout()
         }
     }
-    @Published var preset: CompressionPreset = .balanced
+    @Published var preset: CompressionPreset = .balanced {
+        didSet {
+            defaults.set(preset.rawValue, forKey: presetKey)
+        }
+    }
     @Published var outputDirectory: URL? {
         didSet {
             checkAndApplyAutoExpand()
@@ -173,6 +177,7 @@ final class ImagePetStore: ObservableObject {
     private var didPromptForInitialFolder = false
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
+    private let presetKey = "ImagePet.preset"
     private let saveLocationModeKey = "ImagePet.saveLocationMode"
     private let filenameSuffixKey = "ImagePet.filenameSuffix"
     private let maxDimensionKey = "ImagePet.maxDimension"
@@ -249,6 +254,7 @@ final class ImagePetStore: ObservableObject {
             }
             self.petViewMode = .mini
             self.enableSuccessSound = true
+            self.preset = .balanced
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
@@ -264,6 +270,9 @@ final class ImagePetStore: ObservableObject {
 
             if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
                 self.outputFormat = format
+            }
+            if let savedPreset = defaults.string(forKey: presetKey), let preset = CompressionPreset(rawValue: savedPreset) {
+                self.preset = preset
             }
             if let savedMode = defaults.string(forKey: saveLocationModeKey), let mode = SaveLocationMode(rawValue: savedMode) {
                 self.saveLocationMode = mode
