@@ -21,7 +21,7 @@ struct ContentView: View {
 
             DesktopPetSettingsView(store: store)
                 .tabItem {
-                    Label("Desktop Pet", systemImage: "pawprint")
+                    Label("Settings", systemImage: "gearshape")
                 }
         }
         .frame(minWidth: 780, minHeight: 560)

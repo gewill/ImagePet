@@ -628,8 +628,8 @@ final class ImagePetUITests: XCTestCase {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
 
-        // Switch to the Desktop Pet Tab
-        let tab = window.descendants(matching: .any)["Desktop Pet"]
+        // Switch to the Settings Tab
+        let tab = window.descendants(matching: .any)["Settings"]
         XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
         tab.click()
 
