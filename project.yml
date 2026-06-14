@@ -41,6 +41,7 @@ targets:
         CFBundlePackageType: APPL
         LSMinimumSystemVersion: "13.0"
         NSPrincipalClass: NSApplication
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePet
