@@ -191,6 +191,7 @@ private struct ControlsView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                        .labelsHidden()
                         .frame(width: 250)
                         .disabled(store.isProcessing || store.outputFormat == .png)
                         .accessibilityIdentifier("presetPicker")
@@ -206,6 +207,7 @@ private struct ControlsView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                        .labelsHidden()
                         .frame(width: 280)
                         .disabled(store.isProcessing || store.saveLocationMode == .overwrite)
                         .accessibilityIdentifier("formatPicker")
@@ -226,6 +228,7 @@ private struct ControlsView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                        .labelsHidden()
                         .frame(width: 380)
                         .disabled(store.isProcessing)
                         .accessibilityIdentifier("maxDimensionPicker")
@@ -241,6 +244,7 @@ private struct ControlsView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                        .labelsHidden()
                         .frame(width: 380)
                         .disabled(store.isProcessing)
                         .accessibilityIdentifier("locationModePicker")
