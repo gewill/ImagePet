@@ -42,6 +42,7 @@ targets:
         LSMinimumSystemVersion: "13.0"
         NSPrincipalClass: NSApplication
         ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.utilities
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePet
