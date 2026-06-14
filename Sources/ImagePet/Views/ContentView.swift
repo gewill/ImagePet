@@ -658,15 +658,6 @@ private struct DesktopPetSettingsView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 16) {
                                 ThemeCard(
-                                    name: "Cute Cat",
-                                    description: "A playful, hand-drawn kitty.",
-                                    themeName: "CuteCat",
-                                    selectedTheme: $store.selectedThemeName,
-                                    previewAnim: .idle
-                                )
-                                .accessibilityIdentifier("themeCard_CuteCat")
-
-                                ThemeCard(
                                     name: "Shiba Inu",
                                     description: "An energetic, loyal puppy.",
                                     themeName: "ShibaInu",
@@ -674,6 +665,15 @@ private struct DesktopPetSettingsView: View {
                                     previewAnim: .idle
                                 )
                                 .accessibilityIdentifier("themeCard_ShibaInu")
+
+                                ThemeCard(
+                                    name: "Cute Cat",
+                                    description: "A playful, hand-drawn kitty.",
+                                    themeName: "CuteCat",
+                                    selectedTheme: $store.selectedThemeName,
+                                    previewAnim: .idle
+                                )
+                                .accessibilityIdentifier("themeCard_CuteCat")
 
                                 ThemeCard(
                                     name: "Pixel Slime",

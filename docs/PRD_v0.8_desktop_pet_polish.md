@@ -11,7 +11,7 @@ ImagePet v0.8 的核心目标是：
 
 v0.8 包含以下三大功能模块：
 1. **P0：内置主题切换与过渡动画打磨**：消除桌面 Pet 在 Mini 与 Full 状态切换时的布局跳跃与字符截断；实现中心点锚定的 UI 自动化测试；自查 Shiba Inu 与 Pixel Slime 在 Mini 态头像框下的边缘完整性。
-2. **P0：ThemeCard 边框显示缺陷修复**：在 SwiftUI 侧改用 `.strokeBorder` 替换 `.stroke` 解决边框被外层 frame 截断的问题；化简卡片微动效，去除 Y 轴位移与 Spring 缩放，仅保留 Hover 阴影与选中高亮；坚守 `Cute Cat` 作为默认宠物主题。
+2. **P0：ThemeCard 边框显示缺陷修复与状态持久化**：在 SwiftUI 侧改用 `.strokeBorder` 替换 `.stroke` 解决边框被外层 frame 截断的问题；化简卡片微动效，去除 Y 轴位移与 Spring 缩放，仅保留 Hover 阴影与选中高亮；设定 `Shiba Inu` 作为默认宠物主题并对桌面 Pet 的折叠/展开状态进行持久化。
 3. **P0：空任务状态展示重构**：重新设计主窗口 `EmptyJobListView` 的空任务状态，引入契合主题风格的爪印水印与行动引导文案，打磨首屏视觉。
 4. **P1：无障碍辅助打磨**：为设置页面的每一个 `ThemeCard` 赋予清晰的 Accessibility Value，优化 VoiceOver 体验。
 
@@ -49,9 +49,9 @@ v0.8 包含以下三大功能模块：
 
 ---
 
-### 3.2 P0：ThemeCard 边框缺陷修复与 Cute Cat 默认主题 (ThemeCard Fix & Cute Cat Default)
+### 3.2 P0：ThemeCard 边框缺陷修复、Shiba Inu 默认主题与状态持久化 (ThemeCard Fix, Shiba Inu Default & State Persistence)
 
-目标：修复设置页主题选择卡片的绘制 Bug，精简交互动画降低系统负担，坚守 Cute Cat 的 Mascot 心智。
+目标：修复设置页主题选择卡片的绘制 Bug，精简交互动画降低系统负担，设定 Shiba Inu 为默认宠物并对状态进行持久化。
 
 #### 3.2.1 ThemeCard 边框显示缺陷修复
 *   **当前问题**：目前主题选择卡片 `ThemeCard` 存在边框显示不完整的问题（由于边框描边 `.stroke` 会沿路径中线向外扩张，导致卡片边缘部分超出 frame bounds 被容器截断）。
@@ -63,8 +63,11 @@ v0.8 包含以下三大功能模块：
     *   **Hover 反馈**：当鼠标指针悬停在卡片上时，卡片底部的投影（Shadow）半径适度增大，展现交互聚焦。
     *   **Selected 反馈**：卡片边框高亮主色描边加粗（2px），未选中卡片为浅灰色描边（1px）。
 
-#### 3.2.3 坚守 Cute Cat 作为默认主题
-*   拒绝无业务/数据支撑的默认主题变更为 Shiba Inu 的方案，继续维持 `Cute Cat` 为系统默认初始化宠物主题，尊重老用户心智。
+#### 3.2.3 设定 Shiba Inu 作为默认主题
+*   为了更好的首屏与新用户留存体验，将 `Shiba Inu` 设为系统默认初始化宠物主题，并在设置页面的 Theme Select 列表中置于第一位。
+
+#### 3.2.4 桌面 Pet 状态与模式持久化 (State Persistence)
+*   将 `petViewMode`（迷你态还是 Full 态）持久化至 `UserDefaults`。当用户重启 App 时，自动恢复上一次的桌面 Pet 模式（Mini 或 Full），确保用户偏好的工作状态不丢失。
 
 ---
 
@@ -96,8 +99,8 @@ v0.8 包含以下三大功能模块：
 |                                                              |
 | Theme Select                                                 |
 | +-----------+ +-----------+ +-------------+                  |
-| |  Cute Cat | | Shiba Inu | | Pixel Slime |                  |
-| |  [Selected| |           | |             |                  |
+| | Shiba Inu | |  Cute Cat | | Pixel Slime |                  |
+| | [Selected]| |           | |             |                  |
 | +-----------+ +-----------+ +-------------+                  |
 |                                                              |
 |--------------------------------------------------------------|

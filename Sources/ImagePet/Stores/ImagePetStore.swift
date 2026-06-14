@@ -104,6 +104,7 @@ final class ImagePetStore: ObservableObject {
 
     @Published var petViewMode: DesktopPetViewMode = .mini {
         didSet {
+            defaults.set(petViewMode.rawValue, forKey: petViewModeKey)
             if petViewMode == .full {
                 resetPetIdleTimer()
                 issuesVisuallyDegraded = false
@@ -130,7 +131,7 @@ final class ImagePetStore: ObservableObject {
             defaults.set(energySavingMode, forKey: energySavingModeKey)
         }
     }
-    @Published var selectedThemeName = "CuteCat" {
+    @Published var selectedThemeName = "ShibaInu" {
         didSet {
             defaults.set(selectedThemeName, forKey: selectedThemeNameKey)
         }
@@ -179,6 +180,7 @@ final class ImagePetStore: ObservableObject {
     // PRD v0.7 Keys
     private let launchAtLoginKey = "ImagePet.launchAtLogin"
     private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
+    private let petViewModeKey = "ImagePet.petViewMode"
 
     init(
         compressor: ImageCompressor = ImageCompressor(),
@@ -199,7 +201,7 @@ final class ImagePetStore: ObservableObject {
         self.enableIdleVariants = true
         self.enableHoverFeedback = true
         self.energySavingMode = false
-        self.selectedThemeName = "CuteCat"
+        self.selectedThemeName = "ShibaInu"
 
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
@@ -289,7 +291,11 @@ final class ImagePetStore: ObservableObject {
                 }
             }
 
-            self.petViewMode = .mini
+            if let savedMode = defaults.string(forKey: petViewModeKey), let mode = DesktopPetViewMode(rawValue: savedMode) {
+                self.petViewMode = mode
+            } else {
+                self.petViewMode = .mini
+            }
         }
         checkAndApplyAutoExpand()
         self.isInitializing = false
