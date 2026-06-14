@@ -80,7 +80,6 @@ final class ImagePetStore: ObservableObject {
 
     @Published var petViewMode: DesktopPetViewMode = .mini {
         didSet {
-            defaults.set(petViewMode.rawValue, forKey: petViewModeKey)
             if petViewMode == .full {
                 resetPetIdleTimer()
             } else {
@@ -90,7 +89,6 @@ final class ImagePetStore: ObservableObject {
         }
     }
 
-    private let petViewModeKey = "ImagePet.petViewMode"
     private var idleTimerTask: Task<Void, Never>?
 
     let maxConcurrentJobs = 2
@@ -101,6 +99,7 @@ final class ImagePetStore: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var openMainWindow: (() -> Void)?
     private var desktopPetWindowController: DesktopPetWindowController?
+    private var isPetHovering = false
     private var didPromptForInitialFolder = false
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
@@ -117,7 +116,7 @@ final class ImagePetStore: ObservableObject {
         self.compressor = compressor
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
-        
+
         self.outputFormat = .original
         self.saveLocationMode = .designated
         self.filenameSuffix = "_compressed"
@@ -135,7 +134,7 @@ final class ImagePetStore: ObservableObject {
         } else {
             self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
             restoreOutputDirectory()
-            
+
             if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
                 self.outputFormat = format
             }
@@ -151,12 +150,7 @@ final class ImagePetStore: ObservableObject {
             if defaults.object(forKey: stripMetadataKey) != nil {
                 self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
             }
-            if let savedViewMode = defaults.string(forKey: petViewModeKey),
-               let mode = DesktopPetViewMode(rawValue: savedViewMode) {
-                self.petViewMode = mode
-            } else {
-                self.petViewMode = .mini
-            }
+            self.petViewMode = .mini
         }
         checkAndApplyAutoExpand()
     }
@@ -170,7 +164,7 @@ final class ImagePetStore: ObservableObject {
         let targetFormat = outputFormat
         let targetUTType = targetFormat.targetUTType(for: dummyInput)
         let targetExtension = targetUTType.preferredFilenameExtension ?? "png"
-        
+
         let outputName = OutputNameAllocator.outputFileName(
             for: dummyInput,
             suffix: filenameSuffix,
@@ -482,6 +476,8 @@ final class ImagePetStore: ObservableObject {
             retryFailed()
         case .compressMore:
             compressMore()
+        case .expand:
+            petViewMode = .full
         case .collapse:
             petViewMode = .mini
         }
@@ -504,7 +500,20 @@ final class ImagePetStore: ObservableObject {
     }
 
     func hideDesktopPet() {
+        isPetHovering = false
         isDesktopPetVisible = false
+    }
+
+    func setPetHovering(_ isHovering: Bool) {
+        guard isPetHovering != isHovering else { return }
+        isPetHovering = isHovering
+
+        if isHovering {
+            idleTimerTask?.cancel()
+            idleTimerTask = nil
+        } else {
+            resetPetIdleTimer()
+        }
     }
 
     private func restoreOutputDirectory() {
@@ -571,10 +580,10 @@ final class ImagePetStore: ObservableObject {
     private func checkAndRequestParentFolderPermissions() async -> Bool {
         let pendingJobs = jobs.filter { $0.status == .pending }
         var unauthorizedFolders: Set<URL> = []
-        
+
         for job in pendingJobs {
             let parentFolder = job.inputURL.deletingLastPathComponent()
-            
+
             if let restoredURL = bookmarkStore.restoreMulti(for: parentFolder) {
                 let access = restoredURL.startAccessingSecurityScopedResource()
                 let isWritable = FileManager.default.isWritableFile(atPath: parentFolder.path)
@@ -585,7 +594,7 @@ final class ImagePetStore: ObservableObject {
                     continue
                 }
             }
-            
+
             let testURL = parentFolder.appendingPathComponent(".imagepet_sandbox_test_\(UUID().uuidString)")
             do {
                 try Data().write(to: testURL)
@@ -595,14 +604,14 @@ final class ImagePetStore: ObservableObject {
                 unauthorizedFolders.insert(parentFolder)
             }
         }
-        
+
         for folder in unauthorizedFolders {
             let success = await showFolderPermissionPanel(for: folder)
             if !success {
                 return false
             }
         }
-        
+
         return true
     }
 
@@ -615,7 +624,7 @@ final class ImagePetStore: ObservableObject {
             panel.allowsMultipleSelection = false
             panel.prompt = "Authorize"
             panel.message = "ImagePet needs permission to write compressed files to this folder:\n\(folder.path)"
-            
+
             let response = panel.runModal()
             if response == .OK,
                let url = panel.url,
@@ -700,7 +709,7 @@ final class ImagePetStore: ObservableObject {
 
         var targetOutputDir = outputDirectory
         var restoredBookmarkURL: URL? = nil
-        
+
         if saveLocationMode == .originalFolder {
             let parentFolder = job.inputURL.deletingLastPathComponent()
             restoredBookmarkURL = bookmarkStore.restoreMulti(for: parentFolder)
@@ -788,13 +797,14 @@ final class ImagePetStore: ObservableObject {
 
     func resetPetIdleTimer() {
         idleTimerTask?.cancel()
-        
+
         guard petViewMode == .full else { return }
-        
+
         let snapshot = petSnapshot
         let isBlocking = snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission
         guard !isBlocking && !isProcessing else { return }
-        
+        guard !isPetHovering else { return }
+
         idleTimerTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
             guard !Task.isCancelled else { return }

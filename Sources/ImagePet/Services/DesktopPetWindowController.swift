@@ -15,7 +15,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     init(store: ImagePetStore) {
         self.store = store
         super.init()
-        
+
         store.$petViewMode
             .receive(on: DispatchQueue.main)
             .sink { [weak self] mode in
@@ -55,18 +55,23 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private func updateWindowSize(for mode: DesktopPetViewMode) {
         guard let window = self.window else { return }
         let newSize = mode == .mini ? Self.miniSize : Self.fullSize
-        guard window.frame.size != newSize else { return }
-        
         let currentFrame = window.frame
-        let currentCenter = NSPoint(x: currentFrame.midX, y: currentFrame.midY)
-        let newOrigin = NSPoint(
-            x: currentCenter.x - newSize.width / 2,
-            y: currentCenter.y - newSize.height / 2
-        )
-        
-        let newFrame = NSRect(origin: newOrigin, size: newSize)
+        let newOrigin: NSPoint
+        if currentFrame.size == newSize {
+            newOrigin = currentFrame.origin
+        } else {
+            let currentCenter = NSPoint(x: currentFrame.midX, y: currentFrame.midY)
+            newOrigin = NSPoint(
+                x: currentCenter.x - newSize.width / 2,
+                y: currentCenter.y - newSize.height / 2
+            )
+        }
+
+        let newFrame = constrainedFrame(NSRect(origin: newOrigin, size: newSize))
+        guard window.frame != newFrame else { return }
+
         let shouldAnimate = !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        
+
         window.setFrame(newFrame, display: true, animate: shouldAnimate)
     }
 
@@ -90,7 +95,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window.delegate = self
 
         if window.setFrameUsingName(Self.frameAutosaveName) {
-            window.setFrame(NSRect(origin: window.frame.origin, size: size), display: false)
+            window.setFrame(constrainedFrame(NSRect(origin: window.frame.origin, size: size)), display: false)
             ensureFrameIsVisible(window, fallbackSize: size)
         } else {
             window.setFrame(defaultFrame(for: size), display: false)
@@ -107,19 +112,53 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
         if !isVisibleOnAnyScreen {
             window.setFrame(defaultFrame(for: fallbackSize), display: false)
+        } else {
+            window.setFrame(constrainedFrame(window.frame), display: false)
         }
     }
 
     private func defaultFrame(for size: NSSize) -> NSRect {
-        NSRect(origin: defaultOrigin(for: size), size: size)
+        constrainedFrame(NSRect(origin: defaultOrigin(for: size), size: size))
     }
 
     private func defaultOrigin(for size: NSSize) -> NSPoint {
         let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
+        let expandedWidth = max(size.width, Self.fullSize.width)
+        let horizontalInset = 28 + (expandedWidth - size.width) / 2
         return NSPoint(
-            x: visibleFrame.maxX - size.width - 28,
+            x: visibleFrame.maxX - size.width - horizontalInset,
             y: visibleFrame.minY + 92
         )
+    }
+
+    private func constrainedFrame(_ frame: NSRect) -> NSRect {
+        guard let screen = screen(for: frame) else { return frame }
+
+        let visibleFrame = screen.visibleFrame.insetBy(dx: 8, dy: 8)
+        let width = min(frame.width, visibleFrame.width)
+        let height = min(frame.height, visibleFrame.height)
+        let minX = visibleFrame.minX
+        let maxX = visibleFrame.maxX - width
+        let minY = visibleFrame.minY
+        let maxY = visibleFrame.maxY - height
+        let origin = NSPoint(
+            x: min(max(frame.origin.x, minX), maxX),
+            y: min(max(frame.origin.y, minY), maxY)
+        )
+
+        return NSRect(origin: origin, size: NSSize(width: width, height: height))
+    }
+
+    private func screen(for frame: NSRect) -> NSScreen? {
+        let center = NSPoint(x: frame.midX, y: frame.midY)
+        if let containingScreen = NSScreen.screens.first(where: { $0.visibleFrame.contains(center) }) {
+            return containingScreen
+        }
+
+        return NSScreen.screens
+            .map { screen in (screen, frame.intersection(screen.visibleFrame).width * frame.intersection(screen.visibleFrame).height) }
+            .max { $0.1 < $1.1 }?
+            .0 ?? NSScreen.main
     }
 }
 

@@ -66,19 +66,22 @@ struct DesktopPetView: View {
                 self.isDropTargeted = false
             }
         }
-        .onHover { isHovered in
-            if isHovered {
+        .onContinuousHover(coordinateSpace: .local) { phase in
+            if case .active = phase {
                 store.resetPetIdleTimer()
             }
+        }
+        .onHover { isHovering in
+            store.setPetHovering(isHovering)
         }
         .contextMenu {
             if store.petViewMode == .mini {
                 Button("Show Panel") {
-                    store.petViewMode = .full
+                    store.handlePetAction(.expand)
                 }
             } else {
                 Button("Collapse to Mini") {
-                    store.petViewMode = .mini
+                    store.handlePetAction(.collapse)
                 }
             }
             Button("Open App") {
@@ -141,7 +144,14 @@ struct DesktopPetView: View {
                 .frame(width: 64, height: 56)
                 .scaleEffect(faceScale(for: snapshot.state))
                 .animation(faceAnimation(for: snapshot.state), value: snapshot.state)
-                .accessibilityLabel("Desktop pet, \(snapshot.title), double click to show controls")
+                .accessibilityLabel(accessibilityLabel(for: snapshot))
+                .accessibilityHint(accessibilityHint(for: snapshot))
+                .accessibilityAddTraits(store.petViewMode == .mini ? .isButton : [])
+                .accessibilityAction {
+                    if store.petViewMode == .mini {
+                        store.handlePetAction(.expand)
+                    }
+                }
                 .accessibilityIdentifier("desktopPetEmoji")
 
             if store.petViewMode == .full {
@@ -165,7 +175,7 @@ struct DesktopPetView: View {
             .frame(width: 72, height: 72)
             .contentShape(RoundedRectangle(cornerRadius: 18))
             .onTapGesture {
-                store.petViewMode = .full
+                store.handlePetAction(.expand)
             }
     }
 
@@ -288,6 +298,8 @@ struct DesktopPetView: View {
             return "arrow.clockwise"
         case .compressMore:
             return "plus.circle"
+        case .expand:
+            return "arrow.up.left.and.arrow.down.right"
         case .collapse:
             return "arrow.down.right.and.arrow.up.left"
         }
@@ -307,6 +319,8 @@ struct DesktopPetView: View {
             return "Retry"
         case .compressMore:
             return "More"
+        case .expand:
+            return "Show"
         case .collapse:
             return "Collapse"
         }
@@ -329,6 +343,8 @@ struct DesktopPetView: View {
             return "Retry Failed"
         case .compressMore:
             return "Compress More"
+        case .expand:
+            return "Show Pet Controls"
         case .collapse:
             return "Collapse to Mini Pet"
         }
@@ -348,9 +364,25 @@ struct DesktopPetView: View {
             return "desktopPetRetryFailedButton"
         case .compressMore:
             return "desktopPetCompressMoreButton"
+        case .expand:
+            return "desktopPetExpandButton"
         case .collapse:
             return "collapsePetButton"
         }
+    }
+
+    private func accessibilityLabel(for snapshot: DesktopPetSnapshot) -> String {
+        if store.petViewMode == .mini {
+            return "ImagePet desktop pet, \(snapshot.title), drop images or click to show controls"
+        }
+        return "ImagePet desktop pet, \(snapshot.title), \(snapshot.detail)"
+    }
+
+    private func accessibilityHint(for snapshot: DesktopPetSnapshot) -> String {
+        if store.petViewMode == .mini {
+            return snapshot.canAcceptDrop ? "Drop images or click to show controls" : "Click to show controls"
+        }
+        return snapshot.canAcceptDrop ? "Drop images to add them" : "Open the app for the next step"
     }
 
     private func detailText(for snapshot: DesktopPetSnapshot) -> String {

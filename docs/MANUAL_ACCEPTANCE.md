@@ -176,4 +176,3 @@
 | 12| 右键菜单 | Mini/Full 右键均有控制菜单项，支持切换模式与唤起 App | [ ] | |
 | 13| 阻塞展开 | needsSetup/confirm/permission 等阻塞状态自动从 Mini 展开为 Full | [ ] | |
 | 14| 自动收回 | Full 状态无交互 30 秒自动收回 Mini，Hover 悬停能重置计时器 | [ ] | |
-

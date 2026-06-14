@@ -27,6 +27,38 @@ final class ImagePetUITests: XCTestCase {
         return contentWindow
     }
 
+    private func desktopPetEmoji(in petWindow: XCUIElement) -> XCUIElement {
+        let button = petWindow.buttons["desktopPetEmoji"]
+        if button.exists {
+            return button
+        }
+
+        let staticText = petWindow.staticTexts["desktopPetEmoji"]
+        if staticText.exists {
+            return staticText
+        }
+
+        return petWindow.descendants(matching: .any)["desktopPetEmoji"]
+    }
+
+    private func waitForExpandedPetWindow(_ petWindow: XCUIElement, timeout: TimeInterval = 2.0) {
+        let expanded = NSPredicate { element, _ in
+            guard let petWindow = element as? XCUIElement else { return false }
+            return petWindow.frame.width >= 180
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: expanded, object: petWindow)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: timeout), .completed)
+    }
+
+    private func waitForMiniPetWindow(_ petWindow: XCUIElement, timeout: TimeInterval = 2.0) {
+        let collapsed = NSPredicate { element, _ in
+            guard let petWindow = element as? XCUIElement else { return false }
+            return petWindow.frame.width <= 100
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: collapsed, object: petWindow)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: timeout), .completed)
+    }
+
     func testLaunchAndInitialLayout() throws {
         // Assert main window is open
         let window = mainWindow()
@@ -80,16 +112,16 @@ final class ImagePetUITests: XCTestCase {
 
         // Click to show Desktop Pet
         toggleButton.click()
-        
+
         // Wait since UI updates on window displays might be asynchronous
         let petWindowExists = petWindow.waitForExistence(timeout: 2.0)
         XCTAssertTrue(petWindowExists)
 
         // Verify elements inside DesktopPetWindow (starts in Mini mode)
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
-        XCTAssertLessThanOrEqual(petWindow.frame.width, 100)
-        
+        waitForMiniPetWindow(petWindow)
+
         let petTitle = petWindow.staticTexts["desktopPetTitle"]
         XCTAssertFalse(petTitle.exists)
 
@@ -97,7 +129,7 @@ final class ImagePetUITests: XCTestCase {
         petEmoji.click()
         XCTAssertTrue(petTitle.waitForExistence(timeout: 2.0))
         XCTAssertEqual(petTitle.textContent, "Ready")
-        XCTAssertGreaterThanOrEqual(petWindow.frame.width, 180)
+        waitForExpandedPetWindow(petWindow)
 
         // Close the pet using the window close button
         let closeButton = petWindow.buttons["closePetButton"]
@@ -123,7 +155,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
         // Expand
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
         petEmoji.click()
 
@@ -158,17 +190,17 @@ final class ImagePetUITests: XCTestCase {
         // Verify job rows appear in the UI by querying specific text elements
         let filename1 = window.staticTexts.matching(identifier: "jobFileName_sample1.png").firstMatch
         let filename2 = window.staticTexts.matching(identifier: "jobFileName_sample2.png").firstMatch
-        
+
         XCTAssertTrue(filename1.waitForExistence(timeout: 5.0))
         XCTAssertTrue(filename2.waitForExistence(timeout: 5.0))
 
         // Wait until compression is completed (Done status shows up)
         let status1 = window.staticTexts.matching(identifier: "jobStatusText_sample1.png").firstMatch
         let status2 = window.staticTexts.matching(identifier: "jobStatusText_sample2.png").firstMatch
-        
+
         XCTAssertTrue(status1.waitForExistence(timeout: 5.0))
         XCTAssertTrue(status2.waitForExistence(timeout: 5.0))
-        
+
         XCTAssertEqual(status1.textContent, "Done")
         XCTAssertEqual(status2.textContent, "Done")
 
@@ -208,7 +240,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
         // Expand
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
         petEmoji.click()
 
@@ -259,7 +291,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
         // Expand
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
         petEmoji.click()
 
@@ -311,7 +343,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
         // Expand
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
         petEmoji.click()
 
@@ -347,6 +379,48 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petWindow.buttons["desktopPetCompressMoreButton"].exists)
     }
 
+    func testDesktopPetBlockingConfirmForcesFullFromMini() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["UI_TEST_OVERWRITE"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        XCTAssertFalse(petWindow.staticTexts["desktopPetTitle"].exists)
+        waitForMiniPetWindow(petWindow)
+
+        let addImagesButton = window.buttons["addImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        let confirmExpectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == 'Confirm overwrite' OR value == 'Confirm overwrite'"),
+            object: petTitle
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [confirmExpectation], timeout: 3.0), .completed)
+        waitForExpandedPetWindow(petWindow)
+
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 3.0))
+        let cancelButton = sheet.buttons["Cancel"]
+        XCTAssertTrue(cancelButton.exists)
+        cancelButton.click()
+    }
+
     func testDesktopPetFullCollapsesToMini() throws {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
@@ -358,26 +432,26 @@ final class ImagePetUITests: XCTestCase {
         let petWindow = app.windows["DesktopPetWindow"]
         XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
 
-        let petEmoji = petWindow.staticTexts["desktopPetEmoji"]
+        let petEmoji = desktopPetEmoji(in: petWindow)
         XCTAssertTrue(petEmoji.exists)
-        
+
         // Expand
         petEmoji.click()
-        
+
         let petTitle = petWindow.staticTexts["desktopPetTitle"]
         XCTAssertTrue(petTitle.waitForExistence(timeout: 2.0))
-        XCTAssertGreaterThanOrEqual(petWindow.frame.width, 180)
-        
+        waitForExpandedPetWindow(petWindow)
+
         // Find collapse button
         let collapseButton = petWindow.buttons["collapsePetButton"]
         XCTAssertTrue(collapseButton.exists)
         collapseButton.click()
-        
+
         // Verify title disappears (collapsed back to mini)
         let disappeared = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: disappeared, object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2.0), .completed)
-        XCTAssertLessThanOrEqual(petWindow.frame.width, 100)
+        waitForMiniPetWindow(petWindow)
     }
 }
 

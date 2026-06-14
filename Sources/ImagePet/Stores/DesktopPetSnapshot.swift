@@ -17,6 +17,7 @@ enum DesktopPetAction: Equatable {
     case revealOutput
     case retryFailed
     case compressMore
+    case expand
     case collapse
 }
 
