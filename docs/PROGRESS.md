@@ -1,6 +1,6 @@
 # ImagePet MVP Progress
 
-更新日期：2026-06-14
+更新日期：2026-06-15
 
 ## 当前状态
 
@@ -15,6 +15,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - 桌面宠物小窗第一版
 - 桌面 Pet UI、动效和轻量交互优化
 - V0.3 输出格式、保存位置、覆盖确认、尺寸限制和元数据剥离选项
+- V0.9 WebP 与自定义压缩质量规划文档
 - 单张压缩结果显示原始大小、输出大小和节省比例
 - App Sandbox entitlements
 - committed `ImagePet.xcodeproj`
@@ -38,6 +39,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - V0.4 桌面 Pet 规划：[PRD_v0.4_desktop_pet.md](PRD_v0.4_desktop_pet.md)
 - V0.5 桌面 Pet 双态规划：[PRD_v0.5_desktop_pet_dual_state.md](PRD_v0.5_desktop_pet_dual_state.md)
 - V0.7 静默桌面 Pet 常驻与主题扩展规划：[PRD_v0.7_desktop_pet_expansion.md](PRD_v0.7_desktop_pet_expansion.md)
+- V0.9 WebP 与自定义压缩质量规划：[PRD_v0.9_webp_custom_quality.md](PRD_v0.9_webp_custom_quality.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -47,7 +49,8 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | --- | --- | --- | --- |
 | JPG / JPEG / PNG / HEIC 输入 | 已实现 | `SupportedImageFormat` + ImageIO 解码；fixture 覆盖 JPG/PNG/HEIC | 用真实 iPhone HEIC 做手工验收 |
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
-| WebP / AVIF 不做 | 已锁定 | PRD 和 README 明确排除 | 保持范围，不引入新格式 |
+| WebP | 已规划，未实现 | `docs/PRD_v0.9_webp_custom_quality.md` 已定义静态 WebP 输入/输出、Native ImageIO read/write capability probe、Native engine + capabilities、Custom Quality 和验收标准 | 先做当前可获得环境的 ImageIO WebP spike，记录未覆盖系统版本，再决定 v0.9 是否只走 Native |
+| AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
 | 最大边长限制 | 已实现 | `MaxDimensionLimit` + compressor 单测覆盖缩放 | 用真实大图做视觉验收 |
 | 元数据剥离 | 已实现 | `stripMetadata` 默认开启；保留模式复制基础 source properties | 手工检查 EXIF/GPS 样本 |
@@ -64,7 +67,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | 静默桌面 Pet 常驻与内置主题扩展规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 与 `docs/PRD_v0.7_desktop_pet_expansion.md` 明确内置动画集、Launch at Login 静默启动、既有 Pet 直接拖拽验收、至少 1 套新增内置主题；自定义导入延后 | 进入 v0.7 技术设计评审 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
-| Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；格式边界测试锁定 GIF/WebP/PDF 不支持 | GUI 混合批次仍需手工验证 |
+| Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；当前格式边界测试仍锁定 GIF/WebP/PDF 不支持 | V0.9 实现 WebP 时改写 WebP 边界测试，并保留 GIF/PDF 拒绝 |
 | 总计 Ate / Pooped / Saved | 已实现 | `ImagePetStore` 汇总，GUI 展示 | 手工核对展示 |
 | Reveal in Finder | 已实现 | GUI 调用 Finder reveal/open | 手工点击验证 |
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
