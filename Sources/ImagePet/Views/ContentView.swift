@@ -736,6 +736,17 @@ private struct DesktopPetSettingsView: View {
                             }
                             .accessibilityIdentifier("enableHoverFeedbackToggle")
 
+                            Toggle(isOn: $store.enableSuccessSound) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Play Success Sound")
+                                        .fontWeight(.medium)
+                                    Text("Plays a gentle chime when all images are compressed successfully.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("enableSuccessSoundToggle")
+
                             Divider()
 
                             Toggle(isOn: $store.energySavingMode) {

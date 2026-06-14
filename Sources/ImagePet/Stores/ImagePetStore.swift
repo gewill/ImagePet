@@ -126,6 +126,11 @@ final class ImagePetStore: ObservableObject {
             defaults.set(enableHoverFeedback, forKey: enableHoverFeedbackKey)
         }
     }
+    @Published var enableSuccessSound = true {
+        didSet {
+            defaults.set(enableSuccessSound, forKey: enableSuccessSoundKey)
+        }
+    }
     @Published var energySavingMode = false {
         didSet {
             defaults.set(energySavingMode, forKey: energySavingModeKey)
@@ -174,6 +179,7 @@ final class ImagePetStore: ObservableObject {
     private let stripMetadataKey = "ImagePet.stripMetadata"
     private let enableIdleVariantsKey = "ImagePet.enableIdleVariants"
     private let enableHoverFeedbackKey = "ImagePet.enableHoverFeedback"
+    private let enableSuccessSoundKey = "ImagePet.enableSuccessSound"
     private let energySavingModeKey = "ImagePet.energySavingMode"
     private let selectedThemeNameKey = "ImagePet.selectedThemeName"
 
@@ -200,6 +206,7 @@ final class ImagePetStore: ObservableObject {
 
         self.enableIdleVariants = true
         self.enableHoverFeedback = true
+        self.enableSuccessSound = true
         self.energySavingMode = false
         self.selectedThemeName = "ShibaInu"
 
@@ -241,6 +248,7 @@ final class ImagePetStore: ObservableObject {
                 self.outputDirectory = nil
             }
             self.petViewMode = .mini
+            self.enableSuccessSound = true
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
@@ -275,6 +283,9 @@ final class ImagePetStore: ObservableObject {
             }
             if defaults.object(forKey: enableHoverFeedbackKey) != nil {
                 self.enableHoverFeedback = defaults.bool(forKey: enableHoverFeedbackKey)
+            }
+            if defaults.object(forKey: enableSuccessSoundKey) != nil {
+                self.enableSuccessSound = defaults.bool(forKey: enableSuccessSoundKey)
             }
             if defaults.object(forKey: energySavingModeKey) != nil {
                 self.energySavingMode = defaults.bool(forKey: energySavingModeKey)
@@ -845,6 +856,9 @@ final class ImagePetStore: ObservableObject {
         petState = hasFailedJobs ? .error : .happy
         didConfirmOverwrite = false
 
+        if failedCount == 0 && jobs.count > 0 && enableSuccessSound {
+            SoundManager.shared.playSuccessSound()
+        }
     }
 
     private func claimNextPendingJob() -> ImageJob? {
