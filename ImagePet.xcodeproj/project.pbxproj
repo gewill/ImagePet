@@ -37,6 +37,7 @@
 		C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */; };
 		CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A93444765F4DF14ABA2386D /* PetAnimation.swift */; };
 		D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */; };
+		E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F8FC16873CD4ECB419915BB /* Assets.xcassets */; };
 		E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
@@ -103,6 +104,7 @@
 		2845AD061C173BB07CE9F82B /* DesktopPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetView.swift; sourceTree = "<group>"; };
 		2B48DF5E09E5C0639460FB28 /* ImagePet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagePet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
+		3F8FC16873CD4ECB419915BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetWindowController.swift; sourceTree = "<group>"; };
 		426BA951424DECEFB023D3A9 /* FrameAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameAnimator.swift; sourceTree = "<group>"; };
 		42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptions.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 		086B80E87D840BEB44CFA27C /* ImagePet */ = {
 			isa = PBXGroup;
 			children = (
+				3F8FC16873CD4ECB419915BB /* Assets.xcassets */,
 				6F8F586A1135EAED6910EB32 /* Resources */,
 				9DD5A4DE7991CFEF8ABD7776 /* App */,
 				7DB36FA47B78B6234C07F479 /* Services */,
@@ -430,6 +433,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */,
 				468ABFAA6A7B08517772B948 /* Resources in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -713,7 +717,7 @@
 		B622A874D0E6F7A24ECE0B54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Entitlements/ImagePet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -755,7 +759,7 @@
 		E44F3183F77A155EF6F96042 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Entitlements/ImagePet.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
