@@ -8,11 +8,173 @@ struct DesktopPetView: View {
     var body: some View {
         let snapshot = store.petSnapshot
 
+        Group {
+            if store.petViewMode == .mini {
+                miniView(for: snapshot)
+            } else {
+                fullView(for: snapshot)
+            }
+        }
+        .frame(width: store.petViewMode == .mini ? 80 : 192, height: store.petViewMode == .mini ? 80 : 176)
+        .background(
+            Group {
+                if store.petViewMode == .mini {
+                    Circle()
+                        .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : Color.clear)
+                } else {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : accentColor(for: snapshot.state).opacity(0.04))
+                }
+            }
+        )
+        .background(
+            Group {
+                if store.petViewMode != .mini {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.regularMaterial)
+                }
+            }
+        )
+        .overlay(
+            Group {
+                if store.petViewMode == .mini {
+                    if isDropTargeted {
+                        Circle()
+                            .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                    }
+                } else {
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(
+                            isDropTargeted ? Color.accentColor : accentColor(for: snapshot.state).opacity(0.24),
+                            style: StrokeStyle(lineWidth: isDropTargeted ? 2 : 1, dash: isDropTargeted ? [6, 4] : [])
+                        )
+                }
+            }
+        )
+        .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
+        .contentShape(RoundedRectangle(cornerRadius: store.petViewMode == .mini ? 40 : 8))
+        .animation(reduceMotion ? nil : .spring(response: 0.24, dampingFraction: 0.82), value: isDropTargeted)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: snapshot.state)
+        .dropDestination(for: URL.self) { urls, _ in
+            guard snapshot.canAcceptDrop else { return false }
+            store.addDroppedURLs(urls)
+            return true
+        } isTargeted: { isTargeted in
+            if snapshot.canAcceptDrop {
+                self.isDropTargeted = isTargeted
+            } else {
+                self.isDropTargeted = false
+            }
+        }
+        .onHover { isHovered in
+            if isHovered {
+                store.resetPetIdleTimer()
+            }
+        }
+        .contextMenu {
+            if store.petViewMode == .mini {
+                Button("Show Panel") {
+                    store.petViewMode = .full
+                }
+            } else {
+                Button("Collapse to Mini") {
+                    store.petViewMode = .mini
+                }
+            }
+            Button("Open App") {
+                store.handlePetAction(.openMainApp)
+            }
+            Button("Hide Pet") {
+                store.handlePetAction(.hidePet)
+            }
+        }
+    }
+
+    private var topBar: some View {
+        HStack {
+            Button {
+                store.handlePetAction(.openMainApp)
+            } label: {
+                PetTopActionLabel(title: "App", systemImage: "arrow.up.right.square")
+            }
+            .buttonStyle(.plain)
+            .help("Show Main Application")
+            .accessibilityLabel("Show Main Application")
+            .accessibilityIdentifier("desktopPetReturnToAppButton")
+
+            Spacer()
+
+            Button {
+                store.handlePetAction(.collapse)
+            } label: {
+                PetIconButton(systemImage: "arrow.down.right.and.arrow.up.left", accent: .secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Collapse to Mini Pet")
+            .accessibilityLabel("Collapse to Mini Pet")
+            .accessibilityIdentifier("collapsePetButton")
+
+            Button {
+                store.handlePetAction(.hidePet)
+            } label: {
+                PetIconButton(systemImage: "xmark", accent: .secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Hide Desktop Pet")
+            .accessibilityLabel("Hide Desktop Pet")
+            .accessibilityIdentifier("closePetButton")
+        }
+        .frame(height: 22)
+    }
+
+    private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(accentColor(for: snapshot.state).opacity(isDropTargeted ? 0.22 : 0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 1)
+                )
+
+            Text(snapshot.emoji)
+                .font(.system(size: 48))
+                .frame(width: 64, height: 56)
+                .scaleEffect(faceScale(for: snapshot.state))
+                .animation(faceAnimation(for: snapshot.state), value: snapshot.state)
+                .accessibilityLabel("Desktop pet, \(snapshot.title), double click to show controls")
+                .accessibilityIdentifier("desktopPetEmoji")
+
+            if store.petViewMode == .full {
+                Image(systemName: badgeSymbol(for: snapshot.state))
+                    .font(.system(size: 12, weight: .bold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(accentColor(for: snapshot.state))
+                    .frame(width: 22, height: 22)
+                    .background(.regularMaterial, in: Circle())
+                    .overlay(Circle().stroke(.secondary.opacity(0.18), lineWidth: 1))
+                    .padding(2)
+                    .accessibilityHidden(true)
+            }
+        }
+        .frame(width: 72, height: 60)
+        .shadow(color: accentColor(for: snapshot.state).opacity(0.18), radius: isDropTargeted ? 10 : 6, y: 3)
+    }
+
+    private func miniView(for snapshot: DesktopPetSnapshot) -> some View {
+        petFace(for: snapshot)
+            .frame(width: 72, height: 72)
+            .contentShape(RoundedRectangle(cornerRadius: 18))
+            .onTapGesture {
+                store.petViewMode = .full
+            }
+    }
+
+    @ViewBuilder
+    private func fullView(for snapshot: DesktopPetSnapshot) -> some View {
         VStack(spacing: 7) {
             topBar
 
             petFace(for: snapshot)
-                .accessibilityIdentifier("desktopPetEmoji")
 
             VStack(spacing: 2) {
                 HStack(spacing: 5) {
@@ -54,91 +216,6 @@ struct DesktopPetView: View {
             actionBar(for: snapshot)
         }
         .padding(10)
-        .frame(width: 192, height: 176)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : accentColor(for: snapshot.state).opacity(0.04))
-        )
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(
-                    isDropTargeted ? Color.accentColor : accentColor(for: snapshot.state).opacity(0.24),
-                    style: StrokeStyle(lineWidth: isDropTargeted ? 2 : 1, dash: isDropTargeted ? [6, 4] : [])
-                )
-        )
-        .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
-        .contentShape(RoundedRectangle(cornerRadius: 8))
-        .animation(reduceMotion ? nil : .spring(response: 0.24, dampingFraction: 0.82), value: isDropTargeted)
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: snapshot.state)
-        .dropDestination(for: URL.self) { urls, _ in
-            guard snapshot.canAcceptDrop else { return false }
-            store.addDroppedURLs(urls)
-            return true
-        } isTargeted: { isTargeted in
-            if snapshot.canAcceptDrop {
-                self.isDropTargeted = isTargeted
-            } else {
-                self.isDropTargeted = false
-            }
-        }
-    }
-
-    private var topBar: some View {
-        HStack {
-            Button {
-                store.handlePetAction(.openMainApp)
-            } label: {
-                PetTopActionLabel(title: "App", systemImage: "arrow.up.right.square")
-            }
-            .buttonStyle(.plain)
-            .help("Show Main Application")
-            .accessibilityLabel("Show Main Application")
-            .accessibilityIdentifier("desktopPetReturnToAppButton")
-
-            Spacer()
-
-            Button {
-                store.handlePetAction(.hidePet)
-            } label: {
-                PetIconButton(systemImage: "xmark", accent: .secondary)
-            }
-            .buttonStyle(.plain)
-            .help("Hide Desktop Pet")
-            .accessibilityLabel("Hide Desktop Pet")
-            .accessibilityIdentifier("closePetButton")
-        }
-        .frame(height: 22)
-    }
-
-    private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
-        ZStack(alignment: .bottomTrailing) {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(accentColor(for: snapshot.state).opacity(isDropTargeted ? 0.22 : 0.12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 1)
-                )
-
-            Text(snapshot.emoji)
-                .font(.system(size: 48))
-                .frame(width: 64, height: 56)
-                .scaleEffect(faceScale(for: snapshot.state))
-                .animation(faceAnimation(for: snapshot.state), value: snapshot.state)
-                .accessibilityLabel("Desktop pet \(snapshot.title)")
-
-            Image(systemName: badgeSymbol(for: snapshot.state))
-                .font(.system(size: 12, weight: .bold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(accentColor(for: snapshot.state))
-                .frame(width: 22, height: 22)
-                .background(.regularMaterial, in: Circle())
-                .overlay(Circle().stroke(.secondary.opacity(0.18), lineWidth: 1))
-                .padding(2)
-                .accessibilityHidden(true)
-        }
-        .frame(width: 72, height: 60)
-        .shadow(color: accentColor(for: snapshot.state).opacity(0.18), radius: isDropTargeted ? 10 : 6, y: 3)
     }
 
     @ViewBuilder
@@ -211,6 +288,8 @@ struct DesktopPetView: View {
             return "arrow.clockwise"
         case .compressMore:
             return "plus.circle"
+        case .collapse:
+            return "arrow.down.right.and.arrow.up.left"
         }
     }
 
@@ -228,6 +307,8 @@ struct DesktopPetView: View {
             return "Retry"
         case .compressMore:
             return "More"
+        case .collapse:
+            return "Collapse"
         }
     }
 
@@ -248,6 +329,8 @@ struct DesktopPetView: View {
             return "Retry Failed"
         case .compressMore:
             return "Compress More"
+        case .collapse:
+            return "Collapse to Mini Pet"
         }
     }
 
@@ -265,6 +348,8 @@ struct DesktopPetView: View {
             return "desktopPetRetryFailedButton"
         case .compressMore:
             return "desktopPetCompressMoreButton"
+        case .collapse:
+            return "collapsePetButton"
         }
     }
 

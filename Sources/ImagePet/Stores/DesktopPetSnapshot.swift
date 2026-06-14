@@ -17,6 +17,12 @@ enum DesktopPetAction: Equatable {
     case revealOutput
     case retryFailed
     case compressMore
+    case collapse
+}
+
+enum DesktopPetViewMode: String, Codable, Equatable {
+    case mini
+    case full
 }
 
 struct DesktopPetSnapshot: Equatable {

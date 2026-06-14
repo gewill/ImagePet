@@ -1,17 +1,27 @@
 import AppKit
 import SwiftUI
+import Combine
 
 @MainActor
 final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private static let frameAutosaveName = "ImagePetDesktopPetWindow"
-    private static let windowSize = NSSize(width: 192, height: 176)
+    private static let miniSize = NSSize(width: 80, height: 80)
+    private static let fullSize = NSSize(width: 192, height: 176)
 
     private let store: ImagePetStore
     private var window: NSWindow?
+    private var cancellables = Set<AnyCancellable>()
 
     init(store: ImagePetStore) {
         self.store = store
         super.init()
+        
+        store.$petViewMode
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] mode in
+                self?.updateWindowSize(for: mode)
+            }
+            .store(in: &cancellables)
     }
 
     func setVisible(_ isVisible: Bool) {
@@ -42,8 +52,26 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window?.orderOut(nil)
     }
 
+    private func updateWindowSize(for mode: DesktopPetViewMode) {
+        guard let window = self.window else { return }
+        let newSize = mode == .mini ? Self.miniSize : Self.fullSize
+        guard window.frame.size != newSize else { return }
+        
+        let currentFrame = window.frame
+        let currentCenter = NSPoint(x: currentFrame.midX, y: currentFrame.midY)
+        let newOrigin = NSPoint(
+            x: currentCenter.x - newSize.width / 2,
+            y: currentCenter.y - newSize.height / 2
+        )
+        
+        let newFrame = NSRect(origin: newOrigin, size: newSize)
+        let shouldAnimate = !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        
+        window.setFrame(newFrame, display: true, animate: shouldAnimate)
+    }
+
     private func makeWindow() -> NSWindow {
-        let size = Self.windowSize
+        let size = store.petViewMode == .mini ? Self.miniSize : Self.fullSize
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),
             styleMask: [.borderless],
@@ -97,6 +125,6 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
 private final class DesktopPetWindow: NSWindow {
     override var canBecomeKey: Bool {
-        true
+        false
     }
 }

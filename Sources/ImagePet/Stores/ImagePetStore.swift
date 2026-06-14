@@ -4,18 +4,40 @@ import ImagePetCore
 
 @MainActor
 final class ImagePetStore: ObservableObject {
-    @Published var jobs: [ImageJob] = []
+    @Published var jobs: [ImageJob] = [] {
+        didSet {
+            checkAndApplyAutoExpand()
+        }
+    }
     @Published var preset: CompressionPreset = .balanced
-    @Published var outputDirectory: URL?
+    @Published var outputDirectory: URL? {
+        didSet {
+            checkAndApplyAutoExpand()
+        }
+    }
     @Published var petState: PetState = .idle
     @Published var isDropTargeted = false
-    @Published var isProcessing = false
-    @Published var outputFolderMessage: String?
+    @Published var isProcessing = false {
+        didSet {
+            checkAndApplyAutoExpand()
+            resetPetIdleTimer()
+        }
+    }
+    @Published var outputFolderMessage: String? {
+        didSet {
+            checkAndApplyAutoExpand()
+        }
+    }
     @Published var isDesktopPetVisible = false {
         didSet {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
-            if isDesktopPetVisible && desktopPetWindowController == nil {
-                desktopPetWindowController = DesktopPetWindowController(store: self)
+            if isDesktopPetVisible {
+                if desktopPetWindowController == nil {
+                    desktopPetWindowController = DesktopPetWindowController(store: self)
+                }
+                let snapshot = petSnapshot
+                let isBlocking = snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission
+                self.petViewMode = isBlocking ? .full : .mini
             }
             desktopPetWindowController?.setVisible(isDesktopPetVisible)
         }
@@ -31,6 +53,7 @@ final class ImagePetStore: ObservableObject {
             if saveLocationMode == .overwrite, outputFormat != .original {
                 outputFormat = .original
             }
+            checkAndApplyAutoExpand()
         }
     }
     @Published var filenameSuffix: String = "_compressed" {
@@ -48,8 +71,27 @@ final class ImagePetStore: ObservableObject {
             defaults.set(stripMetadata, forKey: stripMetadataKey)
         }
     }
-    @Published var showOverwriteConfirmation = false
+    @Published var showOverwriteConfirmation = false {
+        didSet {
+            checkAndApplyAutoExpand()
+        }
+    }
     var didConfirmOverwrite = false
+
+    @Published var petViewMode: DesktopPetViewMode = .mini {
+        didSet {
+            defaults.set(petViewMode.rawValue, forKey: petViewModeKey)
+            if petViewMode == .full {
+                resetPetIdleTimer()
+            } else {
+                idleTimerTask?.cancel()
+                idleTimerTask = nil
+            }
+        }
+    }
+
+    private let petViewModeKey = "ImagePet.petViewMode"
+    private var idleTimerTask: Task<Void, Never>?
 
     let maxConcurrentJobs = 2
 
@@ -81,10 +123,12 @@ final class ImagePetStore: ObservableObject {
         self.filenameSuffix = "_compressed"
         self.maxDimension = .none
         self.stripMetadata = true
+        self.petViewMode = .mini
 
         if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
             self.isDesktopPetVisible = false
             self.outputDirectory = nil
+            self.petViewMode = .mini
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
@@ -107,7 +151,14 @@ final class ImagePetStore: ObservableObject {
             if defaults.object(forKey: stripMetadataKey) != nil {
                 self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
             }
+            if let savedViewMode = defaults.string(forKey: petViewModeKey),
+               let mode = DesktopPetViewMode(rawValue: savedViewMode) {
+                self.petViewMode = mode
+            } else {
+                self.petViewMode = .mini
+            }
         }
+        checkAndApplyAutoExpand()
     }
 
     var completedCount: Int {
@@ -431,7 +482,10 @@ final class ImagePetStore: ObservableObject {
             retryFailed()
         case .compressMore:
             compressMore()
+        case .collapse:
+            petViewMode = .mini
         }
+        resetPetIdleTimer()
     }
 
     func toggleDesktopPet() {
@@ -720,5 +774,31 @@ final class ImagePetStore: ObservableObject {
         }
 
         return (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize).map(Int64.init) ?? 0
+    }
+
+    func checkAndApplyAutoExpand() {
+        let snapshot = petSnapshot
+        if snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission {
+            self.petViewMode = .full
+        }
+        if isCompleted && failedCount == jobs.count && jobs.count > 0 {
+            self.petViewMode = .full
+        }
+    }
+
+    func resetPetIdleTimer() {
+        idleTimerTask?.cancel()
+        
+        guard petViewMode == .full else { return }
+        
+        let snapshot = petSnapshot
+        let isBlocking = snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission
+        guard !isBlocking && !isProcessing else { return }
+        
+        idleTimerTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
+            guard !Task.isCancelled else { return }
+            self?.petViewMode = .mini
+        }
     }
 }
