@@ -4,6 +4,14 @@ struct DesktopPetView: View {
     @ObservedObject var store: ImagePetStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isDropTargeted = false
+    @State private var isHovering = false
+    @State private var interactionState: PetInteractionState = .none
+    @StateObject private var animator: FrameAnimator
+
+    init(store: ImagePetStore) {
+        self.store = store
+        self._animator = StateObject(wrappedValue: FrameAnimator(themeName: store.selectedThemeName))
+    }
 
     var body: some View {
         let snapshot = store.petSnapshot
@@ -65,6 +73,7 @@ struct DesktopPetView: View {
             } else {
                 self.isDropTargeted = false
             }
+            updateInteraction()
         }
         .onContinuousHover(coordinateSpace: .local) { phase in
             if case .active = phase {
@@ -72,7 +81,9 @@ struct DesktopPetView: View {
             }
         }
         .onHover { isHovering in
+            self.isHovering = isHovering
             store.setPetHovering(isHovering)
+            updateInteraction()
         }
         .contextMenu {
             if store.petViewMode == .mini {
@@ -91,6 +102,54 @@ struct DesktopPetView: View {
                 store.handlePetAction(.hidePet)
             }
         }
+        .onAppear {
+            animator.enableIdleVariants = store.enableIdleVariants
+            animator.energySavingMode = store.energySavingMode
+            animator.isPaused = !store.isDesktopPetVisible || reduceMotion
+            updateAnimator()
+        }
+        .onDisappear {
+            animator.isPaused = true
+        }
+        .onChange(of: store.isDesktopPetVisible) { val in
+            animator.isPaused = !val || reduceMotion
+        }
+        .onChange(of: store.petSnapshot.state) { _ in updateAnimator() }
+        .onChange(of: store.issuesVisuallyDegraded) { _ in updateAnimator() }
+        .onChange(of: interactionState) { _ in updateAnimator() }
+        .onChange(of: store.selectedThemeName) { newTheme in
+            animator.updateTheme(themeName: newTheme)
+            updateAnimator()
+        }
+        .onChange(of: store.enableIdleVariants) { val in
+            animator.enableIdleVariants = val
+            updateAnimator()
+        }
+        .onChange(of: store.energySavingMode) { val in
+            animator.energySavingMode = val
+            updateAnimator()
+        }
+        .onChange(of: reduceMotion) { val in
+            animator.isPaused = val || !store.isDesktopPetVisible
+        }
+    }
+
+    private func updateInteraction() {
+        if isDropTargeted {
+            interactionState = .dragHover
+        } else if isHovering && store.enableHoverFeedback {
+            interactionState = .hover
+        } else {
+            interactionState = .none
+        }
+    }
+
+    private func updateAnimator() {
+        animator.updateState(
+            displayState: store.petSnapshot.state,
+            interactionState: interactionState,
+            isVisuallyDegraded: store.issuesVisuallyDegraded
+        )
     }
 
     private var topBar: some View {
@@ -131,7 +190,7 @@ struct DesktopPetView: View {
     }
 
     private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
-        ZStack(alignment: .bottomTrailing) {
+        ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(accentColor(for: snapshot.state).opacity(isDropTargeted ? 0.22 : 0.12))
                 .overlay(
@@ -139,20 +198,28 @@ struct DesktopPetView: View {
                         .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 1)
                 )
 
-            Text(snapshot.emoji)
-                .font(.system(size: 48))
-                .frame(width: 64, height: 56)
-                .scaleEffect(faceScale(for: snapshot.state))
-                .animation(faceAnimation(for: snapshot.state), value: snapshot.state)
-                .accessibilityLabel(accessibilityLabel(for: snapshot))
-                .accessibilityHint(accessibilityHint(for: snapshot))
-                .accessibilityAddTraits(store.petViewMode == .mini ? .isButton : [])
-                .accessibilityAction {
-                    if store.petViewMode == .mini {
-                        store.handlePetAction(.expand)
-                    }
+            ZStack {
+                if let frame = animator.currentFrame {
+                    Image(decorative: frame, scale: 1.0)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                } else {
+                    Color.clear
                 }
-                .accessibilityIdentifier("desktopPetEmoji")
+            }
+            .frame(width: 64, height: 56)
+            .scaleEffect(faceScale(for: snapshot.state))
+            .animation(reduceMotion ? nil : faceAnimation(for: snapshot.state), value: snapshot.state)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(accessibilityLabel(for: snapshot))
+            .accessibilityHint(accessibilityHint(for: snapshot))
+            .accessibilityAddTraits(store.petViewMode == .mini ? .isButton : [])
+            .accessibilityAction {
+                if store.petViewMode == .mini {
+                    store.handlePetAction(.expand)
+                }
+            }
+            .accessibilityIdentifier("desktopPetEmoji")
 
             if store.petViewMode == .full {
                 Image(systemName: badgeSymbol(for: snapshot.state))
@@ -164,6 +231,7 @@ struct DesktopPetView: View {
                     .overlay(Circle().stroke(.secondary.opacity(0.18), lineWidth: 1))
                     .padding(2)
                     .accessibilityHidden(true)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
         }
         .frame(width: 72, height: 60)

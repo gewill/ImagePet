@@ -453,6 +453,73 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2.0), .completed)
         waitForMiniPetWindow(petWindow)
     }
+
+    func testDoneStateAutoExitsAfterThreeSeconds() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        XCTAssertTrue(petTitle.exists)
+        let doneExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Done' OR value == 'Done'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [doneExpectation], timeout: 5.0), .completed)
+
+        let readyExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Ready' OR value == 'Ready'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [readyExpectation], timeout: 4.0), .completed)
+    }
+
+    func testIssuesStateDegradesAfterTimeout() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["UI_TEST_FAIL"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
+        XCTAssertTrue(addImagesButton.exists)
+        addImagesButton.click()
+
+        let petTitle = petWindow.staticTexts["desktopPetTitle"]
+        XCTAssertTrue(petTitle.exists)
+        let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
+        XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 5.0), .completed)
+
+        Thread.sleep(forTimeInterval: 3.0)
+
+        XCTAssertEqual(petTitle.textContent, "Issues")
+
+        let retryButton = petWindow.buttons["desktopPetRetryFailedButton"]
+        XCTAssertTrue(retryButton.exists)
+    }
 }
 
 private extension XCUIElement {

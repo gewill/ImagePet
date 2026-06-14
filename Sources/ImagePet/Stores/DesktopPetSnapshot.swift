@@ -28,7 +28,6 @@ enum DesktopPetViewMode: String, Codable, Equatable {
 
 struct DesktopPetSnapshot: Equatable {
     let state: DesktopPetDisplayState
-    let emoji: String
     let title: String
     let detail: String
     let primaryAction: DesktopPetAction?

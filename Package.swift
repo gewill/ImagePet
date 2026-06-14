@@ -18,7 +18,10 @@ let package = Package(
         .executableTarget(
             name: "ImagePet",
             dependencies: ["ImagePetCore"],
-            path: "Sources/ImagePet"
+            path: "Sources/ImagePet",
+            resources: [
+                .copy("Resources")
+            ]
         ),
         .testTarget(
             name: "ImagePetTests",

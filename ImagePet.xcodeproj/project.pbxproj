@@ -13,6 +13,7 @@
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
 		4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */; };
+		468ABFAA6A7B08517772B948 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 6F8F586A1135EAED6910EB32 /* Resources */; };
 		52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */; };
 		53882A231CD77781C8F98CB9 /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 		55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A0E344263EE215722E53D3 /* CompressionPreset.swift */; };
@@ -28,15 +29,19 @@
 		8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */; };
 		945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463A9B12B098CEDA557F6100 /* CompressionError.swift */; };
 		98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */; };
+		9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426BA951424DECEFB023D3A9 /* FrameAnimator.swift */; };
 		B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238810C4DF3FE71683DC9479 /* InputFilePanel.swift */; };
 		B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1510894ED17C31329941EA /* CompressionResult.swift */; };
 		B9CAC9DBC573955EBDA5A0CA /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */; };
 		C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */; };
+		CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A93444765F4DF14ABA2386D /* PetAnimation.swift */; };
 		D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */; };
+		E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
 		F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */; };
+		F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */; };
 		F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 /* End PBXBuildFile section */
 
@@ -92,12 +97,14 @@
 /* Begin PBXFileReference section */
 		1051C6BE4E181089F9924A7E /* ImagePetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImagePetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeCache.swift; sourceTree = "<group>"; };
 		1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetPresenter.swift; sourceTree = "<group>"; };
 		238810C4DF3FE71683DC9479 /* InputFilePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFilePanel.swift; sourceTree = "<group>"; };
 		2845AD061C173BB07CE9F82B /* DesktopPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetView.swift; sourceTree = "<group>"; };
 		2B48DF5E09E5C0639460FB28 /* ImagePet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagePet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
 		41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetWindowController.swift; sourceTree = "<group>"; };
+		426BA951424DECEFB023D3A9 /* FrameAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameAnimator.swift; sourceTree = "<group>"; };
 		42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptions.swift; sourceTree = "<group>"; };
 		45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocator.swift; sourceTree = "<group>"; };
 		463A9B12B098CEDA557F6100 /* CompressionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionError.swift; sourceTree = "<group>"; };
@@ -107,9 +114,12 @@
 		5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetSnapshot.swift; sourceTree = "<group>"; };
 		60F9729CED642EBCF472BAC1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFixtureCompressionTests.swift; sourceTree = "<group>"; };
+		6F8F586A1135EAED6910EB32 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Sources/ImagePet/Resources; sourceTree = SOURCE_ROOT; };
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
+		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
+		9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteCatAssetGenerator.swift; sourceTree = "<group>"; };
 		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
 		B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormat.swift; sourceTree = "<group>"; };
@@ -154,6 +164,7 @@
 		086B80E87D840BEB44CFA27C /* ImagePet */ = {
 			isa = PBXGroup;
 			children = (
+				6F8F586A1135EAED6910EB32 /* Resources */,
 				9DD5A4DE7991CFEF8ABD7776 /* App */,
 				7DB36FA47B78B6234C07F479 /* Services */,
 				C2088D75CBC5FC8132489975 /* Stores */,
@@ -206,9 +217,11 @@
 			isa = PBXGroup;
 			children = (
 				41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */,
+				426BA951424DECEFB023D3A9 /* FrameAnimator.swift */,
 				238810C4DF3FE71683DC9479 /* InputFilePanel.swift */,
 				58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */,
 				B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */,
+				17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -226,6 +239,7 @@
 			children = (
 				6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */,
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
+				9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
 				14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */,
 				573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */,
@@ -268,6 +282,7 @@
 			children = (
 				5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */,
 				4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */,
+				7A93444765F4DF14ABA2386D /* PetAnimation.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -318,6 +333,7 @@
 			buildConfigurationList = 6F85C88C7A893CC6A47BFC80 /* Build configuration list for PBXNativeTarget "ImagePet" */;
 			buildPhases = (
 				08462421B0B0BEE3471FCA74 /* Sources */,
+				3DE347D12A83A46619AE8639 /* Resources */,
 				2AD58D0CC39E93776CE0617E /* Frameworks */,
 				C40BFC2F11DB6F6E959E3CA6 /* Embed Frameworks */,
 			);
@@ -409,6 +425,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		3DE347D12A83A46619AE8639 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				468ABFAA6A7B08517772B948 /* Resources in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		08462421B0B0BEE3471FCA74 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -420,11 +447,14 @@
 				EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */,
 				EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */,
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,
+				9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */,
 				0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */,
 				C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */,
 				B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */,
 				D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */,
 				762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */,
+				CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */,
+				E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +464,7 @@
 			files = (
 				89B7A985CBCE01645C7BB27C /* AppleFixtureCompressionTests.swift in Sources */,
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
+				F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,
 				8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */,
 				1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */,

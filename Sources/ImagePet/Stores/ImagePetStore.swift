@@ -7,6 +7,8 @@ final class ImagePetStore: ObservableObject {
     @Published var jobs: [ImageJob] = [] {
         didSet {
             checkAndApplyAutoExpand()
+            checkIssuesTimeout()
+            checkDoneTimeout()
         }
     }
     @Published var preset: CompressionPreset = .balanced
@@ -82,6 +84,8 @@ final class ImagePetStore: ObservableObject {
         didSet {
             if petViewMode == .full {
                 resetPetIdleTimer()
+                issuesVisuallyDegraded = false
+                doneVisuallyDismissed = false
             } else {
                 idleTimerTask?.cancel()
                 idleTimerTask = nil
@@ -89,7 +93,32 @@ final class ImagePetStore: ObservableObject {
         }
     }
 
+    @Published var enableIdleVariants = true {
+        didSet {
+            defaults.set(enableIdleVariants, forKey: enableIdleVariantsKey)
+        }
+    }
+    @Published var enableHoverFeedback = true {
+        didSet {
+            defaults.set(enableHoverFeedback, forKey: enableHoverFeedbackKey)
+        }
+    }
+    @Published var energySavingMode = false {
+        didSet {
+            defaults.set(energySavingMode, forKey: energySavingModeKey)
+        }
+    }
+    @Published var selectedThemeName = "CuteCat" {
+        didSet {
+            defaults.set(selectedThemeName, forKey: selectedThemeNameKey)
+        }
+    }
+    @Published var issuesVisuallyDegraded = false
+    @Published var doneVisuallyDismissed = false
+
     private var idleTimerTask: Task<Void, Never>?
+    private var issuesTimer: Timer?
+    private var doneTimer: Timer?
 
     let maxConcurrentJobs = 2
 
@@ -107,6 +136,10 @@ final class ImagePetStore: ObservableObject {
     private let filenameSuffixKey = "ImagePet.filenameSuffix"
     private let maxDimensionKey = "ImagePet.maxDimension"
     private let stripMetadataKey = "ImagePet.stripMetadata"
+    private let enableIdleVariantsKey = "ImagePet.enableIdleVariants"
+    private let enableHoverFeedbackKey = "ImagePet.enableHoverFeedback"
+    private let energySavingModeKey = "ImagePet.energySavingMode"
+    private let selectedThemeNameKey = "ImagePet.selectedThemeName"
 
     init(
         compressor: ImageCompressor = ImageCompressor(),
@@ -123,6 +156,11 @@ final class ImagePetStore: ObservableObject {
         self.maxDimension = .none
         self.stripMetadata = true
         self.petViewMode = .mini
+        
+        self.enableIdleVariants = true
+        self.enableHoverFeedback = true
+        self.energySavingMode = false
+        self.selectedThemeName = "CuteCat"
 
         if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
             self.isDesktopPetVisible = false
@@ -150,6 +188,20 @@ final class ImagePetStore: ObservableObject {
             if defaults.object(forKey: stripMetadataKey) != nil {
                 self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
             }
+            
+            if defaults.object(forKey: enableIdleVariantsKey) != nil {
+                self.enableIdleVariants = defaults.bool(forKey: enableIdleVariantsKey)
+            }
+            if defaults.object(forKey: enableHoverFeedbackKey) != nil {
+                self.enableHoverFeedback = defaults.bool(forKey: enableHoverFeedbackKey)
+            }
+            if defaults.object(forKey: energySavingModeKey) != nil {
+                self.energySavingMode = defaults.bool(forKey: energySavingModeKey)
+            }
+            if let theme = defaults.string(forKey: selectedThemeNameKey) {
+                self.selectedThemeName = theme
+            }
+            
             self.petViewMode = .mini
         }
         checkAndApplyAutoExpand()
@@ -332,6 +384,8 @@ final class ImagePetStore: ObservableObject {
     func compressMore() {
         guard !isProcessing else { return }
 
+        clearDoneTimeout()
+        clearIssuesTimeout()
         jobs.removeAll()
         petState = .idle
         outputFolderMessage = nil
@@ -367,7 +421,6 @@ final class ImagePetStore: ObservableObject {
         if saveLocationMode == .designated && outputDirectory == nil {
             return DesktopPetSnapshot(
                 state: .needsSetup,
-                emoji: "🐡",
                 title: "Needs folder",
                 detail: "Choose output folder in app",
                 primaryAction: .openMainApp,
@@ -379,7 +432,6 @@ final class ImagePetStore: ObservableObject {
         if saveLocationMode == .overwrite && showOverwriteConfirmation {
             return DesktopPetSnapshot(
                 state: .confirm,
-                emoji: "🐡",
                 title: "Confirm overwrite",
                 detail: "Review in app",
                 primaryAction: .openMainApp,
@@ -393,7 +445,6 @@ final class ImagePetStore: ObservableObject {
         if hasPermissionDenied || hasFolderDenied {
             return DesktopPetSnapshot(
                 state: .permission,
-                emoji: "😵",
                 title: "Permission needed",
                 detail: "Open app to authorize",
                 primaryAction: .openMainApp,
@@ -405,7 +456,6 @@ final class ImagePetStore: ObservableObject {
         if isProcessing {
             return DesktopPetSnapshot(
                 state: .eating,
-                emoji: "😋",
                 title: "Eating",
                 detail: "\(completedCount) / \(jobs.count)",
                 primaryAction: nil,
@@ -424,9 +474,8 @@ final class ImagePetStore: ObservableObject {
                     secondary = [.addImages, .compressMore, .hidePet]
                 }
                 return DesktopPetSnapshot(
-                    state: .done,
-                    emoji: "🥳",
-                    title: "Done",
+                    state: doneVisuallyDismissed ? .idle : .done,
+                    title: doneVisuallyDismissed ? "Ready" : "Done",
                     detail: "Saved \(FileSizeFormatting.string(from: savedTotal))",
                     primaryAction: hasSuccess ? .revealOutput : .addImages,
                     secondaryActions: secondary,
@@ -441,7 +490,6 @@ final class ImagePetStore: ObservableObject {
                 }
                 return DesktopPetSnapshot(
                     state: .issues,
-                    emoji: "😵",
                     title: "Issues",
                     detail: detailText,
                     primaryAction: .retryFailed,
@@ -453,7 +501,6 @@ final class ImagePetStore: ObservableObject {
 
         return DesktopPetSnapshot(
             state: .idle,
-            emoji: "🐡",
             title: "Ready",
             detail: "Drop images here",
             primaryAction: .addImages,
@@ -810,5 +857,58 @@ final class ImagePetStore: ObservableObject {
             guard !Task.isCancelled else { return }
             self?.petViewMode = .mini
         }
+    }
+
+    private func checkIssuesTimeout() {
+        let isCurrentlyIssues = isCompleted && failedCount > 0
+        if isCurrentlyIssues {
+            if issuesTimer == nil && !issuesVisuallyDegraded {
+                let isTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" || NSClassFromString("XCTestCase") != nil
+                let interval: TimeInterval = isTesting ? 2.0 : 600.0
+                
+                issuesTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+                    Task { @MainActor [weak self] in
+                        guard let self = self else { return }
+                        if self.isCompleted && self.failedCount > 0 {
+                            self.issuesVisuallyDegraded = true
+                        }
+                    }
+                }
+            }
+        } else {
+            clearIssuesTimeout()
+        }
+    }
+
+    private func clearIssuesTimeout() {
+        issuesTimer?.invalidate()
+        issuesTimer = nil
+        issuesVisuallyDegraded = false
+    }
+
+    private func checkDoneTimeout() {
+        let isCurrentlyDone = isCompleted && failedCount == 0 && jobs.count > 0
+        if isCurrentlyDone {
+            if doneTimer == nil && !doneVisuallyDismissed {
+                let interval: TimeInterval = 3.5
+                
+                doneTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+                    Task { @MainActor [weak self] in
+                        guard let self = self else { return }
+                        if self.isCompleted && self.failedCount == 0 {
+                            self.doneVisuallyDismissed = true
+                        }
+                    }
+                }
+            }
+        } else {
+            clearDoneTimeout()
+        }
+    }
+
+    private func clearDoneTimeout() {
+        doneTimer?.invalidate()
+        doneTimer = nil
+        doneVisuallyDismissed = false
     }
 }

@@ -6,14 +6,24 @@ struct ContentView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        VStack(spacing: 16) {
-            HeaderView(store: store)
-            ControlsView(store: store)
-            DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
-            JobListView(jobs: store.jobs)
-            SummaryView(store: store)
+        TabView {
+            VStack(spacing: 16) {
+                HeaderView(store: store)
+                ControlsView(store: store)
+                DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                JobListView(jobs: store.jobs)
+                SummaryView(store: store)
+            }
+            .padding(20)
+            .tabItem {
+                Label("Compress", systemImage: "doc.on.doc")
+            }
+
+            DesktopPetSettingsView(store: store)
+                .tabItem {
+                    Label("Desktop Pet", systemImage: "pawprint")
+                }
         }
-        .padding(20)
         .frame(minWidth: 780, minHeight: 560)
         .dropDestination(for: URL.self) { urls, _ in
             store.addDroppedURLs(urls)
@@ -54,11 +64,21 @@ private struct HeaderView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 18) {
-            Text(petEmoji)
-                .font(.system(size: 64))
-                .frame(width: 86, height: 86)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
-                .accessibilityIdentifier("petEmojiLabel")
+            Group {
+                if let cgImage = petImage {
+                    Image(decorative: cgImage, scale: 1.0)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 64, height: 64)
+                } else {
+                    Color.clear
+                        .frame(width: 64, height: 64)
+                }
+            }
+            .frame(width: 86, height: 86)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+            .accessibilityLabel("Desktop Pet \(store.petState == .idle ? "Idle" : store.petState == .eating ? "Eating" : store.petState == .happy ? "Happy" : "Error")")
+            .accessibilityIdentifier("petEmojiLabel")
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
@@ -83,17 +103,19 @@ private struct HeaderView: View {
         }
     }
 
-    private var petEmoji: String {
+    private var petImage: CGImage? {
+        let anim: PetAnimation
         switch store.petState {
         case .idle:
-            return "🐡"
+            anim = .idle
         case .eating:
-            return "😋"
+            anim = .eating
         case .happy:
-            return "🥳"
+            anim = .done
         case .error:
-            return "😵"
+            anim = .issues
         }
+        return ThemeCache.loadStaticImage(themeName: store.selectedThemeName, animation: anim)
     }
 
     private var title: String {
@@ -581,5 +603,203 @@ private struct SummaryMetric: View {
                 .accessibilityLabel(value)
         }
         .frame(minWidth: 110, alignment: .leading)
+    }
+}
+
+private struct DesktopPetSettingsView: View {
+    @ObservedObject var store: ImagePetStore
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                HStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Desktop Pet Companion")
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                        Text("A cute animated pet that lives on your desktop and reacts to your compression tasks.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Toggle(isOn: $store.isDesktopPetVisible) {
+                        Text(store.isDesktopPetVisible ? "Visible" : "Hidden")
+                            .font(.headline)
+                    }
+                    .toggleStyle(.switch)
+                    .accessibilityIdentifier("petSettingsVisibilityToggle")
+                }
+                .padding()
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select Theme")
+                        .font(.system(.headline, design: .rounded))
+                    
+                    HStack(spacing: 16) {
+                        ThemeCard(
+                            name: "Cute Cat",
+                            description: "A playful, hand-drawn kitty with smooth vector frames.",
+                            themeName: "CuteCat",
+                            selectedTheme: $store.selectedThemeName,
+                            previewAnim: .idle
+                        )
+                        .accessibilityIdentifier("themeCard_CuteCat")
+                        
+                        ThemeCardPlaceholder(
+                            name: "Pixel Slime",
+                            description: "Retro retro pixel animations. Coming soon."
+                        )
+                        
+                        ThemeCardPlaceholder(
+                            name: "Shiba Inu",
+                            description: "A very energetic and doge-like shiba. Coming soon."
+                        )
+                    }
+                }
+                
+                Divider()
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Behavior & Performance Settings")
+                        .font(.system(.headline, design: .rounded))
+                    
+                    VStack(alignment: .leading, spacing: 14) {
+                        Toggle(isOn: $store.enableIdleVariants) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Enable Idle Variants")
+                                    .fontWeight(.medium)
+                                Text("Allows the pet to randomly yawn or stretch during periods of inactivity (every 20-40 seconds).")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("enableIdleVariantsToggle")
+                        
+                        Toggle(isOn: $store.enableHoverFeedback) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Enable Hover Feedback")
+                                    .fontWeight(.medium)
+                                Text("Pet responds to mouse hover with friendly animation.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("enableHoverFeedbackToggle")
+                        
+                        Toggle(isOn: $store.energySavingMode) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Energy Saving Mode")
+                                    .fontWeight(.medium)
+                                Text("Halves the animation frame rate to minimize CPU and battery usage.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("energySavingModeToggle")
+                    }
+                    .padding()
+                    .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+                }
+            }
+            .padding(24)
+        }
+    }
+}
+
+private struct ThemeCard: View {
+    let name: String
+    let description: String
+    let themeName: String
+    @Binding var selectedTheme: String
+    let previewAnim: PetAnimation
+    
+    var isSelected: Bool {
+        selectedTheme == themeName
+    }
+    
+    var body: some View {
+        Button {
+            selectedTheme = themeName
+        } label: {
+            VStack(alignment: .leading, spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
+                    
+                    if let image = ThemeCache.loadStaticImage(themeName: themeName, animation: previewAnim) {
+                        Image(decorative: image, scale: 1.0)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 48, height: 48)
+                    } else {
+                        Image(systemName: "pawprint.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(height: 90)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(name)
+                        .font(.headline)
+                        .foregroundStyle(isSelected ? Color.accentColor : .primary)
+                    
+                    Text(description)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                }
+            }
+            .padding(10)
+            .frame(width: 160, height: 180)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+            )
+            .background(isSelected ? Color.accentColor.opacity(0.04) : Color.clear)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ThemeCardPlaceholder: View {
+    let name: String
+    let description: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.secondary.opacity(0.04))
+                
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.secondary.opacity(0.6))
+            }
+            .frame(height: 90)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(name)
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary.opacity(0.7))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+            }
+        }
+        .padding(10)
+        .frame(width: 160, height: 180)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.secondary.opacity(0.1), lineWidth: 1)
+        )
+        .opacity(0.6)
     }
 }

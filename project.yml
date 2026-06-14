@@ -25,6 +25,10 @@ targets:
     platform: macOS
     sources:
       - path: Sources/ImagePet
+        excludes:
+          - Resources
+      - path: Sources/ImagePet/Resources
+        type: folder
     dependencies:
       - target: ImagePetCore
     info:
