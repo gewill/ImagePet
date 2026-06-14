@@ -413,12 +413,28 @@ private struct JobListView: View {
 
 private struct EmptyJobListView: View {
     var body: some View {
-        Text("No images yet")
-            .foregroundStyle(.tertiary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 34)
-            .accessibilityIdentifier("emptyJobsLabel")
-            .accessibilityLabel("No images yet")
+        VStack(spacing: 12) {
+            Image(systemName: "pawprint.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.tertiary.opacity(0.4))
+                .padding(.top, 24)
+
+            VStack(spacing: 4) {
+                Text("No images in queue")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+
+                Text("Drag images here or click Add to begin")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+            }
+            .multilineTextAlignment(.center)
+            .padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("emptyJobsLabel")
+        .accessibilityLabel("No images in queue. Drag images here or click Add to begin.")
     }
 }
 
@@ -753,6 +769,8 @@ private struct ThemeCard: View {
     @Binding var selectedTheme: String
     let previewAnim: PetAnimation
 
+    @State private var isHovered = false
+
     var isSelected: Bool {
         selectedTheme == themeName
     }
@@ -793,14 +811,19 @@ private struct ThemeCard: View {
             }
             .padding(10)
             .frame(width: 160, height: 180)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
-            )
             .background(isSelected ? Color.accentColor.opacity(0.04) : Color.clear)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+            )
             .contentShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: Color.black.opacity(isHovered ? 0.08 : 0.03), radius: isHovered ? 6 : 2, y: isHovered ? 3 : 1)
+            .onHover { isHovered = $0 }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Theme: \(name)")
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityHint(isSelected ? "" : "Double click to select \(name) theme")
     }
 }
 

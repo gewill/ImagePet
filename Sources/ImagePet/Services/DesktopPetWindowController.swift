@@ -76,6 +76,10 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     }
 
     private func makeWindow() -> NSWindow {
+        if ProcessInfo.processInfo.arguments.contains("-ImagePetResetWindowFrame") {
+            UserDefaults.standard.removeObject(forKey: "NSWindow Frame \(Self.frameAutosaveName)")
+        }
+
         let size = store.petViewMode == .mini ? Self.miniSize : Self.fullSize
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),

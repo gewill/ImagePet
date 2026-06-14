@@ -8,6 +8,10 @@ struct DesktopPetView: View {
     @State private var interactionState: PetInteractionState = .none
     @StateObject private var animator: FrameAnimator
 
+    @State private var currentMode: DesktopPetViewMode = .mini
+    @State private var controlsOpacity: CGFloat = 0.0
+    @State private var controlsOffset: CGFloat = 8.0
+
     init(store: ImagePetStore) {
         self.store = store
         self._animator = StateObject(wrappedValue: FrameAnimator(themeName: store.selectedThemeName))
@@ -17,16 +21,16 @@ struct DesktopPetView: View {
         let snapshot = store.petSnapshot
 
         Group {
-            if store.petViewMode == .mini {
+            if currentMode == .mini {
                 miniView(for: snapshot)
             } else {
                 fullView(for: snapshot)
             }
         }
-        .frame(width: store.petViewMode == .mini ? 80 : 192, height: store.petViewMode == .mini ? 80 : 176)
+        .frame(width: currentMode == .mini ? 80 : 192, height: currentMode == .mini ? 80 : 176)
         .background(
             Group {
-                if store.petViewMode == .mini {
+                if currentMode == .mini {
                     Circle()
                         .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : Color.clear)
                 } else {
@@ -37,7 +41,7 @@ struct DesktopPetView: View {
         )
         .background(
             Group {
-                if store.petViewMode != .mini {
+                if currentMode != .mini {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(.regularMaterial)
                 }
@@ -45,7 +49,7 @@ struct DesktopPetView: View {
         )
         .overlay(
             Group {
-                if store.petViewMode == .mini {
+                if currentMode == .mini {
                     if isDropTargeted {
                         Circle()
                             .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
@@ -60,7 +64,7 @@ struct DesktopPetView: View {
             }
         )
         .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
-        .contentShape(RoundedRectangle(cornerRadius: store.petViewMode == .mini ? 40 : 8))
+        .contentShape(RoundedRectangle(cornerRadius: currentMode == .mini ? 40 : 8))
         .animation(reduceMotion ? nil : .spring(response: 0.24, dampingFraction: 0.82), value: isDropTargeted)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: snapshot.state)
         .dropDestination(for: URL.self) { urls, _ in
@@ -86,7 +90,7 @@ struct DesktopPetView: View {
             updateInteraction()
         }
         .contextMenu {
-            if store.petViewMode == .mini {
+            if currentMode == .mini {
                 Button("Show Panel") {
                     store.handlePetAction(.expand)
                 }
@@ -107,6 +111,10 @@ struct DesktopPetView: View {
             animator.energySavingMode = store.energySavingMode
             animator.isPaused = !store.isDesktopPetVisible || reduceMotion
             updateAnimator()
+
+            currentMode = store.petViewMode
+            controlsOpacity = store.petViewMode == .full ? 1.0 : 0.0
+            controlsOffset = store.petViewMode == .full ? 0.0 : 8.0
         }
         .onDisappear {
             animator.isPaused = true
@@ -131,6 +139,28 @@ struct DesktopPetView: View {
         }
         .onChange(of: reduceMotion) { val in
             animator.isPaused = val || !store.isDesktopPetVisible
+        }
+        .onChange(of: store.petViewMode) { newMode in
+            if newMode == .full {
+                currentMode = .full
+                withAnimation(.easeOut(duration: 0.25).delay(0.12)) {
+                    controlsOpacity = 1.0
+                    controlsOffset = 0.0
+                }
+            } else {
+                currentMode = .mini
+                controlsOpacity = 0.0
+                controlsOffset = 8.0
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .desktopPetWillCollapse)) { _ in
+            withAnimation(.easeOut(duration: 0.2)) {
+                controlsOpacity = 0.0
+                controlsOffset = 8.0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                store.performCollapse()
+            }
         }
     }
 
@@ -213,15 +243,15 @@ struct DesktopPetView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityLabel(for: snapshot))
             .accessibilityHint(accessibilityHint(for: snapshot))
-            .accessibilityAddTraits(store.petViewMode == .mini ? .isButton : [])
+            .accessibilityAddTraits(currentMode == .mini ? .isButton : [])
             .accessibilityAction {
-                if store.petViewMode == .mini {
+                if currentMode == .mini {
                     store.handlePetAction(.expand)
                 }
             }
             .accessibilityIdentifier("desktopPetEmoji")
 
-            if store.petViewMode == .full {
+            if currentMode == .full {
                 Image(systemName: badgeSymbol(for: snapshot.state))
                     .font(.system(size: 12, weight: .bold))
                     .symbolRenderingMode(.hierarchical)
@@ -251,6 +281,8 @@ struct DesktopPetView: View {
     private func fullView(for snapshot: DesktopPetSnapshot) -> some View {
         VStack(spacing: 7) {
             topBar
+                .opacity(controlsOpacity)
+                .offset(y: controlsOffset)
 
             petFace(for: snapshot)
 
@@ -278,6 +310,8 @@ struct DesktopPetView: View {
                     .accessibilityIdentifier("desktopPetDetail")
             }
             .frame(height: 34)
+            .opacity(controlsOpacity)
+            .offset(y: controlsOffset)
 
             if snapshot.state == .eating {
                 ProgressView(
@@ -289,9 +323,13 @@ struct DesktopPetView: View {
                 .frame(height: 6)
                 .padding(.horizontal, 8)
                 .transition(.opacity)
+                .opacity(controlsOpacity)
+                .offset(y: controlsOffset)
             }
 
             actionBar(for: snapshot)
+                .opacity(controlsOpacity)
+                .offset(y: controlsOffset)
         }
         .padding(10)
     }
@@ -440,14 +478,14 @@ struct DesktopPetView: View {
     }
 
     private func accessibilityLabel(for snapshot: DesktopPetSnapshot) -> String {
-        if store.petViewMode == .mini {
+        if currentMode == .mini {
             return "ImagePet desktop pet, \(snapshot.title), drop images or click to show controls"
         }
         return "ImagePet desktop pet, \(snapshot.title), \(snapshot.detail)"
     }
 
     private func accessibilityHint(for snapshot: DesktopPetSnapshot) -> String {
-        if store.petViewMode == .mini {
+        if currentMode == .mini {
             return snapshot.canAcceptDrop ? "Drop images or click to show controls" : "Click to show controls"
         }
         return snapshot.canAcceptDrop ? "Drop images to add them" : "Open the app for the next step"

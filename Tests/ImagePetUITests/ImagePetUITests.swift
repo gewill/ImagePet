@@ -8,6 +8,11 @@ final class ImagePetUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
         app.launchEnvironment["IS_UI_TESTING"] = "1"
+        if name.contains("Restoration") {
+            app.launchEnvironment["IS_UI_TESTING_RESTORATION"] = "1"
+        } else {
+            app.launchArguments += ["-ImagePetResetWindowFrame", "YES"]
+        }
         app.launch()
     }
 
@@ -67,7 +72,7 @@ final class ImagePetUITests: XCTestCase {
         // Assert empty jobs label exists initially
         let emptyLabel = window.staticTexts["emptyJobsLabel"]
         XCTAssertTrue(emptyLabel.exists)
-        XCTAssertEqual(emptyLabel.textContent, "No images yet")
+        XCTAssertTrue(emptyLabel.textContent.contains("No images in queue"))
 
         // Assert that the default output directory has been automatically chosen
         let outputLabel = window.staticTexts["outputFolderLabel"]
@@ -92,6 +97,60 @@ final class ImagePetUITests: XCTestCase {
         let smallButton = picker.radioButtons["Small"]
         XCTAssertTrue(smallButton.exists)
         smallButton.click()
+    }
+
+    func testMiniFullResizeCentering() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        // Choose output folder first to resolve needsSetup blocking state!
+        let chooseFolderButton = window.buttons["chooseFolderButton"]
+        XCTAssertTrue(chooseFolderButton.exists)
+        chooseFolderButton.click()
+
+        // Show Desktop Pet
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        // Get initial mini center
+        waitForMiniPetWindow(petWindow)
+        let miniFrame = petWindow.frame
+        let miniCenterX = miniFrame.midX
+        let miniCenterY = miniFrame.midY
+
+        // Expand
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        waitForExpandedPetWindow(petWindow)
+        let fullFrame = petWindow.frame
+        let fullCenterX = fullFrame.midX
+        let fullCenterY = fullFrame.midY
+
+        // Check if centers are within 1 pixel
+        XCTAssertEqual(miniCenterX, fullCenterX, accuracy: 1.0)
+        XCTAssertEqual(miniCenterY, fullCenterY, accuracy: 1.0)
+
+        // Collapse back to mini
+        let collapseButton = petWindow.buttons["collapsePetButton"]
+        XCTAssertTrue(collapseButton.exists)
+        collapseButton.click()
+
+        waitForMiniPetWindow(petWindow)
+        let restoredFrame = petWindow.frame
+        let restoredCenterX = restoredFrame.midX
+        let restoredCenterY = restoredFrame.midY
+
+        XCTAssertEqual(miniCenterX, restoredCenterX, accuracy: 1.0)
+        XCTAssertEqual(miniCenterY, restoredCenterY, accuracy: 1.0)
+
+        // Close the pet
+        toggleButton.click()
     }
 
     func testToggleDesktopPet() throws {

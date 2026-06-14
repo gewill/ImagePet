@@ -628,9 +628,13 @@ final class ImagePetStore: ObservableObject {
         case .expand:
             petViewMode = .full
         case .collapse:
-            petViewMode = .mini
+            NotificationCenter.default.post(name: .desktopPetWillCollapse, object: nil)
         }
         resetPetIdleTimer()
+    }
+
+    func performCollapse() {
+        self.petViewMode = .mini
     }
 
     func toggleDesktopPet() {
@@ -959,7 +963,7 @@ final class ImagePetStore: ObservableObject {
         idleTimerTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
             guard !Task.isCancelled else { return }
-            self?.petViewMode = .mini
+            self?.handlePetAction(.collapse)
         }
     }
 
@@ -1049,4 +1053,8 @@ final class ImagePetStore: ObservableObject {
             }
         }
     }
+}
+
+extension Notification.Name {
+    static let desktopPetWillCollapse = Notification.Name("ImagePet.desktopPetWillCollapse")
 }
