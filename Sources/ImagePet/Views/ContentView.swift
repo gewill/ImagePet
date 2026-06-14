@@ -191,14 +191,15 @@ private struct ControlsView: View {
                     .disabled(store.isProcessing)
                     .accessibilityIdentifier("maxDimensionPicker")
                 }
-                
+
                 Spacer()
-                
+
                 Button {
                     store.toggleDesktopPet()
                 } label: {
                     Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
                 }
+                .disabled(!store.isDesktopPetEnabled)
                 .accessibilityIdentifier("togglePetButton")
 
                 Button {
@@ -273,14 +274,14 @@ private struct ControlsView: View {
                                     store.sanitizeFilenameSuffix()
                                 }
                         }
-                        
+
                         Text(store.filenamePreview)
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .accessibilityIdentifier("filenamePreviewLabel")
                     }
-                    
+
                     if store.saveLocationMode == .designated {
                         HStack(spacing: 8) {
                             Image(systemName: "folder.badge.gearshape")
@@ -324,7 +325,7 @@ private struct ControlsView: View {
                     .foregroundStyle(.secondary)
                 }
             }
-            
+
             if let message = store.outputFolderMessage, store.saveLocationMode == .designated {
                 Label(message, systemImage: "exclamationmark.triangle")
                     .font(.callout)
@@ -608,7 +609,7 @@ private struct SummaryMetric: View {
 
 private struct DesktopPetSettingsView: View {
     @ObservedObject var store: ImagePetStore
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -620,92 +621,129 @@ private struct DesktopPetSettingsView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     Spacer()
-                    
-                    Toggle(isOn: $store.isDesktopPetVisible) {
-                        Text(store.isDesktopPetVisible ? "Visible" : "Hidden")
+
+                    Toggle(isOn: $store.isDesktopPetEnabled) {
+                        Text(store.isDesktopPetEnabled ? "Enabled" : "Disabled")
                             .font(.headline)
                     }
                     .toggleStyle(.switch)
-                    .accessibilityIdentifier("petSettingsVisibilityToggle")
+                    .accessibilityIdentifier("petSettingsEnabledToggle")
                 }
                 .padding()
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Select Theme")
-                        .font(.system(.headline, design: .rounded))
-                    
-                    HStack(spacing: 16) {
-                        ThemeCard(
-                            name: "Cute Cat",
-                            description: "A playful, hand-drawn kitty with smooth vector frames.",
-                            themeName: "CuteCat",
-                            selectedTheme: $store.selectedThemeName,
-                            previewAnim: .idle
-                        )
-                        .accessibilityIdentifier("themeCard_CuteCat")
-                        
-                        ThemeCardPlaceholder(
-                            name: "Pixel Slime",
-                            description: "Retro retro pixel animations. Coming soon."
-                        )
-                        
-                        ThemeCardPlaceholder(
-                            name: "Shiba Inu",
-                            description: "A very energetic and doge-like shiba. Coming soon."
-                        )
+
+                Group {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Select Theme")
+                            .font(.system(.headline, design: .rounded))
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ThemeCard(
+                                    name: "Cute Cat",
+                                    description: "A playful, hand-drawn kitty.",
+                                    themeName: "CuteCat",
+                                    selectedTheme: $store.selectedThemeName,
+                                    previewAnim: .idle
+                                )
+                                .accessibilityIdentifier("themeCard_CuteCat")
+
+                                ThemeCard(
+                                    name: "Shiba Inu",
+                                    description: "An energetic, loyal puppy.",
+                                    themeName: "ShibaInu",
+                                    selectedTheme: $store.selectedThemeName,
+                                    previewAnim: .idle
+                                )
+                                .accessibilityIdentifier("themeCard_ShibaInu")
+
+                                ThemeCard(
+                                    name: "Pixel Slime",
+                                    description: "Retro bounce pixel slime.",
+                                    themeName: "PixelSlime",
+                                    selectedTheme: $store.selectedThemeName,
+                                    previewAnim: .idle
+                                )
+                                .accessibilityIdentifier("themeCard_PixelSlime")
+                            }
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Behavior & Performance Settings")
+                            .font(.system(.headline, design: .rounded))
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            Toggle(isOn: $store.launchAtLoginEnabled) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Launch at Login")
+                                        .fontWeight(.medium)
+                                    Text("Automatically starts the Desktop Pet when you log into your Mac.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("launchAtLoginToggle")
+
+                            if let error = store.launchAtLoginError {
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                                    .accessibilityIdentifier("launchAtLoginErrorLabel")
+                            }
+
+                            Divider()
+
+                            Toggle(isOn: $store.enableIdleVariants) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Enable Idle Variants")
+                                        .fontWeight(.medium)
+                                    Text("Allows the pet to randomly yawn or stretch during periods of inactivity (every 20-40 seconds).")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("enableIdleVariantsToggle")
+
+                            Toggle(isOn: $store.enableHoverFeedback) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Enable Hover Feedback")
+                                        .fontWeight(.medium)
+                                    Text("Pet responds to mouse hover with friendly animation.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("enableHoverFeedbackToggle")
+
+                            Divider()
+
+                            Toggle(isOn: $store.energySavingMode) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Energy Saving Mode")
+                                        .fontWeight(.medium)
+                                    Text("Halves the animation frame rate to minimize CPU and battery usage.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("energySavingModeToggle")
+                        }
+                        .padding()
+                        .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
                     }
                 }
-                
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Behavior & Performance Settings")
-                        .font(.system(.headline, design: .rounded))
-                    
-                    VStack(alignment: .leading, spacing: 14) {
-                        Toggle(isOn: $store.enableIdleVariants) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Enable Idle Variants")
-                                    .fontWeight(.medium)
-                                Text("Allows the pet to randomly yawn or stretch during periods of inactivity (every 20-40 seconds).")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("enableIdleVariantsToggle")
-                        
-                        Toggle(isOn: $store.enableHoverFeedback) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Enable Hover Feedback")
-                                    .fontWeight(.medium)
-                                Text("Pet responds to mouse hover with friendly animation.")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("enableHoverFeedbackToggle")
-                        
-                        Toggle(isOn: $store.energySavingMode) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Energy Saving Mode")
-                                    .fontWeight(.medium)
-                                Text("Halves the animation frame rate to minimize CPU and battery usage.")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("energySavingModeToggle")
-                    }
-                    .padding()
-                    .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
-                }
+                .disabled(!store.isDesktopPetEnabled)
             }
             .padding(24)
         }
     }
+
+
 }
 
 private struct ThemeCard: View {
@@ -714,11 +752,11 @@ private struct ThemeCard: View {
     let themeName: String
     @Binding var selectedTheme: String
     let previewAnim: PetAnimation
-    
+
     var isSelected: Bool {
         selectedTheme == themeName
     }
-    
+
     var body: some View {
         Button {
             selectedTheme = themeName
@@ -727,7 +765,7 @@ private struct ThemeCard: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
-                    
+
                     if let image = ThemeCache.loadStaticImage(themeName: themeName, animation: previewAnim) {
                         Image(decorative: image, scale: 1.0)
                             .resizable()
@@ -740,12 +778,12 @@ private struct ThemeCard: View {
                     }
                 }
                 .frame(height: 90)
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(name)
                         .font(.headline)
                         .foregroundStyle(isSelected ? Color.accentColor : .primary)
-                    
+
                     Text(description)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -769,24 +807,24 @@ private struct ThemeCard: View {
 private struct ThemeCardPlaceholder: View {
     let name: String
     let description: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.secondary.opacity(0.04))
-                
+
                 Image(systemName: "lock.fill")
                     .font(.system(size: 20))
                     .foregroundStyle(.secondary.opacity(0.6))
             }
             .frame(height: 90)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
                     .font(.headline)
                     .foregroundStyle(.secondary)
-                
+
                 Text(description)
                     .font(.caption)
                     .foregroundStyle(.secondary.opacity(0.7))

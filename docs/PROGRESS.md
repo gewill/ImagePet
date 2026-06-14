@@ -37,6 +37,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - V0.3 扩展需求：[PRD_v0.3.md](PRD_v0.3.md)
 - V0.4 桌面 Pet 规划：[PRD_v0.4_desktop_pet.md](PRD_v0.4_desktop_pet.md)
 - V0.5 桌面 Pet 双态规划：[PRD_v0.5_desktop_pet_dual_state.md](PRD_v0.5_desktop_pet_dual_state.md)
+- V0.7 静默桌面 Pet 常驻与主题扩展规划：[PRD_v0.7_desktop_pet_expansion.md](PRD_v0.7_desktop_pet_expansion.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -60,7 +61,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏、返回主窗口并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |
-| 桌面 Pet 富动画与自定义资产规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 明确内置动画集、自定义资产规范、以及沙盒下的书签持久化访问 | 进入技术架构设计评审 |
+| 静默桌面 Pet 常驻与内置主题扩展规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 与 `docs/PRD_v0.7_desktop_pet_expansion.md` 明确内置动画集、Launch at Login 静默启动、既有 Pet 直接拖拽验收、至少 1 套新增内置主题；自定义导入延后 | 进入 v0.7 技术设计评审 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
 | Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；格式边界测试锁定 GIF/WebP/PDF 不支持 | GUI 混合批次仍需手工验证 |

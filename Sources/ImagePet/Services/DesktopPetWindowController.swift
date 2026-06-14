@@ -17,7 +17,6 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         super.init()
 
         store.$petViewMode
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] mode in
                 self?.updateWindowSize(for: mode)
             }
@@ -45,6 +44,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private func show() {
         let window = window ?? makeWindow()
         self.window = window
+        updateWindowSize(for: store.petViewMode)
         window.orderFrontRegardless()
     }
 

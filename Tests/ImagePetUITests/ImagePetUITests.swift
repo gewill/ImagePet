@@ -520,6 +520,143 @@ final class ImagePetUITests: XCTestCase {
         let retryButton = petWindow.buttons["desktopPetRetryFailedButton"]
         XCTAssertTrue(retryButton.exists)
     }
+
+    func testDesktopPetStateRestoration() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IS_UI_TESTING_RESTORATION"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let chooseFolderButton = window.buttons["chooseFolderButton"]
+        XCTAssertTrue(chooseFolderButton.exists)
+        chooseFolderButton.click()
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        if !petWindow.exists {
+            toggleButton.click()
+            XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+        }
+
+        app.terminate()
+
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IS_UI_TESTING_RESTORATION"] = "1"
+        app.launch()
+
+        let petWindow2 = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow2.waitForExistence(timeout: 8.0), "Desktop pet window should be restored on launch")
+
+        let window2 = mainWindow()
+        if window2.exists {
+            let toggleButton2 = window2.buttons["togglePetButton"]
+            if toggleButton2.exists && petWindow2.exists {
+                toggleButton2.click()
+            }
+        }
+    }
+
+    func testPRDv07NewSettings() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        // Switch to the Desktop Pet Tab
+        let tab = window.descendants(matching: .any)["Desktop Pet"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
+        tab.click()
+
+        // Test petSettingsEnabledToggle
+        let enabledToggle = window.descendants(matching: .any)["petSettingsEnabledToggle"]
+        XCTAssertTrue(enabledToggle.exists)
+
+        let catCard = window.buttons["themeCard_CuteCat"]
+        XCTAssertTrue(catCard.exists)
+        XCTAssertTrue(catCard.isEnabled)
+
+        // Toggle it off, cards should be disabled
+        enabledToggle.click()
+        XCTAssertFalse(catCard.isEnabled)
+
+        // Toggle it back on
+        enabledToggle.click()
+        XCTAssertTrue(catCard.isEnabled)
+
+        let shibaCard = window.buttons["themeCard_ShibaInu"]
+        XCTAssertTrue(shibaCard.exists)
+        shibaCard.click()
+
+        let slimeCard = window.buttons["themeCard_PixelSlime"]
+        XCTAssertTrue(slimeCard.exists)
+        slimeCard.click()
+
+        let launchToggle = window.descendants(matching: .any)["launchAtLoginToggle"]
+        XCTAssertTrue(launchToggle.exists)
+        launchToggle.click()
+
+        let energyToggle = window.descendants(matching: .any)["energySavingModeToggle"]
+        XCTAssertTrue(energyToggle.exists)
+        energyToggle.click()
+    }
+
+    func testQuietStartupWithPetEnabledAndVisible() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IMAGEPET_LAUNCH_MODE"] = "loginItem"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_ENABLED"] = "1"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_VISIBLE"] = "1"
+        app.launch()
+
+        // Verify main window does not exist
+        let window = app.windows["ImagePet"]
+        XCTAssertFalse(window.exists)
+
+        // Verify desktop pet window exists and is collapsed
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 8.0))
+        waitForMiniPetWindow(petWindow)
+
+        // Click pet to expand it
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        // Verify return button exists and click it
+        let returnBtn = petWindow.buttons["desktopPetReturnToAppButton"]
+        XCTAssertTrue(returnBtn.waitForExistence(timeout: 2.0))
+        returnBtn.click()
+
+        // Verify main window is now visible
+        XCTAssertTrue(window.waitForExistence(timeout: 3.0))
+    }
+
+    func testQuietStartupWithPetDisabled() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IMAGEPET_LAUNCH_MODE"] = "loginItem"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_ENABLED"] = "0"
+        app.launch()
+
+        // Verify main window does not exist
+        let window = app.windows["ImagePet"]
+        XCTAssertFalse(window.exists)
+
+        // Verify desktop pet window does not exist either
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertFalse(petWindow.exists)
+    }
 }
 
 private extension XCUIElement {

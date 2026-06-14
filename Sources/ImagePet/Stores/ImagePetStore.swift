@@ -1,6 +1,14 @@
 import AppKit
 import Foundation
 import ImagePetCore
+import ServiceManagement
+
+enum LaunchMode: String, Codable {
+    case normal
+    case loginItem
+    case fileOpen
+    case reopen
+}
 
 @MainActor
 final class ImagePetStore: ObservableObject {
@@ -30,10 +38,20 @@ final class ImagePetStore: ObservableObject {
             checkAndApplyAutoExpand()
         }
     }
+    @Published var isDesktopPetEnabled = true {
+        didSet {
+            defaults.set(isDesktopPetEnabled, forKey: desktopPetEnabledKey)
+            guard !isInitializing else { return }
+            if !isDesktopPetEnabled {
+                isDesktopPetVisible = false
+            }
+        }
+    }
     @Published var isDesktopPetVisible = false {
         didSet {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
-            if isDesktopPetVisible {
+            guard !isInitializing else { return }
+            if isDesktopPetVisible && isDesktopPetEnabled {
                 if desktopPetWindowController == nil {
                     desktopPetWindowController = DesktopPetWindowController(store: self)
                 }
@@ -41,7 +59,11 @@ final class ImagePetStore: ObservableObject {
                 let isBlocking = snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission
                 self.petViewMode = isBlocking ? .full : .mini
             }
-            desktopPetWindowController?.setVisible(isDesktopPetVisible)
+            if !isDesktopPetVisible {
+                desktopPetWindowController?.setVisible(false)
+            } else if isDesktopPetEnabled {
+                desktopPetWindowController?.setVisible(true)
+            }
         }
     }
     @Published var outputFormat: OutputFormat = .original {
@@ -116,6 +138,19 @@ final class ImagePetStore: ObservableObject {
     @Published var issuesVisuallyDegraded = false
     @Published var doneVisuallyDismissed = false
 
+    // PRD v0.7 Properties
+    @Published var launchMode: LaunchMode = .normal
+    @Published var launchAtLoginEnabled = false {
+        didSet {
+            defaults.set(launchAtLoginEnabled, forKey: launchAtLoginKey)
+            updateLaunchAtLogin()
+        }
+    }
+    @Published var launchAtLoginError: String? = nil
+    @Published var hasReopened = false
+    static var shared: ImagePetStore?
+
+    private var isInitializing = true
     private var idleTimerTask: Task<Void, Never>?
     private var issuesTimer: Timer?
     private var doneTimer: Timer?
@@ -141,6 +176,10 @@ final class ImagePetStore: ObservableObject {
     private let energySavingModeKey = "ImagePet.energySavingMode"
     private let selectedThemeNameKey = "ImagePet.selectedThemeName"
 
+    // PRD v0.7 Keys
+    private let launchAtLoginKey = "ImagePet.launchAtLogin"
+    private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
+
     init(
         compressor: ImageCompressor = ImageCompressor(),
         bookmarkStore: OutputDirectoryBookmarkStore? = nil,
@@ -156,20 +195,60 @@ final class ImagePetStore: ObservableObject {
         self.maxDimension = .none
         self.stripMetadata = true
         self.petViewMode = .mini
-        
+
         self.enableIdleVariants = true
         self.enableHoverFeedback = true
         self.energySavingMode = false
         self.selectedThemeName = "CuteCat"
 
-        if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
-            self.isDesktopPetVisible = false
-            self.outputDirectory = nil
+        self.isDesktopPetEnabled = true
+        self.launchAtLoginEnabled = false
+        ImagePetStore.shared = self
+
+        let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
+        let isRestorationTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING_RESTORATION"] == "1"
+
+        // 1. 推断或注入 LaunchMode
+        if let envModeString = ProcessInfo.processInfo.environment["IMAGEPET_LAUNCH_MODE"],
+           let envMode = LaunchMode(rawValue: envModeString) {
+            self.launchMode = envMode
+        } else {
+            let isBackgroundLaunch = !NSApplication.shared.isActive
+            let launchAtLogin = defaults.bool(forKey: launchAtLoginKey)
+            if isBackgroundLaunch && launchAtLogin && !isRestorationTesting && !isUITesting {
+                self.launchMode = .loginItem
+            } else {
+                self.launchMode = .normal
+            }
+        }
+
+        if isUITesting && !isRestorationTesting {
+            if let mockEnabled = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_ENABLED"] {
+                self.isDesktopPetEnabled = (mockEnabled != "0")
+            } else {
+                self.isDesktopPetEnabled = true
+            }
+            if let mockVisible = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_VISIBLE"] {
+                self.isDesktopPetVisible = (mockVisible == "1")
+            } else {
+                self.isDesktopPetVisible = false
+            }
+            if self.launchMode == .loginItem {
+                self.outputDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
+            } else {
+                self.outputDirectory = nil
+            }
             self.petViewMode = .mini
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
+            self.launchAtLoginEnabled = false
         } else {
+            if defaults.object(forKey: desktopPetEnabledKey) == nil {
+                self.isDesktopPetEnabled = true
+            } else {
+                self.isDesktopPetEnabled = defaults.bool(forKey: desktopPetEnabledKey)
+            }
             self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
             restoreOutputDirectory()
 
@@ -188,7 +267,7 @@ final class ImagePetStore: ObservableObject {
             if defaults.object(forKey: stripMetadataKey) != nil {
                 self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
             }
-            
+
             if defaults.object(forKey: enableIdleVariantsKey) != nil {
                 self.enableIdleVariants = defaults.bool(forKey: enableIdleVariantsKey)
             }
@@ -201,10 +280,19 @@ final class ImagePetStore: ObservableObject {
             if let theme = defaults.string(forKey: selectedThemeNameKey) {
                 self.selectedThemeName = theme
             }
-            
+
+            if defaults.object(forKey: launchAtLoginKey) != nil {
+                self.launchAtLoginEnabled = defaults.bool(forKey: launchAtLoginKey)
+            } else {
+                if #available(macOS 13.0, *) {
+                    self.launchAtLoginEnabled = (SMAppService.mainApp.status == .enabled)
+                }
+            }
+
             self.petViewMode = .mini
         }
         checkAndApplyAutoExpand()
+        self.isInitializing = false
     }
 
     var completedCount: Int {
@@ -238,7 +326,21 @@ final class ImagePetStore: ObservableObject {
     }
 
     func activateMainWindow() {
+        self.hasReopened = true
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.setActivationPolicy(.regular)
+        }
         NSApp.activate(ignoringOtherApps: true)
+
+        for window in NSApp.windows {
+            if window.title == "ImagePet" || window.identifier?.rawValue == "main" {
+                if window.isMiniaturized {
+                    window.deminiaturize(nil)
+                }
+                window.makeKeyAndOrderFront(nil)
+            }
+        }
+
         if focusMainWindowIfPresent() {
             return
         }
@@ -732,6 +834,7 @@ final class ImagePetStore: ObservableObject {
         isProcessing = false
         petState = hasFailedJobs ? .error : .happy
         didConfirmOverwrite = false
+
     }
 
     private func claimNextPendingJob() -> ImageJob? {
@@ -819,6 +922,7 @@ final class ImagePetStore: ObservableObject {
         processingTask = nil
         isProcessing = false
         petState = .error
+
     }
 
     private static func fileSize(for url: URL) -> Int64 {
@@ -865,7 +969,7 @@ final class ImagePetStore: ObservableObject {
             if issuesTimer == nil && !issuesVisuallyDegraded {
                 let isTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" || NSClassFromString("XCTestCase") != nil
                 let interval: TimeInterval = isTesting ? 2.0 : 600.0
-                
+
                 issuesTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
                     Task { @MainActor [weak self] in
                         guard let self = self else { return }
@@ -891,7 +995,7 @@ final class ImagePetStore: ObservableObject {
         if isCurrentlyDone {
             if doneTimer == nil && !doneVisuallyDismissed {
                 let interval: TimeInterval = 3.5
-                
+
                 doneTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
                     Task { @MainActor [weak self] in
                         guard let self = self else { return }
@@ -910,5 +1014,39 @@ final class ImagePetStore: ObservableObject {
         doneTimer?.invalidate()
         doneTimer = nil
         doneVisuallyDismissed = false
+    }
+
+    private func updateLaunchAtLogin() {
+        if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
+            return
+        }
+        if #available(macOS 13.0, *) {
+            let service = SMAppService.mainApp
+            if launchAtLoginEnabled {
+                if service.status == .enabled { return }
+                do {
+                    launchAtLoginError = nil
+                    try service.register()
+                } catch {
+                    launchAtLoginError = "Failed to enable launch at login: \(error.localizedDescription)"
+                    launchAtLoginEnabled = false
+                    #if DEBUG
+                    print("[ImagePetStore] Error registering launch service: \(error)")
+                    #endif
+                }
+            } else {
+                if service.status == .notRegistered { return }
+                do {
+                    launchAtLoginError = nil
+                    try service.unregister()
+                } catch {
+                    launchAtLoginError = "Failed to disable launch at login: \(error.localizedDescription)"
+                    launchAtLoginEnabled = true
+                    #if DEBUG
+                    print("[ImagePetStore] Error unregistering launch service: \(error)")
+                    #endif
+                }
+            }
+        }
     }
 }
