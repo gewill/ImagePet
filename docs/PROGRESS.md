@@ -1,6 +1,6 @@
 # ImagePet MVP Progress
 
-更新日期：2026-06-12
+更新日期：2026-06-14
 
 ## 当前状态
 
@@ -13,6 +13,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - GUI 拖拽、队列、状态展示和输出目录选择
 - `Add Images` 菜单/按钮输入入口
 - 桌面宠物小窗第一版
+- 桌面 Pet UI、动效和轻量交互优化
 - V0.3 输出格式、保存位置、覆盖确认、尺寸限制和元数据剥离选项
 - 单张压缩结果显示原始大小、输出大小和节省比例
 - App Sandbox entitlements
@@ -27,8 +28,8 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 
 已自动化验证：
 
-- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，总耗时 0.24 秒，内存峰值约 162 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
-- UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、桌面宠物返回主窗口、以及批量压缩完整流程（由 `ImagePetUITests` 验证）。
+- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，最近一次总耗时 0.22 秒，内存峰值约 161.6 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
+- UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、桌面宠物返回主窗口、完成态动作、失败重试、覆盖确认、以及批量压缩完整流程（由 `ImagePetUITests` 验证）。
 
 ## 追踪入口
 
@@ -56,6 +57,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | autoreleasepool | 已实现 | `ImageCompressor` decode/encode/write 包裹 | 压测确认峰值内存 |
 | 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态、size 和 saved ratio | GUI 手工检查状态变化 |
 | 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏、返回主窗口并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
+| 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
 | Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用；格式边界测试锁定 GIF/WebP/PDF 不支持 | GUI 混合批次仍需手工验证 |
@@ -64,7 +66,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
 | Compress More | 已实现 | 清空队列并保留设置 | 手工验证设置保留 |
 | Committed Xcode project | 已完成 | `ImagePet.xcodeproj` 已入库 | CI 后续直接用 Xcode project |
-| 自动化 UI 测试 | 已实现 | `ImagePetUITests` 覆盖 5 个核心交互与功能用例 | 持续集成持续验证 |
+| 自动化 UI 测试 | 已实现 | `ImagePetUITests` 覆盖 8 个核心交互与功能用例 | 持续集成持续验证 |
 
 ## 已验证
 
@@ -74,7 +76,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 swift test
 结果：通过
 测试数：19
-性能与鲁棒性验证：通过（20张并行压缩，耗时 0.25 秒，峰值内存 158.3 MB）
+性能与鲁棒性验证：通过（20张并行压缩，耗时 0.22 秒，峰值内存 159 MB）
 ```
 
 ```text
@@ -85,8 +87,8 @@ xcodebuild -project ImagePet.xcodeproj \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：24 (19 Unit Tests + 5 UI Tests)
-性能与鲁棒性验证：通过（20张并行压缩，耗时 0.24 秒，峰值内存 162 MB）
+测试数：27 (19 Unit Tests + 8 UI Tests)
+性能与鲁棒性验证：通过（20张并行压缩，耗时 0.22 秒，峰值内存 161.6 MB）
 ```
 
 ```text
@@ -173,8 +175,8 @@ org.gewill.ImagePet
 - Developer ID signing / notarization
 - Mac App Store packaging
 - App icon
-- V0.4 桌面 Pet 产品化实现
-- 更复杂宠物动画
+- V0.4 桌面 Pet 产品化剩余验收
+- 更复杂宠物动画资源
 - Finder Extension
 - Raycast Extension
 - Shortcuts

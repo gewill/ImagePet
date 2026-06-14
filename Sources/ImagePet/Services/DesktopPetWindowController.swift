@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private static let frameAutosaveName = "ImagePetDesktopPetWindow"
+    private static let windowSize = NSSize(width: 192, height: 176)
 
     private let store: ImagePetStore
     private var window: NSWindow?
@@ -42,7 +43,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     }
 
     private func makeWindow() -> NSWindow {
-        let size = NSSize(width: 168, height: 156)
+        let size = Self.windowSize
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),
             styleMask: [.borderless],
@@ -61,6 +62,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window.delegate = self
 
         if window.setFrameUsingName(Self.frameAutosaveName) {
+            window.setFrame(NSRect(origin: window.frame.origin, size: size), display: false)
             ensureFrameIsVisible(window, fallbackSize: size)
         } else {
             window.setFrame(defaultFrame(for: size), display: false)

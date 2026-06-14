@@ -364,7 +364,7 @@ final class ImagePetStore: ObservableObject {
                 title: "Eating",
                 detail: "\(completedCount) / \(jobs.count)",
                 primaryAction: nil,
-                secondaryActions: [.hidePet],
+                secondaryActions: [.addImages, .hidePet],
                 canAcceptDrop: true
             )
         }
