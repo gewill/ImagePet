@@ -81,7 +81,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 总计 Ate / Pooped / Saved | 已实现 | `ImagePetStore` 汇总，GUI 展示 | 手工核对展示 |
 | Reveal in Finder | 已实现 | GUI 调用 Finder reveal/open | 手工点击验证 |
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
-| Compress More | 已实现 | 清空队列并保留设置 | 手工验证设置保留 |
+| Clear List | 已实现 | 清空队列并保留设置 | 手工验证设置保留 |
 | Committed Xcode project | 已完成 | `ImagePet.xcodeproj` 已入库 | CI 后续直接用 Xcode project |
 | 自动化 UI 测试 | 已实现 | `ImagePetUITests` 覆盖 17 个核心交互与功能用例 | 持续集成持续验证 |
 | CLI 命令行工具 (`imagepet`) | 已实现 | `Sources/ImagePetCLI` + `swift-argument-parser` 接入完成并发布独立的可执行文件 | 加入 CI 测试构建流程 |
@@ -230,7 +230,7 @@ org.gewill.ImagePet
   - Pooped
   - Saved
 - 点击 `Reveal in Finder`，确认输出目录可打开。
-- 点击 `Compress More`，确认队列清空，quality 和输出目录保留。
+- 点击 `Clear List`，确认队列清空，quality 和输出目录保留。
 - 点击 `Show Pet`，确认桌面宠物小窗可显示、可拖动、可隐藏，并跟随压缩状态变化。
 
 ### 失败路径验收

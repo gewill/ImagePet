@@ -30,7 +30,7 @@ ImagePet becomes easier to discover, control, and troubleshoot without expanding
   - `⌘O`: Add Images
   - `⇧⌘O`: Choose Output Folder
   - `⇧⌘P`: Show / Hide Desktop Pet
-  - `⌘N`: Compress More
+  - `⌘N`: Clear List
   - `⌘R`: Retry Failed，仅在失败状态按钮上出现
 - 主窗口 `TabView` 目前只有 `Compress` 与 `Settings` 两页；`Settings` 实际是 `DesktopPetSettingsView`，偏桌面 Pet 配置。
 - 目前没有独立 Help 页面、Help 菜单入口、帮助窗口、帮助文档资源或帮助验收清单。
@@ -280,7 +280,7 @@ v0.11 应把现有命令整理成更像 macOS app 的结构：
 File
 - Add Images...              ⌘O
 - Choose Output Folder...    ⇧⌘O
-- Compress More              ⌘N
+- Clear List              ⌘N
 - Retry Failed               ⌘R, only enabled when failed jobs exist
 
 View
@@ -436,7 +436,7 @@ Regression：
 - `⌘O` 仍打开 Add Images。
 - `⇧⌘O` 仍打开 Choose Output Folder。
 - `⇧⌘P` 仍切换 Desktop Pet。
-- `⌘N` 在非处理状态可 Compress More。
+- `⌘N` 在非处理状态可 Clear List。
 - `⌘R` 只在失败状态可 Retry Failed。
 - 覆盖模式确认弹窗不受任何 global shortcut 绕过。
 

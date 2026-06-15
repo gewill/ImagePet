@@ -97,7 +97,7 @@ GUI 层负责：
 - 显示或隐藏桌面宠物小窗。
 - 打开离线帮助中心。
 - 记录用户自定义的全局快捷键，默认不设置任何全局快捷键。
-- 处理 `Reveal in Finder`、`Retry Failed`、`Compress More`。
+- 处理 `Reveal in Finder`、`Retry Failed`、`Clear List`。
 
 v0.13 已在 GUI 层新增 `LocalNotificationManager` 服务边界，用于管理 `UNUserNotificationCenter` 权限、后台压缩完成摘要、通知动作和通知节流。通知能力仍保持 GUI-only，不进入 `ImagePetCore`。
 

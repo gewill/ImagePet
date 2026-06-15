@@ -288,14 +288,14 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(poopedMetric.exists)
         XCTAssertTrue(savedMetric.exists)
 
-        // Verify 'Reveal in Finder' and 'Compress More' buttons exist
+        // Verify 'Reveal in Finder' and 'Clear List' buttons exist
         let revealButton = window.buttons["revealInFinderButton"]
-        let compressMoreButton = window.buttons["compressMoreButton"]
+        let clearListButton = window.buttons["clearListButton"]
         XCTAssertTrue(revealButton.exists)
-        XCTAssertTrue(compressMoreButton.exists)
+        XCTAssertTrue(clearListButton.exists)
 
-        // Click 'Compress More' to reset the state
-        compressMoreButton.click()
+        // Click 'Clear List' to reset the state
+        clearListButton.click()
 
         // Empty state label should be visible again
         let emptyLabel = window.staticTexts["emptyJobsLabel"]
@@ -331,14 +331,14 @@ final class ImagePetUITests: XCTestCase {
         let doneExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Done' OR value == 'Done'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [doneExpectation], timeout: 5.0), .completed)
 
-        // Verify Reveal and Compress More buttons exist
+        // Verify Reveal and Clear List buttons exist
         let revealButton = petWindow.buttons["desktopPetRevealButton"]
-        let compressMoreButton = petWindow.buttons["desktopPetCompressMoreButton"]
+        let clearListButton = petWindow.buttons["desktopPetClearListButton"]
         XCTAssertTrue(revealButton.exists)
-        XCTAssertTrue(compressMoreButton.exists)
+        XCTAssertTrue(clearListButton.exists)
 
-        // Click Compress More to reset state
-        compressMoreButton.click()
+        // Click Clear List to reset state
+        clearListButton.click()
 
         // Verify title resets to Ready
         let readyExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Ready' OR value == 'Ready'"), object: petTitle)
@@ -455,7 +455,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petTitle.exists)
         let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 3.0), .completed)
-        XCTAssertTrue(petWindow.buttons["desktopPetCompressMoreButton"].exists)
+        XCTAssertTrue(petWindow.buttons["desktopPetClearListButton"].exists)
     }
 
     func testDesktopPetBlockingConfirmForcesFullFromMini() throws {

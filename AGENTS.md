@@ -70,7 +70,7 @@ Keep GUI-only concerns out of `ImagePetCore`: drag and drop, `NSOpenPanel`, secu
 - Queueing and max 2 concurrent jobs
 - Per-job UI updates
 - Pet state machine
-- `Reveal in Finder`, `Retry Failed`, and `Compress More`
+- `Reveal in Finder`, `Retry Failed`, and `Clear List`
 
 ## Sandbox And File Access
 

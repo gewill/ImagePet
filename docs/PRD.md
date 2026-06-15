@@ -280,7 +280,7 @@ Ate: 128.4 MB
 Pooped: 18.7 MB
 Saved: 109.7 MB / 85.4%
 [Reveal in Finder]
-[Compress More]
+[Clear List]
 ```
 
 ### Completed 部分失败
@@ -293,7 +293,7 @@ Pooped: 21.3 MB
 Saved: 107.1 MB / 83.4%
 [Reveal in Finder]
 [Retry Failed]
-[Compress More]
+[Clear List]
 ```
 
 ## 宠物状态机
@@ -303,11 +303,11 @@ Saved: 107.1 MB / 83.4%
 | idle | 用户拖入图片且开始处理 | eating |
 | eating | 全部成功 | happy |
 | eating | 部分或全部失败 | error |
-| happy | 用户点击 Compress More | idle |
-| error | 用户点击 Compress More | idle |
+| happy | 用户点击 Clear List | idle |
+| error | 用户点击 Clear List | idle |
 | error | 用户点击 Retry Failed | eating |
 
-`happy` 不自动消失，直到用户点击 `Compress More`。
+`happy` 不自动消失，直到用户点击 `Clear List`。
 
 ## 按钮行为
 
@@ -315,7 +315,7 @@ Saved: 107.1 MB / 83.4%
 
 打开输出目录。
 
-### Compress More
+### Clear List
 
 - 清空任务队列
 - 保留上次设置：
