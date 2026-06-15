@@ -30,7 +30,7 @@ struct ImagePetApp: App {
                 Divider()
 
                 Button("Clear List") {
-                    store.compressMore()
+                    store.clearList()
                 }
                 .keyboardShortcut("n", modifiers: [.command])
                 .disabled(store.isProcessing)

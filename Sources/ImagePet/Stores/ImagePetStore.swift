@@ -678,7 +678,7 @@ final class ImagePetStore: ObservableObject {
         startProcessingIfPossible()
     }
 
-    func compressMore() {
+    func clearList() {
         guard !isProcessing else { return }
 
         clearDoneTimeout()
@@ -767,9 +767,9 @@ final class ImagePetStore: ObservableObject {
                 let hasSuccess = jobs.contains { $0.status == .done }
                 let secondary: [DesktopPetAction]
                 if hasSuccess {
-                    secondary = [.addImages, .revealOutput, .compressMore, .hidePet]
+                    secondary = [.addImages, .revealOutput, .clearList, .hidePet]
                 } else {
-                    secondary = [.addImages, .compressMore, .hidePet]
+                    secondary = [.addImages, .clearList, .hidePet]
                 }
                 return DesktopPetSnapshot(
                     state: doneVisuallyDismissed ? .idle : .done,
@@ -791,7 +791,7 @@ final class ImagePetStore: ObservableObject {
                     title: "Issues",
                     detail: detailText,
                     primaryAction: .retryFailed,
-                    secondaryActions: [.addImages, .retryFailed, .compressMore, .hidePet],
+                    secondaryActions: [.addImages, .retryFailed, .clearList, .hidePet],
                     canAcceptDrop: true
                 )
             }
@@ -823,8 +823,8 @@ final class ImagePetStore: ObservableObject {
             revealOutputDirectory()
         case .retryFailed:
             retryFailed()
-        case .compressMore:
-            compressMore()
+        case .clearList:
+            clearList()
         case .expand:
             petViewMode = .full
         case .collapse:

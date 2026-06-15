@@ -407,7 +407,7 @@ struct DesktopPetView: View {
             return "folder.fill"
         case .retryFailed:
             return "arrow.clockwise"
-        case .compressMore:
+        case .clearList:
             return "plus.circle"
         case .expand:
             return "arrow.up.left.and.arrow.down.right"
@@ -428,7 +428,7 @@ struct DesktopPetView: View {
             return "Reveal"
         case .retryFailed:
             return "Retry"
-        case .compressMore:
+        case .clearList:
             return "Clear"
         case .expand:
             return "Show"
@@ -452,7 +452,7 @@ struct DesktopPetView: View {
             return "Reveal in Finder"
         case .retryFailed:
             return "Retry Failed"
-        case .compressMore:
+        case .clearList:
             return "Clear List"
         case .expand:
             return "Show Pet Controls"
@@ -473,8 +473,8 @@ struct DesktopPetView: View {
             return "desktopPetRevealButton"
         case .retryFailed:
             return "desktopPetRetryFailedButton"
-        case .compressMore:
-            return "desktopPetCompressMoreButton"
+        case .clearList:
+            return "desktopPetClearListButton"
         case .expand:
             return "desktopPetExpandButton"
         case .collapse:
