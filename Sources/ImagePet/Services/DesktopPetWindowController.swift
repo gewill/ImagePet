@@ -11,6 +11,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private let store: ImagePetStore
     private var window: NSWindow?
     private var cancellables = Set<AnyCancellable>()
+    private var isAppTerminating = false
 
     init(store: ImagePetStore) {
         self.store = store
@@ -21,6 +22,17 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
                 self?.updateWindowSize(for: mode)
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillTerminate),
+            name: NSApplication.willTerminateNotification,
+            object: nil
+        )
+    }
+
+    @objc private func appWillTerminate(_ notification: Notification) {
+        isAppTerminating = true
     }
 
     func setVisible(_ isVisible: Bool) {
@@ -38,6 +50,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        guard !isAppTerminating else { return }
         store.hideDesktopPet()
     }
 
