@@ -66,12 +66,12 @@
 		D9E9FED5C374031DCC00E343 /* FileSizeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029178F82948933AB5279570 /* FileSizeFormatting.swift */; };
 		DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */; };
 		E6BD71247B9D2017B1A52CB9 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A775F6539AF723DFC8D3D1 /* LocalNotificationManager.swift */; };
-		E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F8FC16873CD4ECB419915BB /* Assets.xcassets */; };
 		E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
 		F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */; };
 		F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */; };
+		F4D39B0292E06F377A1CCEC3 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */; };
 		F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 /* End PBXBuildFile section */
 
@@ -147,7 +147,6 @@
 		358A8E829CFFE85676AC8B9E /* SwiftWebPEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftWebPEngine.swift; sourceTree = "<group>"; };
 		37C451AC6AE440D62C0D0FDE /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
-		3F8FC16873CD4ECB419915BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4193FE83DCD3C342B858EE45 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetWindowController.swift; sourceTree = "<group>"; };
 		426BA951424DECEFB023D3A9 /* FrameAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameAnimator.swift; sourceTree = "<group>"; };
@@ -194,6 +193,7 @@
 		F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetApp.swift; sourceTree = "<group>"; };
 		F23678BFAD16795886D53796 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
 		F6B768CED9CE7C2047CF0495 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
+		F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -246,7 +246,7 @@
 		086B80E87D840BEB44CFA27C /* ImagePet */ = {
 			isa = PBXGroup;
 			children = (
-				3F8FC16873CD4ECB419915BB /* Assets.xcassets */,
+				F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */,
 				6F8F586A1135EAED6910EB32 /* Resources */,
 				9DD5A4DE7991CFEF8ABD7776 /* App */,
 				0A7B243E7154709CDB185F20 /* Models */,
@@ -590,7 +590,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */,
+				F4D39B0292E06F377A1CCEC3 /* AppIcon.icon in Resources */,
 				468ABFAA6A7B08517772B948 /* Resources in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1110,7 +1110,7 @@
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts.git";
 			requirement = {
 				kind = exactVersion;
-				version = 2.2.2;
+				version = 2.4.0;
 			};
 		};
 		D3B7216B9C9C322068336C77 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
