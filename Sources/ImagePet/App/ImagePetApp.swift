@@ -71,6 +71,10 @@ struct ImagePetApp: App {
                     store.showSettings(.keyboardShortcuts)
                 }
 
+                Button("Notifications...") {
+                    store.showSettings(.notifications)
+                }
+
                 Button("Help & About...") {
                     store.showSettings(.helpAbout)
                 }
@@ -186,7 +190,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         Task { @MainActor in
             if let store = ImagePetStore.shared {
-                store.addDroppedURLs(urls)
+                store.addServiceURLs(urls)
 
                 // Show window if intervention is needed
                 if store.outputDirectory == nil && store.saveLocationMode == .designated {

@@ -10,6 +10,7 @@ enum AppMainTab: String, CaseIterable, Identifiable {
 enum SettingsSection: String, CaseIterable, Identifiable {
     case general
     case folderWatching
+    case notifications
     case desktopPet
     case keyboardShortcuts
     case helpAbout
@@ -22,6 +23,8 @@ enum SettingsSection: String, CaseIterable, Identifiable {
             return "General"
         case .folderWatching:
             return "Folder Watching"
+        case .notifications:
+            return "Notifications"
         case .desktopPet:
             return "Desktop Pet"
         case .keyboardShortcuts:
@@ -37,6 +40,8 @@ enum SettingsSection: String, CaseIterable, Identifiable {
             return "slider.horizontal.3"
         case .folderWatching:
             return "folder.badge.gearshape"
+        case .notifications:
+            return "bell.badge"
         case .desktopPet:
             return "pawprint"
         case .keyboardShortcuts:

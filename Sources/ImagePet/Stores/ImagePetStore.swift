@@ -205,8 +205,10 @@ final class ImagePetStore: ObservableObject {
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
+    private var jobSources: [ImageJob.ID: BackgroundCompressionSource] = [:]
 
     @Published public var folderWatchManager: FolderWatchManager!
+    @Published var notificationManager: LocalNotificationManager
 
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
@@ -239,6 +241,7 @@ final class ImagePetStore: ObservableObject {
         self.compressor = compressor ?? ImageCompressor(capabilities: encoderCapabilities)
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
+        self.notificationManager = LocalNotificationManager(defaults: defaults)
 
         self.outputFormat = .original
         self.jpegEncodingMode = .standard
@@ -262,6 +265,7 @@ final class ImagePetStore: ObservableObject {
 
         self.folderWatchManager = FolderWatchManager(defaults: defaults)
         self.folderWatchManager.store = self
+        bindNotificationActions()
 
         let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
         let isRestorationTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING_RESTORATION"] == "1"
@@ -583,14 +587,18 @@ final class ImagePetStore: ObservableObject {
 
     func chooseInputImages() {
         let urls = InputFilePanel.chooseImages()
-        addInputURLs(urls)
+        addInputURLs(urls, source: .manual)
     }
 
     func addDroppedURLs(_ urls: [URL]) {
-        addInputURLs(urls)
+        addInputURLs(urls, source: .manual)
     }
 
-    private func addInputURLs(_ urls: [URL]) {
+    func addServiceURLs(_ urls: [URL]) {
+        addInputURLs(urls, source: .finderService)
+    }
+
+    private func addInputURLs(_ urls: [URL], source: BackgroundCompressionSource) {
         guard !urls.isEmpty else {
             return
         }
@@ -611,6 +619,9 @@ final class ImagePetStore: ObservableObject {
         }
 
         jobs.append(contentsOf: newJobs)
+        for job in newJobs {
+            jobSources[job.id] = source
+        }
 
         if jobs.contains(where: { $0.status == .pending }) {
             startProcessingIfPossible()
@@ -643,6 +654,9 @@ final class ImagePetStore: ObservableObject {
         }
 
         jobs.append(contentsOf: newJobs)
+        for job in newJobs {
+            jobSources[job.id] = .folderWatching
+        }
 
         if jobs.contains(where: { $0.status == .pending }) {
             startProcessingIfPossible()
@@ -676,6 +690,7 @@ final class ImagePetStore: ObservableObject {
         Task {
             await compressor.resetReservations()
         }
+        jobSources.removeAll()
 
         if outputDirectory == nil && saveLocationMode == .designated {
             chooseOutputDirectory()
@@ -1051,6 +1066,8 @@ final class ImagePetStore: ObservableObject {
         if !batchHasFailures && batchHasSuccess && enableSuccessSound {
             SoundManager.shared.playSuccessSound()
         }
+
+        deliverNotificationSummary(for: processedJobs, batchJobIDs: batchJobIDs)
     }
 
     private func claimNextPendingJob() -> ImageJob? {
@@ -1138,6 +1155,7 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func failPendingJobs(message: String) {
+        let failedJobIDs = Set(jobs.filter { $0.status == .pending }.map { $0.id })
         for index in jobs.indices where jobs[index].status == .pending {
             jobs[index].status = .failed
             jobs[index].errorMessage = message
@@ -1147,6 +1165,56 @@ final class ImagePetStore: ObservableObject {
         isProcessing = false
         petState = .error
 
+        let failedJobs = jobs.filter { failedJobIDs.contains($0.id) }
+        deliverNotificationSummary(for: failedJobs, batchJobIDs: failedJobIDs)
+    }
+
+    private func deliverNotificationSummary(for processedJobs: [ImageJob], batchJobIDs: Set<ImageJob.ID>) {
+        guard !processedJobs.isEmpty else { return }
+
+        let source = notificationSource(for: batchJobIDs)
+        let summary = BackgroundCompressionSummary(source: source, jobs: processedJobs)
+        notificationManager.handleCompletedSummary(summary, appIsActive: NSApp.isActive)
+    }
+
+    private func notificationSource(for jobIDs: Set<ImageJob.ID>) -> BackgroundCompressionSource {
+        let sources = Set(jobIDs.compactMap { jobSources[$0] })
+        if sources.count == 1, let source = sources.first {
+            return source
+        }
+        if sources.contains(.folderWatching) {
+            return .folderWatching
+        }
+        if sources.contains(.finderService) {
+            return .finderService
+        }
+        return .manual
+    }
+
+    private func bindNotificationActions() {
+        notificationManager.setActionHandler { [weak self] action, summary in
+            guard let self else { return }
+
+            switch action {
+            case .openImagePet:
+                self.activateMainWindow()
+            case .revealInFinder:
+                self.activateMainWindow()
+                if let outputURL = summary?.representativeOutputURL {
+                    NSWorkspace.shared.activateFileViewerSelecting([outputURL])
+                } else if let outputDirectory = summary?.outputDirectory {
+                    NSWorkspace.shared.open(outputDirectory)
+                } else {
+                    self.revealOutputDirectory()
+                }
+            case .reviewFailed:
+                self.selectedMainTab = .compress
+                self.activateMainWindow()
+                self.petViewMode = .full
+            case .openSettings:
+                self.showSettings(.notifications)
+            }
+        }
     }
 
     private static func fileSize(for url: URL) -> Int64 {

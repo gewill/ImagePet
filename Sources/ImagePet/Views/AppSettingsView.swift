@@ -18,6 +18,8 @@ struct AppSettingsView: View {
                         GeneralSettingsSection(store: store)
                     case .folderWatching:
                         FolderWatchingSection(store: store)
+                    case .notifications:
+                        NotificationsSection(manager: store.notificationManager)
                     case .desktopPet:
                         DesktopPetSection(store: store)
                     case .keyboardShortcuts:
@@ -237,6 +239,97 @@ private struct KeyboardShortcutsSection: View {
             Label("Clear All Shortcuts", systemImage: "xmark.circle")
         }
         .accessibilityIdentifier("clearShortcutsButton")
+    }
+}
+
+private struct NotificationsSection: View {
+    @ObservedObject var manager: LocalNotificationManager
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            SettingsSectionHeader(
+                title: "Notifications",
+                subtitle: "Background compression results and attention-needed alerts.",
+                systemImage: "bell.badge"
+            )
+            .accessibilityIdentifier("notificationsHeader")
+
+            VStack(alignment: .leading, spacing: 14) {
+                SettingSummaryRow(title: "System Permission", value: manager.authorizationState.displayName)
+
+                HStack(spacing: 10) {
+                    if manager.authorizationState == .notDetermined || manager.authorizationState == .unknown {
+                        Button {
+                            manager.requestAuthorization()
+                        } label: {
+                            Label("Enable Notifications", systemImage: "bell")
+                        }
+                        .accessibilityIdentifier("enableNotificationsButton")
+                    }
+
+                    if manager.authorizationState == .denied {
+                        Button {
+                            manager.openSystemNotificationSettings()
+                        } label: {
+                            Label("Open System Settings", systemImage: "gearshape")
+                        }
+                        .accessibilityIdentifier("openNotificationSettingsButton")
+                    }
+                }
+
+                Divider()
+
+                Toggle(isOn: $manager.notifyBackgroundCompletion) {
+                    SettingToggleLabel(
+                        title: "Background Completion",
+                        detail: "Notify when background compression finishes."
+                    )
+                }
+                .accessibilityIdentifier("notifyBackgroundCompletionToggle")
+
+                Toggle(isOn: $manager.notifyAttentionNeeded) {
+                    SettingToggleLabel(
+                        title: "Attention Needed",
+                        detail: "Notify when a folder, permission, or failed file needs review."
+                    )
+                }
+                .accessibilityIdentifier("notifyAttentionNeededToggle")
+
+                Toggle(isOn: $manager.notifyForegroundCompletion) {
+                    SettingToggleLabel(
+                        title: "Foreground Completion",
+                        detail: "Also notify when ImagePet is already active."
+                    )
+                }
+                .accessibilityIdentifier("notifyForegroundCompletionToggle")
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Recent Background Result")
+                        .font(.headline)
+
+                    if let summary = manager.lastSummary {
+                        SettingSummaryRow(title: "Source", value: summary.source.displayName)
+                        SettingSummaryRow(title: "Status", value: summary.statusText)
+                        SettingSummaryRow(title: "Files", value: "\(summary.successfulCount) ok, \(summary.failedCount) failed, \(summary.skippedCount) skipped")
+                        SettingSummaryRow(title: "Saved", value: FileSizeFormatting.string(from: summary.savedBytes))
+                    } else {
+                        Text("No background result yet")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text(manager.lastDeliveryStatus)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityIdentifier("recentNotificationSummary")
+            }
+        }
+        .onAppear {
+            manager.refreshAuthorizationStatus()
+        }
     }
 }
 
