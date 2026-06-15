@@ -19,7 +19,7 @@ packages:
     exactVersion: 1.1.3
   KeyboardShortcuts:
     url: https://github.com/sindresorhus/KeyboardShortcuts.git
-    exactVersion: 3.0.0
+    exactVersion: 2.2.2
   swift-argument-parser:
     url: https://github.com/apple/swift-argument-parser.git
     exactVersion: 1.3.1
