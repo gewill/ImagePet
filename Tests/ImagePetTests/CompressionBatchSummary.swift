@@ -1,0 +1,1 @@
+../../Sources/ImagePet/Models/CompressionBatchSummary.swift

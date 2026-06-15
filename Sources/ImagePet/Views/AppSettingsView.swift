@@ -303,28 +303,106 @@ private struct NotificationsSection: View {
                 }
                 .accessibilityIdentifier("notifyForegroundCompletionToggle")
 
+                Toggle(isOn: $manager.notifyFolderWatchingCompletion) {
+                    SettingToggleLabel(
+                        title: "Folder Watching Success",
+                        detail: "Notify when folder watching successfully compresses files."
+                    )
+                }
+                .accessibilityIdentifier("notifyFolderWatchingCompletionToggle")
+
                 Divider()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Recent Background Result")
+                    Text("Recent Compression History")
                         .font(.headline)
 
-                    if let summary = manager.lastSummary {
-                        SettingSummaryRow(title: "Source", value: summary.source.displayName)
-                        SettingSummaryRow(title: "Status", value: summary.statusText)
-                        SettingSummaryRow(title: "Files", value: "\(summary.successfulCount) ok, \(summary.failedCount) failed, \(summary.skippedCount) skipped")
-                        SettingSummaryRow(title: "Saved", value: FileSizeFormatting.string(from: summary.savedBytes))
-                    } else {
-                        Text("No background result yet")
+                    if manager.recentSummaries.isEmpty {
+                        Text("No compression history yet")
                             .font(.callout)
                             .foregroundStyle(.secondary)
+                    } else {
+                        VStack(spacing: 8) {
+                            ForEach(manager.recentSummaries) { summary in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(summary.source.displayName)
+                                            .font(.subheadline.weight(.semibold))
+                                        Spacer()
+                                        Text(summary.completedAt, style: .time)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    
+                                    HStack {
+                                        Text("\(summary.successfulCount) ok, \(summary.failedCount) failed, \(summary.skippedCount) skipped")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        
+                                        Spacer()
+                                        
+                                        if summary.successfulCount > 0 {
+                                            Text("Saved \(FileSizeFormatting.string(from: summary.savedBytes))")
+                                                .font(.caption.weight(.medium))
+                                                .foregroundStyle(.green)
+                                        } else {
+                                            Text(summary.statusText)
+                                                .font(.caption)
+                                                .foregroundStyle(summary.hasFailures ? .red : .secondary)
+                                        }
+                                    }
+                                    
+                                    if let errMsg = summary.primaryErrorMessage {
+                                        Text(errMsg)
+                                            .font(.caption)
+                                            .foregroundStyle(.red)
+                                    }
+                                }
+                                .padding(8)
+                                .background(Color.secondary.opacity(0.05))
+                                .cornerRadius(6)
+                            }
+                        }
                     }
 
                     Text(manager.lastDeliveryStatus)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .padding(.top, 4)
                 }
                 .accessibilityIdentifier("recentNotificationSummary")
+
+                #if DEBUG
+                Divider()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Notification Debug (Debug Build Only)")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    HStack(spacing: 8) {
+                        Button("Test Success") {
+                            manager.triggerDebugNotification(type: .success)
+                        }
+                        .accessibilityIdentifier("debugTestSuccessButton")
+
+                        Button("Test Failure") {
+                            manager.triggerDebugNotification(type: .failure)
+                        }
+                        .accessibilityIdentifier("debugTestFailureButton")
+
+                        Button("Test Permission") {
+                            manager.triggerDebugNotification(type: .permission)
+                        }
+                        .accessibilityIdentifier("debugTestPermissionButton")
+
+                        Button("Test Folder Watch") {
+                            manager.triggerDebugNotification(type: .folderWatch)
+                        }
+                        .accessibilityIdentifier("debugTestFolderWatchButton")
+                    }
+                }
+                #endif
             }
         }
         .onAppear {

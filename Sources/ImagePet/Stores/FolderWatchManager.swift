@@ -82,6 +82,7 @@ final class FolderWatchManager: ObservableObject {
         guard let sourceURL = try? URL(resolvingBookmarkData: task.sourceBookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &sourceIsStale),
               let outputURL = try? URL(resolvingBookmarkData: task.outputBookmark, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &outputIsStale) else {
             print("FolderWatchManager: Failed to resolve bookmarks for task \(task.id)")
+            notifyError("Folder watching paused: failed to resolve folder permission bookmarks.")
             return
         }
 
@@ -96,6 +97,7 @@ final class FolderWatchManager: ObservableObject {
             activeMonitors[task.id] = monitor
         } catch {
             print("FolderWatchManager: Failed to start monitor for \(sourceURL.path): \(error)")
+            notifyError("Folder watching paused: failed to start monitor for \(sourceURL.lastPathComponent). \(error.localizedDescription)", directory: sourceURL)
         }
     }
 
@@ -104,6 +106,22 @@ final class FolderWatchManager: ObservableObject {
             monitor.stop()
             activeMonitors.removeValue(forKey: id)
         }
+    }
+
+    private func notifyError(_ message: String, directory: URL? = nil) {
+        let summary = CompressionBatchSummary(
+            source: .folderWatching,
+            successfulCount: 0,
+            failedCount: 0,
+            skippedCount: 0,
+            totalInputBytes: 0,
+            totalOutputBytes: 0,
+            outputDirectory: directory,
+            representativeOutputURL: nil,
+            requiresUserAction: true,
+            primaryErrorMessage: message
+        )
+        store?.notificationManager.handleCompletedSummary(summary, appIsActive: NSApp.isActive)
     }
 }
 
@@ -126,5 +144,8 @@ extension FolderWatchManager: FolderMonitorDelegate {
 
     nonisolated func folderMonitor(_ monitor: FolderMonitor, didEncounterError error: Error) {
         print("FolderMonitor error: \(error)")
+        DispatchQueue.main.async { [weak self] in
+            self?.notifyError("Folder watching error: \(error.localizedDescription)", directory: monitor.monitoredURL)
+        }
     }
 }

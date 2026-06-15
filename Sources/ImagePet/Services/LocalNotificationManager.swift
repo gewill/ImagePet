@@ -2,6 +2,34 @@ import AppKit
 import Foundation
 import UserNotifications
 
+protocol NotificationCenterProtocol: AnyObject, Sendable {
+    var delegate: UNUserNotificationCenterDelegate? { get set }
+    func getSettings(completionHandler: @escaping @Sendable (UNAuthorizationStatus) -> Void)
+    func requestAuth(options: UNAuthorizationOptions, completionHandler: @escaping @Sendable (Bool, Error?) -> Void)
+    func addRequest(_ request: UNNotificationRequest, completionHandler: (@Sendable (Error?) -> Void)?)
+    func setCategories(_ categories: Set<UNNotificationCategory>)
+}
+
+extension UNUserNotificationCenter: NotificationCenterProtocol {
+    func getSettings(completionHandler: @escaping @Sendable (UNAuthorizationStatus) -> Void) {
+        self.getNotificationSettings { settings in
+            completionHandler(settings.authorizationStatus)
+        }
+    }
+
+    func requestAuth(options: UNAuthorizationOptions, completionHandler: @escaping @Sendable (Bool, Error?) -> Void) {
+        self.requestAuthorization(options: options, completionHandler: completionHandler)
+    }
+
+    func addRequest(_ request: UNNotificationRequest, completionHandler: (@Sendable (Error?) -> Void)?) {
+        self.add(request, withCompletionHandler: completionHandler)
+    }
+
+    func setCategories(_ categories: Set<UNNotificationCategory>) {
+        self.setNotificationCategories(categories)
+    }
+}
+
 enum LocalNotificationAuthorizationState: String {
     case notDetermined
     case denied
@@ -67,33 +95,47 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
     @Published var notifyForegroundCompletion: Bool {
         didSet { defaults.set(notifyForegroundCompletion, forKey: notifyForegroundCompletionKey) }
     }
-    @Published private(set) var lastSummary: BackgroundCompressionSummary?
+    @Published var notifyFolderWatchingCompletion: Bool {
+        didSet { defaults.set(notifyFolderWatchingCompletion, forKey: notifyFolderWatchingCompletionKey) }
+    }
+    @Published private(set) var lastSummary: CompressionBatchSummary?
+    @Published private(set) var recentSummaries: [CompressionBatchSummary] = []
     @Published private(set) var lastDeliveryStatus: String = "No notifications sent yet"
 
-    private let center: UNUserNotificationCenter
+    let notificationAggregationWindow: TimeInterval = 2.0
+
+    private let center: NotificationCenterProtocol
     private let defaults: UserDefaults
     private let notifyBackgroundCompletionKey = "ImagePet.notifications.backgroundCompletion"
     private let notifyAttentionNeededKey = "ImagePet.notifications.attentionNeeded"
     private let notifyForegroundCompletionKey = "ImagePet.notifications.foregroundCompletion"
+    private let notifyFolderWatchingCompletionKey = "ImagePet.notifications.folderWatchingCompletion"
+    private let recentSummariesKey = "ImagePet.notifications.recentSummaries"
     private let categoryIdentifier = "IMAGEPET_COMPRESSION_SUMMARY"
     private var lastAttentionDeliveryByKey: [String: Date] = [:]
-    private var summariesByID: [String: BackgroundCompressionSummary] = [:]
-    private var actionHandler: ((LocalNotificationAction, BackgroundCompressionSummary?) -> Void)?
+    private var summariesByID: [String: CompressionBatchSummary] = [:]
+    private var actionHandler: ((LocalNotificationAction, CompressionBatchSummary?) -> Void)?
 
-    init(center: UNUserNotificationCenter = .current(), defaults: UserDefaults = .standard) {
+    private var pendingFolderWatchSummary: CompressionBatchSummary?
+    private var folderWatchDebounceTask: Task<Void, Never>?
+
+    init(center: NotificationCenterProtocol = UNUserNotificationCenter.current(), defaults: UserDefaults = .standard) {
         self.center = center
         self.defaults = defaults
         self.notifyBackgroundCompletion = defaults.object(forKey: notifyBackgroundCompletionKey) as? Bool ?? true
         self.notifyAttentionNeeded = defaults.object(forKey: notifyAttentionNeededKey) as? Bool ?? true
         self.notifyForegroundCompletion = defaults.object(forKey: notifyForegroundCompletionKey) as? Bool ?? false
+        self.notifyFolderWatchingCompletion = defaults.object(forKey: notifyFolderWatchingCompletionKey) as? Bool ?? false
+        
         super.init()
         center.delegate = self
         registerCategories()
         loadAuthorizationStatus()
+        loadRecentSummaries()
     }
 
     @MainActor
-    func setActionHandler(_ handler: @escaping (LocalNotificationAction, BackgroundCompressionSummary?) -> Void) {
+    func setActionHandler(_ handler: @escaping (LocalNotificationAction, CompressionBatchSummary?) -> Void) {
         actionHandler = handler
     }
 
@@ -103,16 +145,40 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
     }
 
     private func loadAuthorizationStatus() {
-        center.getNotificationSettings { [weak self] settings in
+        center.getSettings { [weak self] status in
             Task { @MainActor in
-                self?.authorizationState = LocalNotificationAuthorizationState(status: settings.authorizationStatus)
+                self?.authorizationState = LocalNotificationAuthorizationState(status: status)
             }
+        }
+    }
+
+    private func loadRecentSummaries() {
+        if let data = defaults.data(forKey: recentSummariesKey),
+           let loaded = try? JSONDecoder().decode([CompressionBatchSummary].self, from: data) {
+            recentSummaries = loaded
+        }
+    }
+
+    private func addToHistory(_ summary: CompressionBatchSummary) {
+        var current = recentSummaries
+        current.removeAll { $0.id == summary.id }
+        current.insert(summary, at: 0)
+        if current.count > 20 {
+            current = Array(current.prefix(20))
+        }
+        recentSummaries = current
+        saveRecentSummaries()
+    }
+
+    private func saveRecentSummaries() {
+        if let data = try? JSONEncoder().encode(recentSummaries) {
+            defaults.set(data, forKey: recentSummariesKey)
         }
     }
 
     @MainActor
     func requestAuthorization() {
-        center.requestAuthorization(options: [.alert, .sound]) { [weak self] _, _ in
+        center.requestAuth(options: [.alert, .sound]) { [weak self] _, _ in
             Task { @MainActor in
                 self?.refreshAuthorizationStatus()
             }
@@ -127,9 +193,33 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
     }
 
     @MainActor
-    func handleCompletedSummary(_ summary: BackgroundCompressionSummary, appIsActive: Bool) {
-        lastSummary = summary
+    func handleCompletedSummary(_ summary: CompressionBatchSummary, appIsActive: Bool) {
+        addToHistory(summary)
 
+        if summary.source == .folderWatching {
+            folderWatchDebounceTask?.cancel()
+
+            let merged = pendingFolderWatchSummary?.merging(summary) ?? summary
+            pendingFolderWatchSummary = merged
+            lastSummary = merged
+
+            folderWatchDebounceTask = Task { [weak self] in
+                guard let self = self else { return }
+                try? await Task.sleep(nanoseconds: UInt64(self.notificationAggregationWindow * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                if let summaryToDeliver = self.pendingFolderWatchSummary {
+                    self.pendingFolderWatchSummary = nil
+                    self.deliverSummaryImmediately(summaryToDeliver, appIsActive: appIsActive)
+                }
+            }
+        } else {
+            lastSummary = summary
+            deliverSummaryImmediately(summary, appIsActive: appIsActive)
+        }
+    }
+
+    @MainActor
+    func deliverSummaryImmediately(_ summary: CompressionBatchSummary, appIsActive: Bool) {
         guard shouldDeliver(summary, appIsActive: appIsActive) else {
             lastDeliveryStatus = "Not delivered: visible in ImagePet"
             return
@@ -155,9 +245,9 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
         )
 
         summariesByID[summary.id.uuidString] = summary
-        center.add(request) { [weak self] error in
+        center.addRequest(request) { [weak self] error in
             Task { @MainActor in
-                if let error {
+                if let error = error {
                     self?.lastDeliveryStatus = "Not delivered: \(error.localizedDescription)"
                 } else {
                     self?.lastDeliveryStatus = "Delivered \(summary.statusText.lowercased()) notification"
@@ -166,9 +256,21 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
         }
     }
 
-    private func shouldDeliver(_ summary: BackgroundCompressionSummary, appIsActive: Bool) -> Bool {
+    private func shouldDeliver(_ summary: CompressionBatchSummary, appIsActive: Bool) -> Bool {
         if appIsActive && !notifyForegroundCompletion {
             return false
+        }
+
+        if summary.source == .shortcuts {
+            return summary.requiresUserAction && notifyAttentionNeeded && passesAttentionThrottle(summary)
+        }
+
+        if summary.source == .folderWatching {
+            if summary.requiresUserAction {
+                guard notifyAttentionNeeded else { return false }
+                return passesAttentionThrottle(summary)
+            }
+            return notifyFolderWatchingCompletion
         }
 
         if summary.requiresUserAction {
@@ -183,7 +285,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
         return notifyBackgroundCompletion
     }
 
-    private func passesAttentionThrottle(_ summary: BackgroundCompressionSummary) -> Bool {
+    private func passesAttentionThrottle(_ summary: CompressionBatchSummary) -> Bool {
         let key = [
             summary.source.rawValue,
             summary.outputDirectory?.path ?? "no-output",
@@ -200,7 +302,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
         return true
     }
 
-    private func notificationText(for summary: BackgroundCompressionSummary) -> (title: String, body: String) {
+    private func notificationText(for summary: CompressionBatchSummary) -> (title: String, body: String) {
         if summary.hasSuccesses && !summary.hasFailures {
             let noun = summary.successfulCount == 1 ? "image" : "images"
             return (
@@ -229,7 +331,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
         )
     }
 
-    private func outputDescription(for summary: BackgroundCompressionSummary) -> String {
+    private func outputDescription(for summary: CompressionBatchSummary) -> String {
         if summary.outputDirectory != nil {
             return summary.source == .folderWatching ? "Watched destination" : "Output folder"
         }
@@ -268,7 +370,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
             intentIdentifiers: [],
             options: []
         )
-        center.setNotificationCategories([category])
+        center.setCategories([category])
     }
 }
 
@@ -293,3 +395,76 @@ extension LocalNotificationManager: UNUserNotificationCenterDelegate {
         }
     }
 }
+
+#if DEBUG
+enum DebugNotificationType {
+    case success
+    case failure
+    case permission
+    case folderWatch
+}
+
+extension LocalNotificationManager {
+    @MainActor
+    func triggerDebugNotification(type: DebugNotificationType) {
+        let summary: CompressionBatchSummary
+        switch type {
+        case .success:
+            summary = CompressionBatchSummary(
+                source: .manual,
+                successfulCount: 3,
+                failedCount: 0,
+                skippedCount: 0,
+                totalInputBytes: 10 * 1024 * 1024,
+                totalOutputBytes: 4 * 1024 * 1024,
+                outputDirectory: URL(fileURLWithPath: "/tmp"),
+                representativeOutputURL: URL(fileURLWithPath: "/tmp/sample.jpg"),
+                requiresUserAction: false,
+                primaryErrorMessage: nil
+            )
+        case .failure:
+            summary = CompressionBatchSummary(
+                source: .manual,
+                successfulCount: 2,
+                failedCount: 1,
+                skippedCount: 0,
+                totalInputBytes: 8 * 1024 * 1024,
+                totalOutputBytes: 5 * 1024 * 1024,
+                outputDirectory: URL(fileURLWithPath: "/tmp"),
+                representativeOutputURL: URL(fileURLWithPath: "/tmp/sample.jpg"),
+                requiresUserAction: true,
+                primaryErrorMessage: "Failed to decode image"
+            )
+        case .permission:
+            summary = CompressionBatchSummary(
+                source: .manual,
+                successfulCount: 0,
+                failedCount: 0,
+                skippedCount: 0,
+                totalInputBytes: 0,
+                totalOutputBytes: 0,
+                outputDirectory: nil,
+                representativeOutputURL: nil,
+                requiresUserAction: true,
+                primaryErrorMessage: "Permission denied"
+            )
+        case .folderWatch:
+            summary = CompressionBatchSummary(
+                source: .folderWatching,
+                successfulCount: 0,
+                failedCount: 0,
+                skippedCount: 0,
+                totalInputBytes: 0,
+                totalOutputBytes: 0,
+                outputDirectory: nil,
+                representativeOutputURL: nil,
+                requiresUserAction: true,
+                primaryErrorMessage: "Folder watching paused: lost access to folder"
+            )
+        }
+
+        addToHistory(summary)
+        deliverSummaryImmediately(summary, appIsActive: false)
+    }
+}
+#endif

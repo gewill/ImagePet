@@ -1,7 +1,7 @@
 import Foundation
 import ImagePetCore
 
-enum BackgroundCompressionSource: String, Codable, Equatable, Sendable {
+enum CompressionSource: String, Codable, Equatable, Sendable {
     case manual
     case folderWatching
     case finderService
@@ -21,9 +21,9 @@ enum BackgroundCompressionSource: String, Codable, Equatable, Sendable {
     }
 }
 
-struct BackgroundCompressionSummary: Identifiable, Equatable, Sendable {
+struct CompressionBatchSummary: Identifiable, Codable, Equatable, Sendable {
     let id: UUID
-    let source: BackgroundCompressionSource
+    let source: CompressionSource
     let successfulCount: Int
     let failedCount: Int
     let skippedCount: Int
@@ -37,7 +37,7 @@ struct BackgroundCompressionSummary: Identifiable, Equatable, Sendable {
 
     init(
         id: UUID = UUID(),
-        source: BackgroundCompressionSource,
+        source: CompressionSource,
         successfulCount: Int,
         failedCount: Int,
         skippedCount: Int,
@@ -63,7 +63,7 @@ struct BackgroundCompressionSummary: Identifiable, Equatable, Sendable {
         self.completedAt = completedAt
     }
 
-    init(source: BackgroundCompressionSource, jobs: [ImageJob], completedAt: Date = Date()) {
+    init(source: CompressionSource, jobs: [ImageJob], completedAt: Date = Date()) {
         let successfulJobs = jobs.filter { $0.status == .done }
         let failedJobs = jobs.filter { $0.status == .failed }
         let skippedJobs = jobs.filter { $0.status == .skipped }
@@ -117,5 +117,27 @@ struct BackgroundCompressionSummary: Identifiable, Equatable, Sendable {
             return "Skipped"
         }
         return "No files processed"
+    }
+
+    func merging(_ other: CompressionBatchSummary) -> CompressionBatchSummary {
+        let mergedSource = (self.source == .folderWatching || other.source == .folderWatching) ? .folderWatching : self.source
+        let mergedOutputDirectory = (self.outputDirectory == other.outputDirectory) ? self.outputDirectory : nil
+        let mergedRepresentativeURL = self.representativeOutputURL ?? other.representativeOutputURL
+        let mergedErrorMessage = self.primaryErrorMessage ?? other.primaryErrorMessage
+
+        return CompressionBatchSummary(
+            id: self.id,
+            source: mergedSource,
+            successfulCount: self.successfulCount + other.successfulCount,
+            failedCount: self.failedCount + other.failedCount,
+            skippedCount: self.skippedCount + other.skippedCount,
+            totalInputBytes: self.totalInputBytes + other.totalInputBytes,
+            totalOutputBytes: self.totalOutputBytes + other.totalOutputBytes,
+            outputDirectory: mergedOutputDirectory,
+            representativeOutputURL: mergedRepresentativeURL,
+            requiresUserAction: self.requiresUserAction || other.requiresUserAction,
+            primaryErrorMessage: mergedErrorMessage,
+            completedAt: max(self.completedAt, other.completedAt)
+        )
     }
 }

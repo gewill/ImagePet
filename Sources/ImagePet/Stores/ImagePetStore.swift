@@ -205,7 +205,7 @@ final class ImagePetStore: ObservableObject {
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
-    private var jobSources: [ImageJob.ID: BackgroundCompressionSource] = [:]
+    private var jobSources: [ImageJob.ID: CompressionSource] = [:]
 
     @Published public var folderWatchManager: FolderWatchManager!
     @Published var notificationManager: LocalNotificationManager
@@ -598,7 +598,7 @@ final class ImagePetStore: ObservableObject {
         addInputURLs(urls, source: .finderService)
     }
 
-    private func addInputURLs(_ urls: [URL], source: BackgroundCompressionSource) {
+    private func addInputURLs(_ urls: [URL], source: CompressionSource) {
         guard !urls.isEmpty else {
             return
         }
@@ -1173,11 +1173,11 @@ final class ImagePetStore: ObservableObject {
         guard !processedJobs.isEmpty else { return }
 
         let source = notificationSource(for: batchJobIDs)
-        let summary = BackgroundCompressionSummary(source: source, jobs: processedJobs)
+        let summary = CompressionBatchSummary(source: source, jobs: processedJobs)
         notificationManager.handleCompletedSummary(summary, appIsActive: NSApp.isActive)
     }
 
-    private func notificationSource(for jobIDs: Set<ImageJob.ID>) -> BackgroundCompressionSource {
+    private func notificationSource(for jobIDs: Set<ImageJob.ID>) -> CompressionSource {
         let sources = Set(jobIDs.compactMap { jobSources[$0] })
         if sources.count == 1, let source = sources.first {
             return source

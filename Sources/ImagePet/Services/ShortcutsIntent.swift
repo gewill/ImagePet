@@ -142,6 +142,27 @@ struct CompressImagesIntent: AppIntent {
             }
         }
 
+        let successfulCount = results.count
+        let failedCount = images.count - successfulCount
+
+        let summary = CompressionBatchSummary(
+            source: .shortcuts,
+            successfulCount: successfulCount,
+            failedCount: failedCount,
+            skippedCount: 0,
+            totalInputBytes: 0,
+            totalOutputBytes: 0,
+            outputDirectory: nil,
+            representativeOutputURL: results.first?.fileURL,
+            requiresUserAction: failedCount > 0,
+            primaryErrorMessage: failedCount > 0 ? "Some files failed to compress." : nil
+        )
+
+        await MainActor.run {
+            let notificationManager = LocalNotificationManager()
+            notificationManager.handleCompletedSummary(summary, appIsActive: false)
+        }
+
         return .result(value: results)
     }
 }

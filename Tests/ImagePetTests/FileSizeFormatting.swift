@@ -1,0 +1,1 @@
+../../Sources/ImagePet/Support/FileSizeFormatting.swift
