@@ -120,7 +120,7 @@ private enum HelpContent {
                         "Choose an output folder before the first batch.",
                         "Pick quality, output format, max edge, and metadata options.",
                         "Use Reveal in Finder when a batch finishes.",
-                        "Compress More (⌘N) clears the completed queue and lets you start a new batch."
+                        "Clear List (⌘N) clears the completed queue and lets you start a new batch."
                     ]
                 )
             ]

@@ -429,7 +429,7 @@ struct DesktopPetView: View {
         case .retryFailed:
             return "Retry"
         case .compressMore:
-            return "More"
+            return "Clear"
         case .expand:
             return "Show"
         case .collapse:
@@ -453,7 +453,7 @@ struct DesktopPetView: View {
         case .retryFailed:
             return "Retry Failed"
         case .compressMore:
-            return "Compress More"
+            return "Clear List"
         case .expand:
             return "Show Pet Controls"
         case .collapse:

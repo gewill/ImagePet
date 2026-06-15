@@ -29,7 +29,7 @@ struct ImagePetApp: App {
 
                 Divider()
 
-                Button("Compress More") {
+                Button("Clear List") {
                     store.compressMore()
                 }
                 .keyboardShortcut("n", modifiers: [.command])

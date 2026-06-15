@@ -644,10 +644,10 @@ private struct SummaryView: View {
                 Button {
                     store.compressMore()
                 } label: {
-                    Label("Compress More", systemImage: "plus")
+                    Label("Clear List", systemImage: "xmark.circle")
                 }
                 .keyboardShortcut("n", modifiers: [.command])
-                .help("Compress More (⌘N)")
+                .help("Clear List (⌘N)")
                 .accessibilityIdentifier("compressMoreButton")
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
