@@ -20,6 +20,9 @@ packages:
   KeyboardShortcuts:
     url: https://github.com/sindresorhus/KeyboardShortcuts.git
     exactVersion: 3.0.0
+  swift-argument-parser:
+    url: https://github.com/apple/swift-argument-parser.git
+    exactVersion: 1.3.1
 targets:
   ImagePetCore:
     type: framework
@@ -62,6 +65,14 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSServices:
+          - NSMenuItem:
+              default: Compress with ImagePet
+            NSMessage: handleServices
+            NSPortName: ImagePet
+            NSRequiredContext: {}
+            NSSendTypes:
+              - public.image
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePet
@@ -95,6 +106,23 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetUITests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: ImagePet
+  ImagePetCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources/ImagePetCLI
+    dependencies:
+      - target: ImagePetCore
+      - package: swift-argument-parser
+        product: ArgumentParser
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.gewill.imagepet
+        GENERATE_INFOPLIST_FILE: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - $(inherited)
+          - "@executable_path"
+          - "@executable_path/../Frameworks"
 schemes:
   ImagePet:
     build:
@@ -102,6 +130,7 @@ schemes:
         ImagePet: all
         ImagePetTests: [test]
         ImagePetUITests: [test]
+        ImagePetCLI: [test]
     run:
       config: Debug
     test:
@@ -109,3 +138,9 @@ schemes:
       targets:
         - ImagePetTests
         - ImagePetUITests
+  ImagePetCLI:
+    build:
+      targets:
+        ImagePetCLI: all
+    run:
+      config: Debug

@@ -8,6 +8,7 @@ public struct ImageJob: Identifiable, Equatable, Sendable {
     public var compressedSize: Int64?
     public var status: JobStatus
     public var errorMessage: String?
+    public var designatedOutputDirectory: URL?
 
     public init(
         id: UUID = UUID(),
@@ -16,7 +17,8 @@ public struct ImageJob: Identifiable, Equatable, Sendable {
         originalSize: Int64,
         compressedSize: Int64? = nil,
         status: JobStatus = .pending,
-        errorMessage: String? = nil
+        errorMessage: String? = nil,
+        designatedOutputDirectory: URL? = nil
     ) {
         self.id = id
         self.inputURL = inputURL
@@ -25,6 +27,7 @@ public struct ImageJob: Identifiable, Equatable, Sendable {
         self.compressedSize = compressedSize
         self.status = status
         self.errorMessage = errorMessage
+        self.designatedOutputDirectory = designatedOutputDirectory
     }
 
     public var fileName: String {

@@ -17,9 +17,8 @@ struct DesktopPetView: View {
         self._animator = StateObject(wrappedValue: FrameAnimator(themeName: store.selectedThemeName))
     }
 
-    var body: some View {
-        let snapshot = store.petSnapshot
-
+    @ViewBuilder
+    private func configuredPetView(for snapshot: DesktopPetSnapshot) -> some View {
         Group {
             if currentMode == .mini {
                 miniView(for: snapshot)
@@ -65,103 +64,109 @@ struct DesktopPetView: View {
         )
         .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
         .contentShape(RoundedRectangle(cornerRadius: currentMode == .mini ? 40 : 8))
-        .animation(reduceMotion ? nil : .spring(response: 0.24, dampingFraction: 0.82), value: isDropTargeted)
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: snapshot.state)
-        .dropDestination(for: URL.self) { urls, _ in
-            guard snapshot.canAcceptDrop else { return false }
-            store.addDroppedURLs(urls)
-            return true
-        } isTargeted: { isTargeted in
-            if snapshot.canAcceptDrop {
-                self.isDropTargeted = isTargeted
-            } else {
-                self.isDropTargeted = false
-            }
-            updateInteraction()
-        }
-        .onContinuousHover(coordinateSpace: .local) { phase in
-            if case .active = phase {
-                store.resetPetIdleTimer()
-            }
-        }
-        .onHover { isHovering in
-            self.isHovering = isHovering
-            store.setPetHovering(isHovering)
-            updateInteraction()
-        }
-        .contextMenu {
-            if currentMode == .mini {
-                Button("Show Panel") {
-                    store.handlePetAction(.expand)
-                }
-            } else {
-                Button("Collapse to Mini") {
-                    store.handlePetAction(.collapse)
-                }
-            }
-            Button("Open App") {
-                store.handlePetAction(.openMainApp)
-            }
-            Button("Hide Pet") {
-                store.handlePetAction(.hidePet)
-            }
-        }
-        .onAppear {
-            animator.enableIdleVariants = store.enableIdleVariants
-            animator.energySavingMode = store.energySavingMode
-            animator.isPaused = !store.isDesktopPetVisible || reduceMotion
-            updateAnimator()
+    }
 
-            currentMode = store.petViewMode
-            controlsOpacity = store.petViewMode == .full ? 1.0 : 0.0
-            controlsOffset = store.petViewMode == .full ? 0.0 : 8.0
-        }
-        .onDisappear {
-            animator.isPaused = true
-        }
-        .onChange(of: store.isDesktopPetVisible) { val in
-            animator.isPaused = !val || reduceMotion
-        }
-        .onChange(of: store.petSnapshot.state) { _ in updateAnimator() }
-        .onChange(of: store.issuesVisuallyDegraded) { _ in updateAnimator() }
-        .onChange(of: interactionState) { _ in updateAnimator() }
-        .onChange(of: store.selectedThemeName) { newTheme in
-            animator.updateTheme(themeName: newTheme)
-            updateAnimator()
-        }
-        .onChange(of: store.enableIdleVariants) { val in
-            animator.enableIdleVariants = val
-            updateAnimator()
-        }
-        .onChange(of: store.energySavingMode) { val in
-            animator.energySavingMode = val
-            updateAnimator()
-        }
-        .onChange(of: reduceMotion) { val in
-            animator.isPaused = val || !store.isDesktopPetVisible
-        }
-        .onChange(of: store.petViewMode) { newMode in
-            if newMode == .full {
-                currentMode = .full
-                withAnimation(.easeOut(duration: 0.25).delay(0.12)) {
-                    controlsOpacity = 1.0
-                    controlsOffset = 0.0
+    var body: some View {
+        let snapshot = store.petSnapshot
+
+        configuredPetView(for: snapshot)
+            .animation(reduceMotion ? nil : .spring(response: 0.24, dampingFraction: 0.82), value: isDropTargeted)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: snapshot.state)
+            .dropDestination(for: URL.self) { urls, _ in
+                guard snapshot.canAcceptDrop else { return false }
+                store.addDroppedURLs(urls)
+                return true
+            } isTargeted: { isTargeted in
+                if snapshot.canAcceptDrop {
+                    self.isDropTargeted = isTargeted
+                } else {
+                    self.isDropTargeted = false
                 }
-            } else {
-                currentMode = .mini
-                controlsOpacity = 0.0
-                controlsOffset = 8.0
+                updateInteraction()
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .desktopPetWillCollapse)) { _ in
-            withAnimation(.easeOut(duration: 0.2)) {
-                controlsOpacity = 0.0
-                controlsOffset = 8.0
+            .onContinuousHover(coordinateSpace: .local) { phase in
+                if case .active = phase {
+                    store.resetPetIdleTimer()
+                }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                store.performCollapse()
+            .onHover { isHovering in
+                self.isHovering = isHovering
+                store.setPetHovering(isHovering)
+                updateInteraction()
             }
-        }
+            .contextMenu {
+                if currentMode == .mini {
+                    Button("Show Panel") {
+                        store.handlePetAction(.expand)
+                    }
+                } else {
+                    Button("Collapse to Mini") {
+                        store.handlePetAction(.collapse)
+                    }
+                }
+                Button("Open App") {
+                    store.handlePetAction(.openMainApp)
+                }
+                Button("Hide Pet") {
+                    store.handlePetAction(.hidePet)
+                }
+            }
+            .onAppear {
+                animator.enableIdleVariants = store.enableIdleVariants
+                animator.energySavingMode = store.energySavingMode
+                animator.isPaused = !store.isDesktopPetVisible || reduceMotion
+                updateAnimator()
+
+                currentMode = store.petViewMode
+                controlsOpacity = store.petViewMode == .full ? 1.0 : 0.0
+                controlsOffset = store.petViewMode == .full ? 0.0 : 8.0
+            }
+            .onDisappear {
+                animator.isPaused = true
+            }
+            .onChange(of: store.isDesktopPetVisible) { val in
+                animator.isPaused = !val || reduceMotion
+            }
+            .onChange(of: store.petSnapshot.state) { _ in updateAnimator() }
+            .onChange(of: store.issuesVisuallyDegraded) { _ in updateAnimator() }
+            .onChange(of: interactionState) { _ in updateAnimator() }
+            .onChange(of: store.selectedThemeName) { newTheme in
+                animator.updateTheme(themeName: newTheme)
+                updateAnimator()
+            }
+            .onChange(of: store.enableIdleVariants) { val in
+                animator.enableIdleVariants = val
+                updateAnimator()
+            }
+            .onChange(of: store.energySavingMode) { val in
+                animator.energySavingMode = val
+                updateAnimator()
+            }
+            .onChange(of: reduceMotion) { val in
+                animator.isPaused = val || !store.isDesktopPetVisible
+            }
+            .onChange(of: store.petViewMode) { newMode in
+                if newMode == .full {
+                    currentMode = .full
+                    withAnimation(.easeOut(duration: 0.25).delay(0.12)) {
+                        controlsOpacity = 1.0
+                        controlsOffset = 0.0
+                    }
+                } else {
+                    currentMode = .mini
+                    controlsOpacity = 0.0
+                    controlsOffset = 8.0
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .desktopPetWillCollapse)) { _ in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    controlsOpacity = 0.0
+                    controlsOffset = 8.0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    store.performCollapse()
+                }
+            }
     }
 
     private func updateInteraction() {

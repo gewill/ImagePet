@@ -106,6 +106,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var windowUpdateObserver: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.servicesProvider = self
+
         if let store = ImagePetStore.shared {
             let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
             if store.launchMode == .loginItem {
@@ -167,5 +169,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             store.activateMainWindow()
         }
         return true
+    }
+
+    @objc func handleServices(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
+        guard let items = pboard.pasteboardItems else { return }
+
+        var urls: [URL] = []
+        for item in items {
+            if let urlString = item.string(forType: .fileURL),
+               let url = URL(string: urlString) {
+                urls.append(url)
+            }
+        }
+
+        guard !urls.isEmpty else { return }
+
+        Task { @MainActor in
+            if let store = ImagePetStore.shared {
+                store.addDroppedURLs(urls)
+
+                // Show window if intervention is needed
+                if store.outputDirectory == nil && store.saveLocationMode == .designated {
+                    store.activateMainWindow()
+                } else if store.saveLocationMode == .overwrite && !store.didConfirmOverwrite {
+                    store.activateMainWindow()
+                }
+            }
+        }
     }
 }

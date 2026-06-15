@@ -16,6 +16,8 @@ struct AppSettingsView: View {
                     switch store.selectedSettingsSection {
                     case .general:
                         GeneralSettingsSection(store: store)
+                    case .folderWatching:
+                        FolderWatchingSection(store: store)
                     case .desktopPet:
                         DesktopPetSection(store: store)
                     case .keyboardShortcuts:
@@ -328,7 +330,7 @@ private struct SettingsThemeCard: View {
     }
 }
 
-private struct SettingsSectionHeader: View {
+struct SettingsSectionHeader: View {
     let title: String
     let subtitle: String
     let systemImage: String

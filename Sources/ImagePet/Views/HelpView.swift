@@ -203,6 +203,65 @@ private enum HelpContent {
             ]
         ),
         HelpTopic(
+            id: "folderWatching",
+            title: "Folder Watching",
+            systemImage: "folder.badge.gearshape",
+            sections: [
+                HelpSection(
+                    "Automated compression",
+                    paragraphs: [
+                        "Monitor folders and compress newly added images in the background."
+                    ],
+                    bullets: [
+                        "Go to Settings -> Folder Watching and click Add Monitored Folder.",
+                        "Select a source folder to watch and a separate destination folder for output.",
+                        "Source and destination folders must be different to prevent recursive compression loops.",
+                        "The desktop pet will show eating animations while background files are compressed."
+                    ]
+                )
+            ]
+        ),
+        HelpTopic(
+            id: "integration",
+            title: "System Integration",
+            systemImage: "cpu",
+            sections: [
+                HelpSection(
+                    "Apple Shortcuts",
+                    paragraphs: [
+                        "ImagePet provides a native 'Compress Images with ImagePet' shortcut action."
+                    ],
+                    bullets: [
+                        "Open the Shortcuts app on macOS.",
+                        "Search for ImagePet to locate the custom compression action.",
+                        "Configure input files, quality preset, output format, maximum edge dimension, and metadata preservation."
+                    ]
+                ),
+                HelpSection(
+                    "Finder Services",
+                    paragraphs: [
+                        "Compress images directly from Finder without opening the main application window."
+                    ],
+                    bullets: [
+                        "Right-click one or more images in Finder.",
+                        "Choose Services (or Quick Actions) -> Compress with ImagePet.",
+                        "Compressed files will be saved in the same directory as the originals, named with the '_compressed' suffix."
+                    ]
+                ),
+                HelpSection(
+                    "Command Line Interface (CLI)",
+                    paragraphs: [
+                        "The bundled 'imagepet' command-line tool allows developers to compress files from terminal scripts."
+                    ],
+                    bullets: [
+                        "Basic syntax: imagepet [options] <input-files...>",
+                        "Use '-p' to set a preset, '-o' to specify an output folder, or '--overwrite' to replace original files.",
+                        "Run 'imagepet --help' for a full list of available options, quality levels, formats, and dimension limits."
+                    ]
+                )
+            ]
+        ),
+        HelpTopic(
             id: "shortcuts",
             title: "Keyboard Shortcuts",
             systemImage: "keyboard",

@@ -205,6 +205,9 @@ final class ImagePetStore: ObservableObject {
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
+
+    @Published public var folderWatchManager: FolderWatchManager!
+
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
     private let jpegEncodingModeKey = "ImagePet.jpegEncodingMode"
@@ -256,6 +259,9 @@ final class ImagePetStore: ObservableObject {
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
         ImagePetStore.shared = self
+
+        self.folderWatchManager = FolderWatchManager(defaults: defaults)
+        self.folderWatchManager.store = self
 
         let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
         let isRestorationTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING_RESTORATION"] == "1"
@@ -602,6 +608,38 @@ final class ImagePetStore: ObservableObject {
             }
 
             return ImageJob(inputURL: url, originalSize: size)
+        }
+
+        jobs.append(contentsOf: newJobs)
+
+        if jobs.contains(where: { $0.status == .pending }) {
+            startProcessingIfPossible()
+        } else if hasFailedJobs {
+            petState = .error
+        }
+    }
+
+    func processWatchedFiles(_ urls: [URL], outputDirectory: URL) {
+        guard !urls.isEmpty else { return }
+
+        let newJobs = urls.map { url in
+            let size = Self.fileSize(for: url)
+
+            guard SupportedImageFormat.isSupported(url, capabilities: encoderCapabilities) else {
+                return ImageJob(
+                    inputURL: url,
+                    originalSize: size,
+                    status: .failed,
+                    errorMessage: CompressionError.unsupportedImageFormat.localizedDescription,
+                    designatedOutputDirectory: outputDirectory
+                )
+            }
+
+            return ImageJob(
+                inputURL: url,
+                originalSize: size,
+                designatedOutputDirectory: outputDirectory
+            )
         }
 
         jobs.append(contentsOf: newJobs)
@@ -1041,7 +1079,11 @@ final class ImagePetStore: ObservableObject {
         var targetOutputDir = outputDirectory
         var restoredBookmarkURL: URL? = nil
 
-        if saveLocationMode == .originalFolder {
+        if let designated = job.designatedOutputDirectory {
+            targetOutputDir = designated
+            // Make sure we have access to the designated output folder (handled by FolderWatchManager's bookmark resolving implicitly, but we can do it explicitly)
+            // It's actually already startAccessingSecurityScopedResource'd by FolderWatchManager when it resolved the outputURL
+        } else if saveLocationMode == .originalFolder {
             let parentFolder = job.inputURL.deletingLastPathComponent()
             restoredBookmarkURL = bookmarkStore.restoreMulti(for: parentFolder)
             targetOutputDir = parentFolder
