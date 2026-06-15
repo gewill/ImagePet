@@ -119,7 +119,8 @@ private enum HelpContent {
                     bullets: [
                         "Choose an output folder before the first batch.",
                         "Pick quality, output format, max edge, and metadata options.",
-                        "Use Reveal in Finder when a batch finishes."
+                        "Use Reveal in Finder when a batch finishes.",
+                        "Compress More (⌘N) clears the completed queue and lets you start a new batch."
                     ]
                 )
             ]
@@ -197,7 +198,20 @@ private enum HelpContent {
                     bullets: [
                         "Show or hide the pet from the main window or View menu.",
                         "Click the mini pet to expand controls.",
+                        "The pet remembers its visibility across app restarts.",
                         "Launch at Login starts the pet quietly when enabled."
+                    ]
+                ),
+                HelpSection(
+                    "Themes and appearance",
+                    paragraphs: [
+                        "Choose a pet theme in Settings → Desktop Pet."
+                    ],
+                    bullets: [
+                        "Shiba Inu, Cute Cat, and Pixel Slime themes are available.",
+                        "Enable Idle Variants lets the pet yawn or stretch during inactivity.",
+                        "Enable Hover Feedback animates the pet when the pointer hovers over it.",
+                        "Energy Saving Mode reduces animation frame rate for lower CPU usage."
                     ]
                 )
             ]
@@ -213,10 +227,30 @@ private enum HelpContent {
                         "Monitor folders and compress newly added images in the background."
                     ],
                     bullets: [
-                        "Go to Settings -> Folder Watching and click Add Monitored Folder.",
+                        "Go to Settings → Folder Watching and click Add Monitored Folder.",
                         "Select a source folder to watch and a separate destination folder for output.",
                         "Source and destination folders must be different to prevent recursive compression loops.",
                         "The desktop pet will show eating animations while background files are compressed."
+                    ]
+                )
+            ]
+        ),
+        HelpTopic(
+            id: "notifications",
+            title: "Notifications",
+            systemImage: "bell.badge",
+            sections: [
+                HelpSection(
+                    "Notification settings",
+                    paragraphs: [
+                        "ImagePet can notify you when compression finishes or needs attention. Configure in Settings → Notifications."
+                    ],
+                    bullets: [
+                        "Background Completion alerts when background batches finish.",
+                        "Attention Needed alerts when a folder, permission, or failed file needs review.",
+                        "Foreground Completion also notifies when ImagePet is already active.",
+                        "Folder Watching Success notifies when watched-folder batches complete.",
+                        "Recent compression history is visible in the Notifications settings panel."
                     ]
                 )
             ]
@@ -244,7 +278,7 @@ private enum HelpContent {
                     ],
                     bullets: [
                         "Right-click one or more images in Finder.",
-                        "Choose Services (or Quick Actions) -> Compress with ImagePet.",
+                        "Choose Services (or Quick Actions) → Compress with ImagePet.",
                         "Compressed files will be saved in the same directory as the originals, named with the '_compressed' suffix."
                     ]
                 ),
@@ -273,13 +307,14 @@ private enum HelpContent {
                         "Shift-Command-O chooses the output folder.",
                         "Shift-Command-P shows or hides the desktop pet.",
                         "Command-N clears a completed queue.",
-                        "Command-R retries failed jobs when failures exist."
+                        "Command-R retries failed jobs when failures exist.",
+                        "Command-1 shows the main window."
                     ]
                 ),
                 HelpSection(
                     "Global shortcuts",
                     paragraphs: [
-                        "Global shortcuts are unset by default. Record them in Settings if you want ImagePet to respond while another app is active."
+                        "Global shortcuts are unset by default. Record them in Settings → Keyboard Shortcuts if you want ImagePet to respond while another app is active."
                     ]
                 )
             ]
