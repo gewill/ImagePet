@@ -8,15 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		03C392A927037DB8E056A0FD /* EncoderCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */; };
+		0833A37D66B17440D43822C3 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65286F00477023AC73A1D3B6 /* AppNavigation.swift */; };
 		0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */; };
+		14F9D3688D821923A8F75165 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 769C51B2F554CCD738A26D89 /* KeyboardShortcuts */; };
 		16C83F11840628567F5DF785 /* PerformanceAndRobustnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */; };
 		1C5E346C8DCC4094FE8C6689 /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
 		1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
+		32A57C46BE11190CEBB47EE6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FD78B2591A703F59ECE6F7 /* HelpView.swift */; };
 		39D8473A58EBDD037557FD17 /* MozJPEGEncodingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF8AF7B27658DBE4D17CEDC /* MozJPEGEncodingEngine.swift */; };
 		4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */; };
 		468ABFAA6A7B08517772B948 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 6F8F586A1135EAED6910EB32 /* Resources */; };
+		468BDB0185A3FB1706EBCCD3 /* AppSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D6D9C6C992578DE4DC36E4 /* AppSettingsView.swift */; };
 		48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */; };
 		4A7AA8FEB5D3A491903A1F11 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = C42098C3933CF7DD11C29203 /* WebP */; };
 		52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */; };
@@ -38,6 +42,7 @@
 		945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463A9B12B098CEDA557F6100 /* CompressionError.swift */; };
 		98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */; };
 		9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426BA951424DECEFB023D3A9 /* FrameAnimator.swift */; };
+		A398F56170D6E35B9EA6B3BB /* GlobalShortcutCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4694488B654E7D1FED3A6E8E /* GlobalShortcutCoordinator.swift */; };
 		B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238810C4DF3FE71683DC9479 /* InputFilePanel.swift */; };
 		B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1510894ED17C31329941EA /* CompressionResult.swift */; };
 		B9CAC9DBC573955EBDA5A0CA /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -123,17 +128,21 @@
 		42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptions.swift; sourceTree = "<group>"; };
 		45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocator.swift; sourceTree = "<group>"; };
 		463A9B12B098CEDA557F6100 /* CompressionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionError.swift; sourceTree = "<group>"; };
+		4694488B654E7D1FED3A6E8E /* GlobalShortcutCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcutCoordinator.swift; sourceTree = "<group>"; };
 		4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetStore.swift; sourceTree = "<group>"; };
 		4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptionsTests.swift; sourceTree = "<group>"; };
 		573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocatorTests.swift; sourceTree = "<group>"; };
 		58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputDirectoryBookmarkStore.swift; sourceTree = "<group>"; };
+		59D6D9C6C992578DE4DC36E4 /* AppSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsView.swift; sourceTree = "<group>"; };
 		5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetSnapshot.swift; sourceTree = "<group>"; };
 		60F9729CED642EBCF472BAC1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		65286F00477023AC73A1D3B6 /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
 		6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFixtureCompressionTests.swift; sourceTree = "<group>"; };
 		6F8F586A1135EAED6910EB32 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Sources/ImagePet/Resources; sourceTree = SOURCE_ROOT; };
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
+		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
 		9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteCatAssetGenerator.swift; sourceTree = "<group>"; };
@@ -168,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */,
+				14F9D3688D821923A8F75165 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,6 +258,7 @@
 			children = (
 				41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */,
 				426BA951424DECEFB023D3A9 /* FrameAnimator.swift */,
+				4694488B654E7D1FED3A6E8E /* GlobalShortcutCoordinator.swift */,
 				238810C4DF3FE71683DC9479 /* InputFilePanel.swift */,
 				58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */,
 				B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */,
@@ -305,9 +316,11 @@
 		BB6FD615868A7EBBA6CB0FC0 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				59D6D9C6C992578DE4DC36E4 /* AppSettingsView.swift */,
 				60F9729CED642EBCF472BAC1 /* ContentView.swift */,
 				1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */,
 				2845AD061C173BB07CE9F82B /* DesktopPetView.swift */,
+				83FD78B2591A703F59ECE6F7 /* HelpView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -315,6 +328,7 @@
 		C2088D75CBC5FC8132489975 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				65286F00477023AC73A1D3B6 /* AppNavigation.swift */,
 				5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */,
 				4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */,
 				7A93444765F4DF14ABA2386D /* PetAnimation.swift */,
@@ -382,6 +396,7 @@
 			);
 			name = ImagePet;
 			packageProductDependencies = (
+				769C51B2F554CCD738A26D89 /* KeyboardShortcuts */,
 			);
 			productName = ImagePet;
 			productReference = 2B48DF5E09E5C0639460FB28 /* ImagePet.app */;
@@ -454,6 +469,7 @@
 			mainGroup = AFF2F82BF755A7D70C44220A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
 				03325F18B6523DA6A3C00E6B /* XCRemoteSwiftPackageReference "mozjpeg.swift" */,
 			);
@@ -487,6 +503,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0833A37D66B17440D43822C3 /* AppNavigation.swift in Sources */,
+				468BDB0185A3FB1706EBCCD3 /* AppSettingsView.swift in Sources */,
 				77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */,
 				BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */,
 				F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */,
@@ -494,6 +512,8 @@
 				EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */,
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,
 				9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */,
+				A398F56170D6E35B9EA6B3BB /* GlobalShortcutCoordinator.swift in Sources */,
+				32A57C46BE11190CEBB47EE6 /* HelpView.swift in Sources */,
 				0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */,
 				C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */,
 				B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */,
@@ -913,6 +933,14 @@
 				version = 0.6.1;
 			};
 		};
+		862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts.git";
+			requirement = {
+				kind = exactVersion;
+				version = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -920,6 +948,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 03325F18B6523DA6A3C00E6B /* XCRemoteSwiftPackageReference "mozjpeg.swift" */;
 			productName = mozjpeg;
+		};
+		769C51B2F554CCD738A26D89 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 		C42098C3933CF7DD11C29203 /* WebP */ = {
 			isa = XCSwiftPackageProductDependency;

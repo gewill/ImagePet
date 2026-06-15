@@ -12,7 +12,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ainame/Swift-WebP.git", exact: "0.6.1"),
-        .package(url: "https://github.com/awxkee/mozjpeg.swift.git", exact: "1.1.3")
+        .package(url: "https://github.com/awxkee/mozjpeg.swift.git", exact: "1.1.3"),
+        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts.git", exact: "3.0.0")
     ],
     targets: [
         .target(
@@ -25,7 +26,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "ImagePet",
-            dependencies: ["ImagePetCore"],
+            dependencies: [
+                "ImagePetCore",
+                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts")
+            ],
             path: "Sources/ImagePet",
             resources: [
                 .copy("Resources")

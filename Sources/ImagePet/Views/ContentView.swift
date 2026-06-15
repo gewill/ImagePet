@@ -6,7 +6,7 @@ struct ContentView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        TabView {
+        TabView(selection: $store.selectedMainTab) {
             VStack(spacing: 16) {
                 HeaderView(store: store)
                 ControlsView(store: store)
@@ -18,13 +18,15 @@ struct ContentView: View {
             .tabItem {
                 Label("Compress", systemImage: "doc.on.doc")
             }
+            .tag(AppMainTab.compress)
 
-            DesktopPetSettingsView(store: store)
+            AppSettingsView(store: store)
                 .tabItem {
                     Label("Settings", systemImage: "gearshape")
                 }
+                .tag(AppMainTab.settings)
         }
-        .frame(minWidth: 780, minHeight: 560)
+        .frame(minWidth: 780, minHeight: 640)
         .dropDestination(for: URL.self) { urls, _ in
             store.addDroppedURLs(urls)
             return true
@@ -37,6 +39,9 @@ struct ContentView: View {
         .onAppear {
             store.setMainWindowOpener {
                 openWindow(id: "main")
+            }
+            store.setHelpWindowOpener {
+                openWindow(id: "help")
             }
         }
         .background {
@@ -407,7 +412,7 @@ private struct DropZoneView: View {
                 .font(.system(size: hasJobs ? 24 : 34, weight: .medium))
                 .foregroundStyle(isTargeted ? Color.accentColor : Color.secondary)
 
-            Text(hasJobs ? "Drop more images" : "Drop JPG, PNG, or HEIC images")
+            Text(hasJobs ? "Drop more images" : "Drop JPG, PNG, HEIC, or WebP images")
                 .font(hasJobs ? .callout : .headline)
                 .foregroundStyle(isTargeted ? .primary : .secondary)
         }
@@ -459,7 +464,7 @@ private struct JobListView: View {
                 .padding(.vertical, 2)
             }
         }
-        .frame(maxHeight: .infinity)
+        .frame(minHeight: jobs.isEmpty ? 140 : 132, maxHeight: .infinity)
     }
 }
 
@@ -675,258 +680,5 @@ private struct SummaryMetric: View {
                 .accessibilityLabel(value)
         }
         .frame(minWidth: 110, alignment: .leading)
-    }
-}
-
-private struct DesktopPetSettingsView: View {
-    @ObservedObject var store: ImagePetStore
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                HStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Desktop Pet Companion")
-                            .font(.system(.title2, design: .rounded, weight: .bold))
-                        Text("A cute animated pet that lives on your desktop and reacts to your compression tasks.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer()
-
-                    Toggle(isOn: $store.isDesktopPetEnabled) {
-                        Text(store.isDesktopPetEnabled ? "Enabled" : "Disabled")
-                            .font(.headline)
-                    }
-                    .toggleStyle(.switch)
-                    .accessibilityIdentifier("petSettingsEnabledToggle")
-                }
-                .padding()
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-
-                Group {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Select Theme")
-                            .font(.system(.headline, design: .rounded))
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ThemeCard(
-                                    name: "Shiba Inu",
-                                    description: "An energetic, loyal puppy.",
-                                    themeName: "ShibaInu",
-                                    selectedTheme: $store.selectedThemeName,
-                                    previewAnim: .idle
-                                )
-                                .accessibilityIdentifier("themeCard_ShibaInu")
-
-                                ThemeCard(
-                                    name: "Cute Cat",
-                                    description: "A playful, hand-drawn kitty.",
-                                    themeName: "CuteCat",
-                                    selectedTheme: $store.selectedThemeName,
-                                    previewAnim: .idle
-                                )
-                                .accessibilityIdentifier("themeCard_CuteCat")
-
-                                ThemeCard(
-                                    name: "Pixel Slime",
-                                    description: "Retro bounce pixel slime.",
-                                    themeName: "PixelSlime",
-                                    selectedTheme: $store.selectedThemeName,
-                                    previewAnim: .idle
-                                )
-                                .accessibilityIdentifier("themeCard_PixelSlime")
-                            }
-                        }
-                    }
-
-                    Divider()
-
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Behavior & Performance Settings")
-                            .font(.system(.headline, design: .rounded))
-
-                        VStack(alignment: .leading, spacing: 14) {
-                            Toggle(isOn: $store.launchAtLoginEnabled) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Launch at Login")
-                                        .fontWeight(.medium)
-                                    Text("Automatically starts the Desktop Pet when you log into your Mac.")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .accessibilityIdentifier("launchAtLoginToggle")
-
-                            if let error = store.launchAtLoginError {
-                                Text(error)
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                                    .accessibilityIdentifier("launchAtLoginErrorLabel")
-                            }
-
-                            Divider()
-
-                            Toggle(isOn: $store.enableIdleVariants) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Enable Idle Variants")
-                                        .fontWeight(.medium)
-                                    Text("Allows the pet to randomly yawn or stretch during periods of inactivity (every 20-40 seconds).")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .accessibilityIdentifier("enableIdleVariantsToggle")
-
-                            Toggle(isOn: $store.enableHoverFeedback) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Enable Hover Feedback")
-                                        .fontWeight(.medium)
-                                    Text("Pet responds to mouse hover with friendly animation.")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .accessibilityIdentifier("enableHoverFeedbackToggle")
-
-                            Toggle(isOn: $store.enableSuccessSound) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Play Success Sound")
-                                        .fontWeight(.medium)
-                                    Text("Plays a gentle chime when all images are compressed successfully.")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .accessibilityIdentifier("enableSuccessSoundToggle")
-
-                            Divider()
-
-                            Toggle(isOn: $store.energySavingMode) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Energy Saving Mode")
-                                        .fontWeight(.medium)
-                                    Text("Halves the animation frame rate to minimize CPU and battery usage.")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .accessibilityIdentifier("energySavingModeToggle")
-                        }
-                        .padding()
-                        .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
-                    }
-                }
-                .disabled(!store.isDesktopPetEnabled)
-            }
-            .padding(24)
-        }
-    }
-
-
-}
-
-private struct ThemeCard: View {
-    let name: String
-    let description: String
-    let themeName: String
-    @Binding var selectedTheme: String
-    let previewAnim: PetAnimation
-
-    @State private var isHovered = false
-
-    var isSelected: Bool {
-        selectedTheme == themeName
-    }
-
-    var body: some View {
-        Button {
-            selectedTheme = themeName
-        } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
-
-                    if let image = ThemeCache.loadStaticImage(themeName: themeName, animation: previewAnim) {
-                        Image(decorative: image, scale: 1.0)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
-                    } else {
-                        Image(systemName: "pawprint.fill")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .frame(height: 90)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(name)
-                        .font(.headline)
-                        .foregroundStyle(isSelected ? Color.accentColor : .primary)
-
-                    Text(description)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(2)
-                }
-            }
-            .padding(10)
-            .frame(width: 160, height: 180)
-            .background(isSelected ? Color.accentColor.opacity(0.04) : Color.clear)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
-            )
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: Color.black.opacity(isHovered ? 0.08 : 0.03), radius: isHovered ? 6 : 2, y: isHovered ? 3 : 1)
-            .onHover { isHovered = $0 }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Theme: \(name)")
-        .accessibilityValue(isSelected ? "Selected" : "Not selected")
-        .accessibilityHint(isSelected ? "" : "Double click to select \(name) theme")
-    }
-}
-
-private struct ThemeCardPlaceholder: View {
-    let name: String
-    let description: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.secondary.opacity(0.04))
-
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.secondary.opacity(0.6))
-            }
-            .frame(height: 90)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(name)
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-
-                Text(description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary.opacity(0.7))
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(2)
-            }
-        }
-        .padding(10)
-        .frame(width: 160, height: 180)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.secondary.opacity(0.1), lineWidth: 1)
-        )
-        .opacity(0.6)
     }
 }

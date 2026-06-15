@@ -1,6 +1,15 @@
 {
-  "originHash" : "9d4affa63a5f2efcba0f310a72aa4150c46d376f296cb0dd9a37a9c6f1f889b6",
+  "originHash" : "b3c82275721d8fcb7359485d468c1cce896808bee236d8e86939dfa065100751",
   "pins" : [
+    {
+      "identity" : "keyboardshortcuts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/KeyboardShortcuts.git",
+      "state" : {
+        "revision" : "f7d08ba4109d5ca025e1a64165be169cdf089206",
+        "version" : "3.0.0"
+      }
+    },
     {
       "identity" : "libwebp-xcode",
       "kind" : "remoteSourceControl",

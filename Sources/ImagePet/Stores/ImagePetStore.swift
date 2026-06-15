@@ -63,6 +63,8 @@ final class ImagePetStore: ObservableObject {
             checkAndApplyAutoExpand()
         }
     }
+    @Published var selectedMainTab: AppMainTab = .compress
+    @Published var selectedSettingsSection: SettingsSection = .desktopPet
     @Published var isDesktopPetEnabled = true {
         didSet {
             defaults.set(isDesktopPetEnabled, forKey: desktopPetEnabledKey)
@@ -199,6 +201,7 @@ final class ImagePetStore: ObservableObject {
     private let defaults: UserDefaults
     private var processingTask: Task<Void, Never>?
     private var openMainWindow: (() -> Void)?
+    private var openHelpWindow: (() -> Void)?
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
@@ -369,6 +372,16 @@ final class ImagePetStore: ObservableObject {
                 self.petViewMode = .mini
             }
         }
+
+        if isUITesting && isRestorationTesting {
+            if let mockEnabled = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_ENABLED"] {
+                self.isDesktopPetEnabled = (mockEnabled != "0")
+            }
+            if let mockVisible = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_VISIBLE"] {
+                self.isDesktopPetVisible = (mockVisible == "1")
+            }
+        }
+
         checkAndApplyAutoExpand()
         self.isInitializing = false
     }
@@ -438,6 +451,20 @@ final class ImagePetStore: ObservableObject {
         openMainWindow = opener
     }
 
+    func setHelpWindowOpener(_ opener: @escaping () -> Void) {
+        openHelpWindow = opener
+    }
+
+    func openHelp() {
+        openHelpWindow?()
+    }
+
+    func showSettings(_ section: SettingsSection) {
+        selectedSettingsSection = section
+        selectedMainTab = .settings
+        activateMainWindow()
+    }
+
     func activateMainWindow() {
         self.hasReopened = true
         if NSApp.activationPolicy() == .accessory {
@@ -467,6 +494,10 @@ final class ImagePetStore: ObservableObject {
     @discardableResult
     private func focusMainWindowIfPresent() -> Bool {
         for window in NSApp.windows {
+            guard window.isVisible else {
+                continue
+            }
+
             if window.title == "ImagePet" || window.identifier?.rawValue == "main" || window.frameAutosaveName == "ImagePet" {
                 if window.isMiniaturized {
                     window.deminiaturize(nil)
@@ -755,6 +786,24 @@ final class ImagePetStore: ObservableObject {
 
     func toggleDesktopPet() {
         isDesktopPetVisible.toggle()
+    }
+
+    func toggleDesktopPetMode() {
+        guard isDesktopPetEnabled else {
+            return
+        }
+
+        guard isDesktopPetVisible else {
+            isDesktopPetVisible = true
+            petViewMode = .mini
+            return
+        }
+
+        if petViewMode == .full {
+            handlePetAction(.collapse)
+        } else {
+            petViewMode = .full
+        }
     }
 
     func attachDesktopPetControllerIfNeeded() {

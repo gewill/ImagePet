@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手工验收、性能验收和发布前打包阶段。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG，以及 V0.11 app 完整性能力已经实现，当前更适合进入手工验收、性能验收和发布前打包阶段。
 
 已完成：
 
@@ -22,15 +22,17 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - SwiftPM 和 Xcode build/test 路径
 - 本地 Apple 测试素材 fixture
 - 真实图片批量拖入与压缩的手工 GUI 验收
+- V0.11 离线 Help Center、菜单整理、设置页分区和可自定义全局快捷键
 
 尚未完成验收：
 
 - Developer ID notarization workflow
+- 真实手工录制并触发 global shortcuts 的发布前 smoke
 
 已自动化验证：
 
-- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，最近一次总耗时 0.22 秒，内存峰值约 161.6 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
-- UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、桌面宠物返回主窗口、完成态动作、失败重试、覆盖确认、以及批量压缩完整流程（由 `ImagePetUITests` 验证）。
+- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，最近一次总耗时 0.22 秒，内存峰值约 174.2 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
+- UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、桌面宠物返回主窗口、完成态动作、失败重试、覆盖确认、批量压缩完整流程、Help Center 和 Keyboard Shortcuts 设置区（由 `ImagePetUITests` 验证）。
 
 ## 追踪入口
 
@@ -41,6 +43,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - V0.7 静默桌面 Pet 常驻与主题扩展规划：[PRD_v0.7_desktop_pet_expansion.md](PRD_v0.7_desktop_pet_expansion.md)
 - V0.9 WebP 与自定义压缩质量规划：[PRD_v0.9_webp_custom_quality.md](PRD_v0.9_webp_custom_quality.md)
 - V0.10 Advanced JPEG 与 mozjpeg 规划：[PRD_v0.10_advanced_jpeg_mozjpeg.md](PRD_v0.10_advanced_jpeg_mozjpeg.md)
+- V0.11 App 完整性、帮助中心与可自定义快捷键规划：[PRD_v0.11_app_completeness.md](PRD_v0.11_app_completeness.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -52,6 +55,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
 | WebP | 已实现，本机验证通过 | Swift-WebP `0.6.1` + libwebp-Xcode `1.5.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；Developer ID/notarization 发布前 smoke |
 | Advanced JPEG / mozjpeg | 已实现，本机验证通过 | `awxkee/mozjpeg.swift` `1.1.3` 已接入；`EncoderCapabilities.jpegEncodingModes` 分离 standard/advanced；Advanced JPEG 只影响 JPEG 输出并由 smoke encode gate 控制；Third Party Notices 已扩展 | 补 benchmark fixture、Preview/Safari/Chrome 打开验证、Developer ID/notarization smoke |
+| App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `3.0.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口 | 发布前手工录制并触发 Show Main Window / Toggle Desktop Pet global shortcuts |
 | AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
 | 最大边长限制 | 已实现 | `MaxDimensionLimit` + compressor 单测覆盖缩放 | 用真实大图做视觉验收 |
@@ -84,8 +88,8 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 ```text
 swift test
 结果：通过
-测试数：32
-性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.24 秒，峰值内存 168.5 MB）
+测试数：38
+性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.21 秒，峰值内存 169.6 MB）
 ```
 
 ```text
@@ -96,8 +100,22 @@ xcodebuild -project ImagePet.xcodeproj \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：49 (32 Unit Tests + 17 UI Tests)
-性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.25 秒，峰值内存 172.4 MB）
+测试数：57 (38 Unit Tests + 19 UI Tests)
+性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.22 秒，峰值内存 174.2 MB）
+UI suite：通过（19 tests，209.263 秒）
+```
+
+KeyboardShortcuts dependency spike：
+
+```text
+KeyboardShortcuts version: 3.0.0
+revision: f7d08ba4109d5ca025e1a64165be169cdf089206
+target boundary: ImagePet GUI target only; ImagePetCore remains dependency-free
+global shortcut defaults: unset
+settings UI: KeyboardShortcuts.Recorder renders for Show Main Window, Toggle Desktop Pet, Toggle Pet Mini / Full
+handler smoke: UI-test registration disabled through IS_UI_TESTING to avoid global hotkey side effects
+manual trigger smoke: pending before release candidate
+license: MIT, archived in docs/THIRD_PARTY_NOTICES.md
 ```
 
 Swift-WebP dependency spike：
@@ -143,7 +161,7 @@ ImagePet swift test: pass, 38 tests
 Advanced JPEG smoke encode: pass
 ImageIO decode of Advanced JPEG output: pass in unit test
 xcodebuild targeted Desktop Pet overwrite UI regression: pass
-xcodebuild test: partial pass; unit target passed, full UI suite interrupted after macOS accessibility timeout/flakiness during rerun
+xcodebuild test: pass, 38 unit tests + 19 UI tests
 ./script/build_and_run.sh --verify: pass
 app sandbox smoke: pass in local Debug build entitlement inspection
 codesign smoke: pass with local ad-hoc signing
@@ -243,7 +261,7 @@ org.gewill.ImagePet
 - V0.6 桌面 Pet 富动画与自定义资产开发
 - Finder Extension
 - Raycast Extension
-- Shortcuts
+- Apple Shortcuts / Automator wrapper
 - 文件夹监听
 - CLI target
 

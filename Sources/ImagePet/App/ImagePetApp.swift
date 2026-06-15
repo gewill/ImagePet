@@ -3,20 +3,20 @@ import SwiftUI
 
 @main
 struct ImagePetApp: App {
+    @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = ImagePetStore()
+    @StateObject private var shortcutCoordinator = GlobalShortcutCoordinator()
 
     var body: some Scene {
         WindowGroup("ImagePet") {
             ContentView(store: store)
+                .onAppear {
+                    shortcutCoordinator.bind(to: store)
+                }
         }
         .commands {
-            CommandGroup(after: .newItem) {
-                Button("Show Main Window") {
-                    store.activateMainWindow()
-                }
-                .keyboardShortcut("1", modifiers: [.command])
-
+            CommandGroup(replacing: .newItem) {
                 Button("Add Images...") {
                     store.chooseInputImages()
                 }
@@ -27,22 +27,78 @@ struct ImagePetApp: App {
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
 
-                Button(store.isDesktopPetVisible ? "Hide Desktop Pet" : "Show Desktop Pet") {
-                    store.toggleDesktopPet()
-                }
-                .keyboardShortcut("p", modifiers: [.command, .shift])
+                Divider()
 
                 Button("Compress More") {
                     store.compressMore()
                 }
                 .keyboardShortcut("n", modifiers: [.command])
                 .disabled(store.isProcessing)
+
+                Button("Retry Failed") {
+                    store.retryFailed()
+                }
+                .keyboardShortcut("r", modifiers: [.command])
+                .disabled(store.isProcessing || !store.hasFailedJobs)
+            }
+
+            CommandGroup(after: .toolbar) {
+                Button("Show Main Window") {
+                    store.activateMainWindow()
+                }
+                .keyboardShortcut("1", modifiers: [.command])
+
+                Divider()
+
+                Button(store.isDesktopPetVisible ? "Hide Desktop Pet" : "Show Desktop Pet") {
+                    store.toggleDesktopPet()
+                }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
+                .disabled(!store.isDesktopPetEnabled)
+
+                Button("Toggle Pet Mini / Full") {
+                    store.toggleDesktopPetMode()
+                }
+                .disabled(!store.isDesktopPetEnabled)
+            }
+
+            CommandMenu("Settings") {
+                Button("Desktop Pet Settings...") {
+                    store.showSettings(.desktopPet)
+                }
+
+                Button("Keyboard Shortcuts...") {
+                    store.showSettings(.keyboardShortcuts)
+                }
+
+                Button("Help & About...") {
+                    store.showSettings(.helpAbout)
+                }
+            }
+
+            CommandGroup(replacing: .help) {
+                Button("ImagePet Help") {
+                    openWindow(id: "help")
+                }
+                .keyboardShortcut("/", modifiers: [.command, .shift])
+
+                Button("Keyboard Shortcuts...") {
+                    store.showSettings(.keyboardShortcuts)
+                }
             }
         }
 
         Window("ImagePet", id: "main") {
             ContentView(store: store)
+                .onAppear {
+                    shortcutCoordinator.bind(to: store)
+                }
         }
+
+        Window("ImagePet Help", id: "help") {
+            HelpView()
+        }
+        .defaultSize(width: 820, height: 560)
     }
 }
 
@@ -57,11 +113,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     forName: NSWindow.didUpdateNotification,
                     object: nil,
                     queue: .main
-                ) { @MainActor _ in
-                    for window in NSApp.windows {
-                        let isMainWindow = window.title == "ImagePet" || window.identifier?.rawValue == "main"
-                        if isMainWindow && store.launchMode == .loginItem && !store.hasReopened {
-                            window.orderOut(nil)
+                ) { _ in
+                    Task { @MainActor in
+                        for window in NSApp.windows {
+                            let isMainWindow = window.title == "ImagePet" || window.identifier?.rawValue == "main"
+                            if isMainWindow && store.launchMode == .loginItem && !store.hasReopened {
+                                window.orderOut(nil)
+                            }
                         }
                     }
                 }
@@ -88,7 +146,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 NSApp.setActivationPolicy(.regular)
                 NSApp.activate(ignoringOtherApps: true)
                 if isUITesting && store.isDesktopPetEnabled && store.isDesktopPetVisible {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                    DispatchQueue.main.async {
                         store.attachDesktopPetControllerIfNeeded()
                     }
                 } else {

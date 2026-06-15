@@ -17,6 +17,9 @@ packages:
   mozjpeg.swift:
     url: https://github.com/awxkee/mozjpeg.swift.git
     exactVersion: 1.1.3
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts.git
+    exactVersion: 3.0.0
 targets:
   ImagePetCore:
     type: framework
@@ -43,6 +46,8 @@ targets:
         type: folder
     dependencies:
       - target: ImagePetCore
+      - package: KeyboardShortcuts
+        product: KeyboardShortcuts
     info:
       path: Generated/Info.plist
       properties:
