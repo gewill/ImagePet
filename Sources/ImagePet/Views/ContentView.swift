@@ -346,8 +346,22 @@ private struct ControlsView: View {
                     .disabled(store.isProcessing)
                     .accessibilityIdentifier("stripMetadataToggle")
 
+                if store.canUseAdvancedJPEG {
+                    Toggle("Advanced JPEG", isOn: Binding(
+                        get: { store.jpegEncodingMode == .advanced },
+                        set: { store.jpegEncodingMode = $0 ? .advanced : .standard }
+                    ))
+                    .disabled(store.isProcessing)
+                    .help("Smaller JPEG output for web sharing.")
+                    .accessibilityIdentifier("advancedJPEGToggle")
+                }
+
                 if store.outputFormat == .png {
                     Label("PNG uses lossless compression. Quality does not apply.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if store.canUseAdvancedJPEG && store.jpegEncodingMode == .advanced {
+                    Label("Smaller JPEG output for web sharing.", systemImage: "info.circle")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else if store.outputFormat == .webp {

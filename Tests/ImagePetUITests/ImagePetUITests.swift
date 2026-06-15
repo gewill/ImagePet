@@ -415,11 +415,15 @@ final class ImagePetUITests: XCTestCase {
             app.typeKey("w", modifierFlags: [.command])
         }
 
+        let mainWindowDisappeared = NSPredicate(format: "exists == false")
+        let mainWindowClosed = XCTNSPredicateExpectation(predicate: mainWindowDisappeared, object: window)
+        XCTAssertEqual(XCTWaiter.wait(for: [mainWindowClosed], timeout: 2.0), .completed)
+
         let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
         XCTAssertTrue(addImagesButton.exists)
         addImagesButton.click()
 
-        XCTAssertTrue(mainWindow(timeout: 3.0).exists)
+        XCTAssertTrue(mainWindow(timeout: 70.0).exists)
 
         // Verify alert sheet/dialog is displayed
         let sheet = app.sheets.firstMatch

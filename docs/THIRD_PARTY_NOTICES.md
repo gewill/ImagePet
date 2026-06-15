@@ -1,6 +1,6 @@
 # Third Party Notices
 
-ImagePet v0.9 uses the following third-party packages for WebP support. Versions are locked by `Package.resolved`.
+ImagePet uses the following third-party packages for image codec support. Versions are locked by `Package.resolved`.
 
 ## Swift-WebP
 
@@ -87,3 +87,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
+
+## mozjpeg.swift
+
+- Package: `mozjpeg.swift`
+- Product: `mozjpeg`
+- Version: `1.1.3`
+- Revision: `42aaf0105aa7cd5640397306577bda756863003a`
+- Source: https://github.com/awxkee/mozjpeg.swift
+- Build method: Swift Package Manager dependency linked by `ImagePetCore`
+- License: CC0-1.0 for the Swift/Objective-C++ wrapper repository
+
+`mozjpeg.swift` packages Swift and Objective-C++ bindings around a bundled `libturbojpeg.xcframework`. ImagePet uses it only for Advanced JPEG output.
+
+## Bundled libturbojpeg / mozjpeg binary from mozjpeg.swift
+
+- Library: `libturbojpeg`
+- Package source: https://github.com/awxkee/mozjpeg.swift
+- Bundled artifact: `Sources/libturbojpeg.xcframework`
+- macOS artifact: `macos-arm64_x86_64/libturbojpeg.a`
+- Reported header version: `LIBJPEG_TURBO_VERSION 4.1.0`
+- Build method: Prebuilt static library distributed inside `mozjpeg.swift`
+- Linked frameworks: `Accelerate`
+- License summary: libjpeg-turbo / mozjpeg license roll-up; includes IJG License, Modified BSD License, and zlib-style SIMD notices where applicable.
+
+Required attribution:
+
+```text
+This software is based in part on the work of the Independent JPEG Group.
+```
+
+ImagePet does not bundle `cjpeg`, `djpeg`, `jpegtran`, or other command-line tools from this dependency.

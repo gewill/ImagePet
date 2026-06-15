@@ -96,6 +96,11 @@ final class ImagePetStore: ObservableObject {
             defaults.set(outputFormat.rawValue, forKey: outputFormatKey)
         }
     }
+    @Published var jpegEncodingMode: JPEGEncodingMode = .standard {
+        didSet {
+            defaults.set(jpegEncodingMode.rawValue, forKey: jpegEncodingModeKey)
+        }
+    }
     @Published var saveLocationMode: SaveLocationMode = .designated {
         didSet {
             defaults.set(saveLocationMode.rawValue, forKey: saveLocationModeKey)
@@ -199,6 +204,7 @@ final class ImagePetStore: ObservableObject {
     private var didPromptForInitialFolder = false
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
+    private let jpegEncodingModeKey = "ImagePet.jpegEncodingMode"
     private let presetKey = "ImagePet.preset"
     private let qualityModeKey = "ImagePet.qualityMode"
     private let customQualityKey = "ImagePet.customQuality"
@@ -229,6 +235,7 @@ final class ImagePetStore: ObservableObject {
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
 
         self.outputFormat = .original
+        self.jpegEncodingMode = .standard
         self.saveLocationMode = .designated
         self.filenameSuffix = "_compressed"
         self.maxDimension = .none
@@ -285,6 +292,7 @@ final class ImagePetStore: ObservableObject {
             self.preset = .balanced
             self.qualityMode = .balanced
             self.customQuality = 80
+            self.jpegEncodingMode = .standard
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
@@ -300,6 +308,10 @@ final class ImagePetStore: ObservableObject {
 
             if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
                 self.outputFormat = encoderCapabilities.writableFormats.contains(format) ? format : .original
+            }
+            if let savedJPEGMode = defaults.string(forKey: jpegEncodingModeKey),
+               let mode = JPEGEncodingMode(rawValue: savedJPEGMode) {
+                self.jpegEncodingMode = encoderCapabilities.jpegEncodingModes.contains(mode) ? mode : .standard
             }
             if let savedPreset = defaults.string(forKey: presetKey), let preset = CompressionPreset(rawValue: savedPreset) {
                 self.preset = preset
@@ -380,6 +392,27 @@ final class ImagePetStore: ObservableObject {
         outputFormat == .png ? nil : qualityMode.compressionQuality(customQuality: customQuality)
     }
 
+    var canUseAdvancedJPEG: Bool {
+        guard encoderCapabilities.jpegEncodingModes.contains(.advanced),
+              saveLocationMode != .overwrite else {
+            return false
+        }
+
+        if outputFormat == .jpeg {
+            return true
+        }
+
+        if outputFormat == .original {
+            return jobs.contains { SupportedImageFormat.format(for: $0.inputURL) == .jpeg }
+        }
+
+        return false
+    }
+
+    var effectiveJPEGEncodingMode: JPEGEncodingMode {
+        canUseAdvancedJPEG ? jpegEncodingMode : .standard
+    }
+
     var filenamePreview: String {
         let dummyInput = URL(fileURLWithPath: "/tmp/photo.png")
         let targetFormat = encoderCapabilities.writableFormats.contains(outputFormat) ? outputFormat : .original
@@ -412,23 +445,21 @@ final class ImagePetStore: ObservableObject {
         }
         NSApp.activate(ignoringOtherApps: true)
 
-        for window in NSApp.windows {
-            if window.title == "ImagePet" || window.identifier?.rawValue == "main" {
-                if window.isMiniaturized {
-                    window.deminiaturize(nil)
-                }
-                window.makeKeyAndOrderFront(nil)
-            }
-        }
-
         if focusMainWindowIfPresent() {
             return
         }
 
         openMainWindow?()
 
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
             await Task.yield()
+            guard let self else { return }
+            if self.focusMainWindowIfPresent() {
+                return
+            }
+
+            self.openMainWindow?()
+            try? await Task.sleep(nanoseconds: 150_000_000)
             self.focusMainWindowIfPresent()
         }
     }
@@ -490,6 +521,7 @@ final class ImagePetStore: ObservableObject {
 
     func promptForOutputFolderOnFirstLaunch() {
         guard !didPromptForInitialFolder else { return }
+        guard saveLocationMode == .designated else { return }
         didPromptForInitialFolder = true
 
         if outputDirectory == nil {
@@ -698,7 +730,11 @@ final class ImagePetStore: ObservableObject {
         case .hidePet:
             hideDesktopPet()
         case .addImages:
-            chooseInputImages()
+            activateMainWindow()
+            Task { @MainActor in
+                await Task.yield()
+                chooseInputImages()
+            }
         case .revealOutput:
             revealOutputDirectory()
         case .retryFailed:
@@ -944,6 +980,7 @@ final class ImagePetStore: ObservableObject {
         let compressionOptions = CompressionOptions(
             lossyQuality: effectiveLossyQuality,
             format: outputFormat,
+            jpegEncodingMode: effectiveJPEGEncodingMode,
             maxDimension: maxDimension,
             stripMetadata: stripMetadata
         )

@@ -182,6 +182,7 @@ enum SwiftWebPCapabilityProbe {
         var writableFormats: Set<OutputFormat> = [.original, .jpeg, .png, .heic]
         var alphaCapableFormats: Set<OutputFormat> = [.png, .heic]
         var supportsBitstreamInspection = false
+        var jpegEncodingModes: Set<JPEGEncodingMode> = [.standard]
 
         if let image = makeSmokeImage(),
            let encoded = try? encodeSmokeImage(image),
@@ -195,12 +196,17 @@ enum SwiftWebPCapabilityProbe {
             }
         }
 
+        if MozJPEGCapabilityProbe.canEncode() {
+            jpegEncodingModes.insert(.advanced)
+        }
+
         return EncoderCapabilities(
             readableFormats: readableFormats,
             writableFormats: writableFormats,
             supportsCustomQuality: true,
             alphaCapableFormats: alphaCapableFormats,
-            supportsBitstreamInspection: supportsBitstreamInspection
+            supportsBitstreamInspection: supportsBitstreamInspection,
+            jpegEncodingModes: jpegEncodingModes
         )
     }
 

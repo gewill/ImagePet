@@ -21,4 +21,14 @@ final class CompressionOptionsTests: XCTestCase {
         let options = CompressionOptions(lossyQuality: .custom(80), format: .png)
         XCTAssertNil(options.lossyQuality)
     }
+
+    func testJPEGEncodingModeDefaultsToStandard() {
+        let options = CompressionOptions(format: .jpeg)
+        XCTAssertEqual(options.jpegEncodingMode, .standard)
+    }
+
+    func testJPEGEncodingModeCanBeAdvanced() {
+        let options = CompressionOptions(format: .jpeg, jpegEncodingMode: .advanced)
+        XCTAssertEqual(options.jpegEncodingMode, .advanced)
+    }
 }

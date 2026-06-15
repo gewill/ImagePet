@@ -11,13 +11,15 @@ let package = Package(
         .executable(name: "ImagePet", targets: ["ImagePet"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ainame/Swift-WebP.git", exact: "0.6.1")
+        .package(url: "https://github.com/ainame/Swift-WebP.git", exact: "0.6.1"),
+        .package(url: "https://github.com/awxkee/mozjpeg.swift.git", exact: "1.1.3")
     ],
     targets: [
         .target(
             name: "ImagePetCore",
             dependencies: [
-                .product(name: "WebP", package: "Swift-WebP")
+                .product(name: "WebP", package: "Swift-WebP"),
+                .product(name: "mozjpeg", package: "mozjpeg.swift")
             ],
             path: "Sources/ImagePetCore"
         ),

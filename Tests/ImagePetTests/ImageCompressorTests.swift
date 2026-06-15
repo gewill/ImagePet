@@ -178,6 +178,94 @@ final class ImageCompressorTests: XCTestCase {
         }
     }
 
+    func testAdvancedJPEGSkipsWhenCapabilityUnavailable() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.png")
+        try Self.writeSamplePNG(to: inputURL)
+
+        do {
+            _ = try await ImageCompressor(capabilities: .nativeOnly).compress(
+                inputURL: inputURL,
+                outputDirectory: directory,
+                compressionOptions: CompressionOptions(
+                    lossyQuality: .custom(82),
+                    format: .jpeg,
+                    jpegEncodingMode: .advanced
+                ),
+                saveOptions: SaveOptions(locationMode: .designated, suffix: "_advanced")
+            )
+            XCTFail("Expected Advanced JPEG to be skipped when mozjpeg is unavailable")
+        } catch let error as CompressionError {
+            XCTAssertEqual(error, .advancedJPEGUnavailable)
+            let expectedOutputURL = directory.appendingPathComponent("sample_advanced.jpg")
+            XCTAssertFalse(FileManager.default.fileExists(atPath: expectedOutputURL.path))
+        }
+    }
+
+    func testAdvancedJPEGCompressesWhenCapabilityAvailable() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.png")
+        try Self.writeSamplePNG(to: inputURL)
+
+        let capabilities = EncoderCapabilities(
+            readableFormats: [.jpeg, .png, .heic, .webp],
+            writableFormats: [.original, .jpeg, .png, .heic, .webp],
+            supportsCustomQuality: true,
+            alphaCapableFormats: [.png, .heic, .webp],
+            supportsBitstreamInspection: true,
+            jpegEncodingModes: [.standard, .advanced]
+        )
+
+        let result = try await ImageCompressor(capabilities: capabilities).compress(
+            inputURL: inputURL,
+            outputDirectory: directory,
+            compressionOptions: CompressionOptions(
+                lossyQuality: .custom(80),
+                format: .jpeg,
+                jpegEncodingMode: .advanced
+            ),
+            saveOptions: SaveOptions(locationMode: .designated, suffix: "_advanced")
+        )
+
+        XCTAssertEqual(result.outputURL.pathExtension.lowercased(), "jpg")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.outputURL.path))
+        let outputSource = CGImageSourceCreateWithURL(result.outputURL as CFURL, nil)
+        XCTAssertEqual(CGImageSourceGetType(outputSource!) as String?, UTType.jpeg.identifier)
+    }
+
+    func testOverwriteModeIgnoresAdvancedJPEG() async throws {
+        let directory = try Self.makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let inputURL = directory.appendingPathComponent("sample.jpg")
+        try Self.writeLargeSampleJPG(to: inputURL, quality: 1.0)
+
+        let result = try await ImageCompressor(capabilities: .nativeOnly).compress(
+            inputURL: inputURL,
+            outputDirectory: nil,
+            compressionOptions: CompressionOptions(
+                lossyQuality: .preset(.small),
+                format: .jpeg,
+                jpegEncodingMode: .advanced
+            ),
+            saveOptions: SaveOptions(locationMode: .overwrite, suffix: "_ignored")
+        )
+
+        XCTAssertEqual(result.outputURL, inputURL)
+        XCTAssertEqual(result.outputURL.pathExtension.lowercased(), "jpg")
+        XCTAssertLessThan(result.compressedSize, result.originalSize)
+    }
+
     private static func writeSampleJPG(to url: URL, quality: Double) throws {
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
         guard let context = CGContext(

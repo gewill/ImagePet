@@ -40,6 +40,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 - V0.5 桌面 Pet 双态规划：[PRD_v0.5_desktop_pet_dual_state.md](PRD_v0.5_desktop_pet_dual_state.md)
 - V0.7 静默桌面 Pet 常驻与主题扩展规划：[PRD_v0.7_desktop_pet_expansion.md](PRD_v0.7_desktop_pet_expansion.md)
 - V0.9 WebP 与自定义压缩质量规划：[PRD_v0.9_webp_custom_quality.md](PRD_v0.9_webp_custom_quality.md)
+- V0.10 Advanced JPEG 与 mozjpeg 规划：[PRD_v0.10_advanced_jpeg_mozjpeg.md](PRD_v0.10_advanced_jpeg_mozjpeg.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -50,6 +51,7 @@ MVP 工程骨架和 V0.3 核心 workflow 已经实现，当前更适合进入手
 | JPG / JPEG / PNG / HEIC 输入 | 已实现 | `SupportedImageFormat` + ImageIO 解码；fixture 覆盖 JPG/PNG/HEIC | 用真实 iPhone HEIC 做手工验收 |
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
 | WebP | 已实现，本机验证通过 | Swift-WebP `0.6.1` + libwebp-Xcode `1.5.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；Developer ID/notarization 发布前 smoke |
+| Advanced JPEG / mozjpeg | 已实现，本机验证通过 | `awxkee/mozjpeg.swift` `1.1.3` 已接入；`EncoderCapabilities.jpegEncodingModes` 分离 standard/advanced；Advanced JPEG 只影响 JPEG 输出并由 smoke encode gate 控制；Third Party Notices 已扩展 | 补 benchmark fixture、Preview/Safari/Chrome 打开验证、Developer ID/notarization smoke |
 | AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
 | 最大边长限制 | 已实现 | `MaxDimensionLimit` + compressor 单测覆盖缩放 | 用真实大图做视觉验收 |
@@ -122,6 +124,35 @@ Safari open: not verified
 Chrome open: not verified
 ImageIO fixture comparison: not verified
 notes: WebP write/read capability is injectable for tests; WebP write unavailable maps to a skipped result reason.
+```
+
+mozjpeg.swift dependency spike：
+
+```text
+macOS version: 26.5.1 (25F80)
+hardware / runner: local arm64 Mac
+Swift / Xcode version: Swift 6.3.2 / Xcode 26.5 (17F42)
+mozjpeg.swift version: 1.1.3
+mozjpeg.swift revision: 42aaf0105aa7cd5640397306577bda756863003a
+bundled libturbojpeg artifact: Sources/libturbojpeg.xcframework
+macOS artifact architecture: arm64 + x86_64
+reported header version: LIBJPEG_TURBO_VERSION 4.1.0
+SPM resolve: pass
+standalone mozjpeg.swift swift test: pass, 1 placeholder test
+ImagePet swift test: pass, 38 tests
+Advanced JPEG smoke encode: pass
+ImageIO decode of Advanced JPEG output: pass in unit test
+xcodebuild targeted Desktop Pet overwrite UI regression: pass
+xcodebuild test: partial pass; unit target passed, full UI suite interrupted after macOS accessibility timeout/flakiness during rerun
+./script/build_and_run.sh --verify: pass
+app sandbox smoke: pass in local Debug build entitlement inspection
+codesign smoke: pass with local ad-hoc signing
+notarization smoke: not verified
+benchmark fixture: pending
+Preview open: not verified
+Safari open: not verified
+Chrome open: not verified
+notes: mozjpeg.swift README still lists file handling and tests as TODO, so ImagePet keeps capability gate and its own integration tests.
 ```
 
 ```text

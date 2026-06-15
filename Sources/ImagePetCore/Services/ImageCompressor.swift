@@ -17,17 +17,23 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
     private let capabilities: EncoderCapabilities
     private let webPEncodingEngine: SwiftWebPEncodingEngine
     private let webPDecodingEngine: SwiftWebPDecodingEngine
+    private let mozJPEGEncodingEngine: MozJPEGEncodingEngine
 
     public init(
         allocator: OutputNameAllocator = OutputNameAllocator(),
         capabilities: EncoderCapabilities = .current,
         webPEncodingEngine: SwiftWebPEncodingEngine? = nil,
-        webPDecodingEngine: SwiftWebPDecodingEngine? = nil
+        webPDecodingEngine: SwiftWebPDecodingEngine? = nil,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine? = nil
     ) {
         self.allocator = allocator
         self.capabilities = capabilities
         self.webPEncodingEngine = webPEncodingEngine ?? SwiftWebPEncodingEngine(capabilities: capabilities)
         self.webPDecodingEngine = webPDecodingEngine ?? SwiftWebPDecodingEngine(capabilities: capabilities)
+        let mozJPEGAvailability: MozJPEGEncodingEngine.Availability = capabilities.jpegEncodingModes.contains(.advanced)
+            ? .available
+            : .unavailable
+        self.mozJPEGEncodingEngine = mozJPEGEncodingEngine ?? MozJPEGEncodingEngine(availability: mozJPEGAvailability)
     }
 
     public func resetReservations() async {
@@ -61,7 +67,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         let options = CompressionOptions(lossyQuality: .preset(preset), format: .jpeg, maxDimension: .none, stripMetadata: true)
 
         do {
-            return try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine] in
+            return try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
@@ -71,7 +77,8 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                         targetOutputFormat: .jpeg,
                         capabilities: capabilities,
                         webPEncodingEngine: webPEncodingEngine,
-                        webPDecodingEngine: webPDecodingEngine
+                        webPDecodingEngine: webPDecodingEngine,
+                        mozJPEGEncodingEngine: mozJPEGEncodingEngine
                     )
                 }
             }.value
@@ -162,12 +169,17 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         let effectiveCompressionOptions = CompressionOptions(
             lossyQuality: compressionOptions.lossyQuality,
             format: targetOutputFormat,
+            jpegEncodingMode: Self.effectiveJPEGEncodingMode(
+                requestedMode: compressionOptions.jpegEncodingMode,
+                targetOutputFormat: targetOutputFormat,
+                saveOptions: saveOptions
+            ),
             maxDimension: compressionOptions.maxDimension,
             stripMetadata: compressionOptions.stripMetadata
         )
 
         do {
-            let result = try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine] in
+            let result = try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
@@ -177,7 +189,8 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                         targetOutputFormat: targetOutputFormat,
                         capabilities: capabilities,
                         webPEncodingEngine: webPEncodingEngine,
-                        webPDecodingEngine: webPDecodingEngine
+                        webPDecodingEngine: webPDecodingEngine,
+                        mozJPEGEncodingEngine: mozJPEGEncodingEngine
                     )
                 }
             }.value
@@ -218,7 +231,8 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         targetOutputFormat: OutputFormat,
         capabilities: EncoderCapabilities,
         webPEncodingEngine: SwiftWebPEncodingEngine,
-        webPDecodingEngine: SwiftWebPDecodingEngine
+        webPDecodingEngine: SwiftWebPDecodingEngine,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine
     ) throws -> CompressionResult {
         let originalSize = try fileSize(for: inputURL)
         try ensureLikelyDiskCapacity(for: originalSize, at: destinationTemporaryURL.deletingLastPathComponent())
@@ -236,7 +250,9 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             destinationTemporaryURL: destinationTemporaryURL,
             options: options,
             targetOutputFormat: targetOutputFormat,
-            webPEncodingEngine: webPEncodingEngine
+            webPEncodingEngine: webPEncodingEngine,
+            mozJPEGEncodingEngine: mozJPEGEncodingEngine,
+            capabilities: capabilities
         )
 
         let compressedSize = try fileSize(for: destinationTemporaryURL)
@@ -315,7 +331,9 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         destinationTemporaryURL: URL,
         options: CompressionOptions,
         targetOutputFormat: OutputFormat,
-        webPEncodingEngine: SwiftWebPEncodingEngine
+        webPEncodingEngine: SwiftWebPEncodingEngine,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine,
+        capabilities: EncoderCapabilities
     ) throws {
         if targetOutputFormat == .webp {
             try webPEncodingEngine.encode(
@@ -323,6 +341,19 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                 source: preparedImage.sourceMetadata,
                 destinationTemporaryURL: destinationTemporaryURL,
                 options: options
+            )
+            return
+        }
+
+        if targetOutputFormat == .jpeg, options.jpegEncodingMode == .advanced {
+            guard capabilities.jpegEncodingModes.contains(.advanced) else {
+                throw CompressionError.advancedJPEGUnavailable
+            }
+            try mozJPEGEncodingEngine.encode(
+                image: preparedImage.image,
+                metadata: preparedImage.sourceMetadata,
+                quality: options.lossyQuality ?? .preset(.balanced),
+                destinationTemporaryURL: destinationTemporaryURL
             )
             return
         }
@@ -495,6 +526,17 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             }
         }
         return targetOutputFormat.targetExtension(for: inputURL)
+    }
+
+    private static func effectiveJPEGEncodingMode(
+        requestedMode: JPEGEncodingMode,
+        targetOutputFormat: OutputFormat,
+        saveOptions: SaveOptions
+    ) -> JPEGEncodingMode {
+        guard targetOutputFormat == .jpeg, saveOptions.locationMode != .overwrite else {
+            return .standard
+        }
+        return requestedMode
     }
 
     private static func temporaryOutputURL(in directory: URL, targetExtension: String) -> URL {

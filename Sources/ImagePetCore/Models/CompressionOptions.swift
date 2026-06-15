@@ -57,6 +57,20 @@ public extension UTType {
     static let imagePetWebP = UTType(filenameExtension: "webp") ?? UTType(exportedAs: "org.webmproject.webp")
 }
 
+public enum JPEGEncodingMode: String, CaseIterable, Identifiable, Codable, Sendable {
+    case standard
+    case advanced
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .standard: return "Standard JPEG"
+        case .advanced: return "Advanced JPEG"
+        }
+    }
+}
+
 /// The mode for where the output file should be written.
 public enum SaveLocationMode: String, CaseIterable, Identifiable, Codable, Sendable {
     case designated
@@ -110,16 +124,19 @@ public enum OverwritePolicy: String, Codable, Sendable {
 public struct CompressionOptions: Sendable, Equatable, Codable {
     public let lossyQuality: CompressionQuality?
     public let format: OutputFormat
+    public let jpegEncodingMode: JPEGEncodingMode
     public let maxDimension: MaxDimensionLimit
     public let stripMetadata: Bool
     
     public init(
         lossyQuality: CompressionQuality? = .preset(.balanced),
         format: OutputFormat = .original,
+        jpegEncodingMode: JPEGEncodingMode = .standard,
         maxDimension: MaxDimensionLimit = .none,
         stripMetadata: Bool = true
     ) {
         self.format = format
+        self.jpegEncodingMode = jpegEncodingMode
         self.lossyQuality = format == .png ? nil : lossyQuality
         self.maxDimension = maxDimension
         self.stripMetadata = stripMetadata

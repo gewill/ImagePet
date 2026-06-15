@@ -13,6 +13,7 @@ final class EncoderCapabilitiesTests: XCTestCase {
 
         XCTAssertTrue(capabilities.readableFormats.contains(.webp))
         XCTAssertFalse(capabilities.writableFormats.contains(.webp))
+        XCTAssertEqual(capabilities.jpegEncodingModes, [.standard])
     }
 
     func testAlphaCapabilityIsPerOutputFormat() {
@@ -28,5 +29,19 @@ final class EncoderCapabilitiesTests: XCTestCase {
         XCTAssertTrue(capabilities.alphaCapableFormats.contains(.png))
         XCTAssertTrue(capabilities.alphaCapableFormats.contains(.webp))
         XCTAssertTrue(capabilities.supportsBitstreamInspection)
+    }
+
+    func testAdvancedJPEGCapabilityIsExplicit() {
+        let capabilities = EncoderCapabilities(
+            readableFormats: [.jpeg, .png, .heic, .webp],
+            writableFormats: [.original, .jpeg, .png, .heic, .webp],
+            supportsCustomQuality: true,
+            alphaCapableFormats: [.png, .heic, .webp],
+            supportsBitstreamInspection: true,
+            jpegEncodingModes: [.standard, .advanced]
+        )
+
+        XCTAssertTrue(capabilities.jpegEncodingModes.contains(.standard))
+        XCTAssertTrue(capabilities.jpegEncodingModes.contains(.advanced))
     }
 }
