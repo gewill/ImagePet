@@ -10,12 +10,19 @@ settings:
     SWIFT_VERSION: "5.9"
     MACOSX_DEPLOYMENT_TARGET: "13.0"
     CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+packages:
+  Swift-WebP:
+    url: https://github.com/ainame/Swift-WebP.git
+    exactVersion: 0.6.1
 targets:
   ImagePetCore:
     type: framework
     platform: macOS
     sources:
       - path: Sources/ImagePetCore
+    dependencies:
+      - package: Swift-WebP
+        product: WebP
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetCore

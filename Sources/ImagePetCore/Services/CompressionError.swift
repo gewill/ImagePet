@@ -8,6 +8,7 @@ public enum CompressionError: Error, Equatable, LocalizedError, Sendable {
     case failedToWriteOutputFile
     case notEnoughDiskSpace
     case skipped
+    case webPOutputUnavailable
     case unknown
 
     public var errorDescription: String? {
@@ -25,10 +26,16 @@ public enum CompressionError: Error, Equatable, LocalizedError, Sendable {
         case .notEnoughDiskSpace:
             return "Not enough disk space"
         case .skipped:
-            return "Compression skipped (size would increase)"
+            return "Skipped: output would be larger than source"
+        case .webPOutputUnavailable:
+            return "Skipped: WebP output is unavailable on this Mac"
         case .unknown:
             return "Unknown error"
         }
+    }
+
+    public var isSkippedResult: Bool {
+        self == .skipped || self == .webPOutputUnavailable
     }
 
     public static func map(_ error: Error) -> CompressionError {

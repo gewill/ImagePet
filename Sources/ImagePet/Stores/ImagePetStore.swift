@@ -22,6 +22,27 @@ final class ImagePetStore: ObservableObject {
     @Published var preset: CompressionPreset = .balanced {
         didSet {
             defaults.set(preset.rawValue, forKey: presetKey)
+            if qualityMode.preset != preset {
+                qualityMode = CompressionQualityMode(preset: preset)
+            }
+        }
+    }
+    @Published var qualityMode: CompressionQualityMode = .balanced {
+        didSet {
+            defaults.set(qualityMode.rawValue, forKey: qualityModeKey)
+            if let preset = qualityMode.preset, self.preset != preset {
+                self.preset = preset
+            }
+        }
+    }
+    @Published var customQuality: Int = 80 {
+        didSet {
+            let clamped = min(95, max(30, customQuality))
+            if customQuality != clamped {
+                customQuality = clamped
+                return
+            }
+            defaults.set(customQuality, forKey: customQualityKey)
         }
     }
     @Published var outputDirectory: URL? {
@@ -168,6 +189,7 @@ final class ImagePetStore: ObservableObject {
     let maxConcurrentJobs = 2
 
     private let compressor: ImageCompressor
+    private let encoderCapabilities: EncoderCapabilities
     private let bookmarkStore: OutputDirectoryBookmarkStore
     private let defaults: UserDefaults
     private var processingTask: Task<Void, Never>?
@@ -178,6 +200,8 @@ final class ImagePetStore: ObservableObject {
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
     private let presetKey = "ImagePet.preset"
+    private let qualityModeKey = "ImagePet.qualityMode"
+    private let customQualityKey = "ImagePet.customQuality"
     private let saveLocationModeKey = "ImagePet.saveLocationMode"
     private let filenameSuffixKey = "ImagePet.filenameSuffix"
     private let maxDimensionKey = "ImagePet.maxDimension"
@@ -194,11 +218,13 @@ final class ImagePetStore: ObservableObject {
     private let petViewModeKey = "ImagePet.petViewMode"
 
     init(
-        compressor: ImageCompressor = ImageCompressor(),
+        compressor: ImageCompressor? = nil,
+        encoderCapabilities: EncoderCapabilities = .current,
         bookmarkStore: OutputDirectoryBookmarkStore? = nil,
         defaults: UserDefaults = .standard
     ) {
-        self.compressor = compressor
+        self.encoderCapabilities = encoderCapabilities
+        self.compressor = compressor ?? ImageCompressor(capabilities: encoderCapabilities)
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
 
@@ -207,6 +233,8 @@ final class ImagePetStore: ObservableObject {
         self.filenameSuffix = "_compressed"
         self.maxDimension = .none
         self.stripMetadata = true
+        self.qualityMode = .balanced
+        self.customQuality = 80
         self.petViewMode = .mini
 
         self.enableIdleVariants = true
@@ -255,6 +283,8 @@ final class ImagePetStore: ObservableObject {
             self.petViewMode = .mini
             self.enableSuccessSound = true
             self.preset = .balanced
+            self.qualityMode = .balanced
+            self.customQuality = 80
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
@@ -269,13 +299,23 @@ final class ImagePetStore: ObservableObject {
             restoreOutputDirectory()
 
             if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
-                self.outputFormat = format
+                self.outputFormat = encoderCapabilities.writableFormats.contains(format) ? format : .original
             }
             if let savedPreset = defaults.string(forKey: presetKey), let preset = CompressionPreset(rawValue: savedPreset) {
                 self.preset = preset
+                self.qualityMode = CompressionQualityMode(preset: preset)
+            }
+            if let savedQualityMode = defaults.string(forKey: qualityModeKey), let mode = CompressionQualityMode(rawValue: savedQualityMode) {
+                self.qualityMode = mode
+            }
+            if defaults.object(forKey: customQualityKey) != nil {
+                self.customQuality = min(95, max(30, defaults.integer(forKey: customQualityKey)))
             }
             if let savedMode = defaults.string(forKey: saveLocationModeKey), let mode = SaveLocationMode(rawValue: savedMode) {
                 self.saveLocationMode = mode
+            }
+            if self.saveLocationMode == .overwrite {
+                self.outputFormat = .original
             }
             if let savedSuffix = defaults.string(forKey: filenameSuffixKey) {
                 self.filenameSuffix = OutputNameAllocator.sanitizedSuffix(savedSuffix)
@@ -325,11 +365,25 @@ final class ImagePetStore: ObservableObject {
         jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
     }
 
+    var availableOutputFormats: [OutputFormat] {
+        OutputFormat.allCases.filter { encoderCapabilities.writableFormats.contains($0) }
+    }
+
+    var qualitySummary: String {
+        guard outputFormat != .png else {
+            return "Lossless"
+        }
+        return qualityMode.compressionQuality(customQuality: customQuality).displayName
+    }
+
+    var effectiveLossyQuality: CompressionQuality? {
+        outputFormat == .png ? nil : qualityMode.compressionQuality(customQuality: customQuality)
+    }
+
     var filenamePreview: String {
         let dummyInput = URL(fileURLWithPath: "/tmp/photo.png")
-        let targetFormat = outputFormat
-        let targetUTType = targetFormat.targetUTType(for: dummyInput)
-        let targetExtension = targetUTType.preferredFilenameExtension ?? "png"
+        let targetFormat = encoderCapabilities.writableFormats.contains(outputFormat) ? outputFormat : .original
+        let targetExtension = targetFormat.targetExtension(for: dummyInput)
 
         let outputName = OutputNameAllocator.outputFileName(
             for: dummyInput,
@@ -475,7 +529,7 @@ final class ImagePetStore: ObservableObject {
         let newJobs = urls.map { url in
             let size = Self.fileSize(for: url)
 
-            guard SupportedImageFormat.isSupported(url) else {
+            guard SupportedImageFormat.isSupported(url, capabilities: encoderCapabilities) else {
                 return ImageJob(
                     inputURL: url,
                     originalSize: size,
@@ -887,13 +941,15 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func process(_ job: ImageJob, outputDirectory: URL?) async {
-        let options = CompressionOptions(
-            preset: preset,
+        let compressionOptions = CompressionOptions(
+            lossyQuality: effectiveLossyQuality,
             format: outputFormat,
-            locationMode: saveLocationMode,
-            suffix: OutputNameAllocator.sanitizedSuffix(filenameSuffix),
             maxDimension: maxDimension,
             stripMetadata: stripMetadata
+        )
+        let saveOptions = SaveOptions(
+            locationMode: saveLocationMode,
+            suffix: OutputNameAllocator.sanitizedSuffix(filenameSuffix)
         )
 
         var targetOutputDir = outputDirectory
@@ -920,7 +976,8 @@ final class ImagePetStore: ObservableObject {
             let result = try await compressor.compress(
                 inputURL: job.inputURL,
                 outputDirectory: targetOutputDir,
-                options: options
+                compressionOptions: compressionOptions,
+                saveOptions: saveOptions
             )
             updateJob(job.id) { updated in
                 updated.outputURL = result.outputURL
@@ -932,7 +989,7 @@ final class ImagePetStore: ObservableObject {
         } catch {
             let mapped = CompressionError.map(error)
             updateJob(job.id) { updated in
-                if mapped == .skipped {
+                if mapped.isSkippedResult {
                     updated.status = .skipped
                     updated.errorMessage = mapped.localizedDescription
                 } else {

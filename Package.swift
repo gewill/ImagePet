@@ -10,9 +10,15 @@ let package = Package(
     products: [
         .executable(name: "ImagePet", targets: ["ImagePet"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/ainame/Swift-WebP.git", exact: "0.6.1")
+    ],
     targets: [
         .target(
             name: "ImagePetCore",
+            dependencies: [
+                .product(name: "WebP", package: "Swift-WebP")
+            ],
             path: "Sources/ImagePetCore"
         ),
         .executableTarget(

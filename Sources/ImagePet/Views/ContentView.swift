@@ -183,22 +183,42 @@ private struct ControlsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 24) {
-                // Column 1: Quality Preset & Output Format
+                // Column 1: Quality & Output Format
                 VStack(alignment: .leading, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Quality Preset")
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Quality")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Picker("Quality", selection: $store.preset) {
-                            ForEach(CompressionPreset.allCases) { preset in
-                                Text(preset.displayName).tag(preset)
+                        Picker("Quality", selection: $store.qualityMode) {
+                            ForEach(CompressionQualityMode.allCases) { mode in
+                                Text(mode.displayName).tag(mode)
                             }
                         }
                         .pickerStyle(.segmented)
                         .labelsHidden()
-                        .frame(width: 250)
+                        .frame(width: 320)
                         .disabled(store.isProcessing || store.outputFormat == .png)
                         .accessibilityIdentifier("presetPicker")
+
+                        if store.qualityMode == .custom && store.outputFormat != .png {
+                            HStack(spacing: 10) {
+                                Text("Quality \(store.customQuality)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 70, alignment: .leading)
+                                Slider(
+                                    value: Binding(
+                                        get: { Double(store.customQuality) },
+                                        set: { store.customQuality = Int($0.rounded()) }
+                                    ),
+                                    in: 30...95,
+                                    step: 1
+                                )
+                                .disabled(store.isProcessing)
+                                .accessibilityIdentifier("customQualitySlider")
+                            }
+                            .frame(width: 320)
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -206,7 +226,7 @@ private struct ControlsView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Picker("Format", selection: $store.outputFormat) {
-                            ForEach(OutputFormat.allCases) { format in
+                            ForEach(store.availableOutputFormats) { format in
                                 Text(format.displayName).tag(format)
                             }
                         }
@@ -327,7 +347,11 @@ private struct ControlsView: View {
                     .accessibilityIdentifier("stripMetadataToggle")
 
                 if store.outputFormat == .png {
-                    Label("PNG is compressed losslessly", systemImage: "info.circle")
+                    Label("PNG uses lossless compression. Quality does not apply.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if store.outputFormat == .webp {
+                    Label("Best for web sharing. Static images only.", systemImage: "info.circle")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
@@ -531,7 +555,7 @@ private struct JobRowView: View {
         case .failed:
             return "Failed: \(job.errorMessage ?? "Unknown error")"
         case .skipped:
-            return "Skipped"
+            return job.errorMessage ?? "Skipped"
         }
     }
 
@@ -610,7 +634,7 @@ private struct SummaryView: View {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
                 Spacer()
             } else {
-                SummaryMetric(title: "Quality", value: store.preset.displayName)
+                SummaryMetric(title: "Quality", value: store.qualitySummary)
                 SummaryMetric(title: "Output", value: store.outputFormat.displayName)
                 Spacer()
             }

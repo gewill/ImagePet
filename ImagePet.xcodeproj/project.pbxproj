@@ -7,20 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03C392A927037DB8E056A0FD /* EncoderCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */; };
 		0E464296C36D0355ABEA5DF7 /* ImagePetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */; };
 		16C83F11840628567F5DF785 /* PerformanceAndRobustnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */; };
 		1C5E346C8DCC4094FE8C6689 /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */; };
+		1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
 		4282A30C6EA5B3712CFC00E2 /* SupportedImageFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */; };
 		468ABFAA6A7B08517772B948 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 6F8F586A1135EAED6910EB32 /* Resources */; };
 		48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */; };
+		4A7AA8FEB5D3A491903A1F11 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = C42098C3933CF7DD11C29203 /* WebP */; };
 		52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */; };
 		53882A231CD77781C8F98CB9 /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 		55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A0E344263EE215722E53D3 /* CompressionPreset.swift */; };
 		5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */; };
 		60E30EA5590352744B7ED864 /* ImageCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23678BFAD16795886D53796 /* ImageCompressor.swift */; };
 		63F9DEED2087EFB6448C2257 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C451AC6AE440D62C0D0FDE /* SoundManager.swift */; };
+		6B324BBFA0E653F3DA6EA87D /* SwiftWebPEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358A8E829CFFE85676AC8B9E /* SwiftWebPEngine.swift */; };
 		6B5F0F8C4B4B8BB4E3FF08A6 /* ImageJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E9A10CEBCF1D610F452175 /* ImageJob.swift */; };
 		762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */; };
 		77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F9729CED642EBCF472BAC1 /* ContentView.swift */; };
@@ -40,6 +44,7 @@
 		C8E26175B487C190A0025EE1 /* ImagePetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */; };
 		CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A93444765F4DF14ABA2386D /* PetAnimation.swift */; };
 		D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */; };
+		DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */; };
 		E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F8FC16873CD4ECB419915BB /* Assets.xcassets */; };
 		E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
@@ -107,6 +112,7 @@
 		2845AD061C173BB07CE9F82B /* DesktopPetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetView.swift; sourceTree = "<group>"; };
 		2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		2B48DF5E09E5C0639460FB28 /* ImagePet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImagePet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		358A8E829CFFE85676AC8B9E /* SwiftWebPEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftWebPEngine.swift; sourceTree = "<group>"; };
 		37C451AC6AE440D62C0D0FDE /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
 		3F8FC16873CD4ECB419915BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -116,6 +122,7 @@
 		45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocator.swift; sourceTree = "<group>"; };
 		463A9B12B098CEDA557F6100 /* CompressionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionError.swift; sourceTree = "<group>"; };
 		4C53A9B8C3C3EE992F654DA2 /* ImagePetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetStore.swift; sourceTree = "<group>"; };
+		4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptionsTests.swift; sourceTree = "<group>"; };
 		573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputNameAllocatorTests.swift; sourceTree = "<group>"; };
 		58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputDirectoryBookmarkStore.swift; sourceTree = "<group>"; };
 		5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetSnapshot.swift; sourceTree = "<group>"; };
@@ -128,6 +135,7 @@
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
 		9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteCatAssetGenerator.swift; sourceTree = "<group>"; };
+		A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncoderCapabilities.swift; sourceTree = "<group>"; };
 		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
 		B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormat.swift; sourceTree = "<group>"; };
@@ -135,6 +143,7 @@
 		CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ImagePetCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6E9A10CEBCF1D610F452175 /* ImageJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageJob.swift; sourceTree = "<group>"; };
 		ED2484081B356D0CD0BAE4CD /* ImagePetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImagePetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncoderCapabilitiesTests.swift; sourceTree = "<group>"; };
 		EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetUITests.swift; sourceTree = "<group>"; };
 		EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressorTests.swift; sourceTree = "<group>"; };
 		F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetApp.swift; sourceTree = "<group>"; };
@@ -142,6 +151,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		03BA756178C70E4432497831 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A7AA8FEB5D3A491903A1F11 /* WebP in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2AD58D0CC39E93776CE0617E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -248,8 +265,10 @@
 			isa = PBXGroup;
 			children = (
 				6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */,
+				4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */,
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
 				9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */,
+				ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
 				14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */,
 				573D57B84F436BE0A6F177BD /* OutputNameAllocatorTests.swift */,
@@ -303,9 +322,11 @@
 			isa = PBXGroup;
 			children = (
 				463A9B12B098CEDA557F6100 /* CompressionError.swift */,
+				A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */,
 				F23678BFAD16795886D53796 /* ImageCompressor.swift */,
 				45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */,
 				B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */,
+				358A8E829CFFE85676AC8B9E /* SwiftWebPEngine.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -366,6 +387,7 @@
 			buildConfigurationList = 400D66706E4FDFEE9DF4F658 /* Build configuration list for PBXNativeTarget "ImagePetCore" */;
 			buildPhases = (
 				CBD27EA55B95DB68E0633673 /* Sources */,
+				03BA756178C70E4432497831 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -373,6 +395,7 @@
 			);
 			name = ImagePetCore;
 			packageProductDependencies = (
+				C42098C3933CF7DD11C29203 /* WebP */,
 			);
 			productName = ImagePetCore;
 			productReference = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */;
@@ -424,6 +447,9 @@
 			);
 			mainGroup = AFF2F82BF755A7D70C44220A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 39565793E5514708B2479035 /* Products */;
 			projectDirPath = "";
@@ -477,8 +503,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				89B7A985CBCE01645C7BB27C /* AppleFixtureCompressionTests.swift in Sources */,
+				1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */,
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
 				F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */,
+				DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,
 				8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */,
 				1CA704F2C0B05C7385EF4124 /* OutputNameAllocatorTests.swift in Sources */,
@@ -505,10 +533,12 @@
 				98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */,
 				55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */,
 				B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */,
+				03C392A927037DB8E056A0FD /* EncoderCapabilities.swift in Sources */,
 				60E30EA5590352744B7ED864 /* ImageCompressor.swift in Sources */,
 				6B5F0F8C4B4B8BB4E3FF08A6 /* ImageJob.swift in Sources */,
 				84DF67E7F26FB52ADF4008D2 /* OutputNameAllocator.swift in Sources */,
 				20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */,
+				6B324BBFA0E653F3DA6EA87D /* SwiftWebPEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -857,6 +887,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ainame/Swift-WebP.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.6.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C42098C3933CF7DD11C29203 /* WebP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */;
+			productName = WebP;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2F45178F0BC925D3EDD35424 /* Project object */;
 }

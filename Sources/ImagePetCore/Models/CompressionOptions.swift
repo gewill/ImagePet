@@ -7,6 +7,7 @@ public enum OutputFormat: String, CaseIterable, Identifiable, Codable, Sendable 
     case jpeg
     case png
     case heic
+    case webp
     
     public var id: String { rawValue }
     
@@ -16,6 +17,7 @@ public enum OutputFormat: String, CaseIterable, Identifiable, Codable, Sendable 
         case .jpeg: return "JPEG"
         case .png: return "PNG"
         case .heic: return "HEIC"
+        case .webp: return "WebP"
         }
     }
     
@@ -29,8 +31,30 @@ public enum OutputFormat: String, CaseIterable, Identifiable, Codable, Sendable 
             return .png
         case .heic:
             return .heic
+        case .webp:
+            return .imagePetWebP
         }
     }
+
+    public func targetExtension(for inputURL: URL) -> String {
+        switch self {
+        case .original:
+            return SupportedImageFormat.format(for: inputURL)?.preferredFilenameExtension
+                ?? inputURL.pathExtension.lowercased()
+        case .jpeg:
+            return "jpg"
+        case .png:
+            return "png"
+        case .heic:
+            return "heic"
+        case .webp:
+            return "webp"
+        }
+    }
+}
+
+public extension UTType {
+    static let imagePetWebP = UTType(filenameExtension: "webp") ?? UTType(exportedAs: "org.webmproject.webp")
 }
 
 /// The mode for where the output file should be written.
@@ -78,28 +102,43 @@ public enum MaxDimensionLimit: String, CaseIterable, Identifiable, Codable, Send
     }
 }
 
-/// Complete configuration options passed to the compressor.
+public enum OverwritePolicy: String, Codable, Sendable {
+    case replaceOriginalKeepingFormat
+}
+
+/// Encoding and transform options passed to the compressor.
 public struct CompressionOptions: Sendable, Equatable, Codable {
-    public let preset: CompressionPreset
+    public let lossyQuality: CompressionQuality?
     public let format: OutputFormat
-    public let locationMode: SaveLocationMode
-    public let suffix: String
     public let maxDimension: MaxDimensionLimit
     public let stripMetadata: Bool
     
     public init(
-        preset: CompressionPreset = .balanced,
+        lossyQuality: CompressionQuality? = .preset(.balanced),
         format: OutputFormat = .original,
-        locationMode: SaveLocationMode = .designated,
-        suffix: String = "_compressed",
         maxDimension: MaxDimensionLimit = .none,
         stripMetadata: Bool = true
     ) {
-        self.preset = preset
         self.format = format
-        self.locationMode = locationMode
-        self.suffix = suffix
+        self.lossyQuality = format == .png ? nil : lossyQuality
         self.maxDimension = maxDimension
         self.stripMetadata = stripMetadata
+    }
+}
+
+/// Filesystem save behavior kept outside encoder options.
+public struct SaveOptions: Sendable, Equatable, Codable {
+    public let locationMode: SaveLocationMode
+    public let suffix: String
+    public let overwritePolicy: OverwritePolicy
+
+    public init(
+        locationMode: SaveLocationMode = .designated,
+        suffix: String = "_compressed",
+        overwritePolicy: OverwritePolicy = .replaceOriginalKeepingFormat
+    ) {
+        self.locationMode = locationMode
+        self.suffix = suffix
+        self.overwritePolicy = overwritePolicy
     }
 }

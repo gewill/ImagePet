@@ -49,7 +49,7 @@ enum InputFilePanel {
 
         let panel = NSOpenPanel()
         panel.title = "Add Images"
-        panel.message = "Choose JPG, PNG, or HEIC images to compress."
+        panel.message = "Choose JPG, PNG, HEIC, or WebP images to compress."
         panel.prompt = "Add Images"
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
