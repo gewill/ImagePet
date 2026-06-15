@@ -46,6 +46,7 @@
 		945441063EAA477DEC0D9363 /* CompressionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463A9B12B098CEDA557F6100 /* CompressionError.swift */; };
 		98263452B4D6B87F8124F1C9 /* CompressionOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA1F52BCC2EADB3678E8CC /* CompressionOptions.swift */; };
 		98E3A9EE00DCE60CAC8E9226 /* FolderWatchingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63122AAD9F56829BED8AD2B /* FolderWatchingSection.swift */; };
+		9BD9669BB632736925B748F2 /* ShortcutsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDE7C87B4DA93B9D2470D4B /* ShortcutsIntent.swift */; };
 		9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426BA951424DECEFB023D3A9 /* FrameAnimator.swift */; };
 		A398F56170D6E35B9EA6B3BB /* GlobalShortcutCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4694488B654E7D1FED3A6E8E /* GlobalShortcutCoordinator.swift */; };
 		A7B37423809D305446A9183B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF65F5E10809D82C7FDDF5 /* main.swift */; };
@@ -158,7 +159,7 @@
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
-		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
@@ -167,6 +168,7 @@
 		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
 		AD4485EE348B2FF15115C4B1 /* FolderWatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatchManager.swift; sourceTree = "<group>"; };
+		AEDE7C87B4DA93B9D2470D4B /* ShortcutsIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsIntent.swift; sourceTree = "<group>"; };
 		B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormat.swift; sourceTree = "<group>"; };
 		B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputFolderPanel.swift; sourceTree = "<group>"; };
 		CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ImagePetCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -301,6 +303,7 @@
 				238810C4DF3FE71683DC9479 /* InputFilePanel.swift */,
 				58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */,
 				B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */,
+				AEDE7C87B4DA93B9D2470D4B /* ShortcutsIntent.swift */,
 				2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */,
 				17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */,
 			);
@@ -588,6 +591,7 @@
 				D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */,
 				762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */,
 				CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */,
+				9BD9669BB632736925B748F2 /* ShortcutsIntent.swift in Sources */,
 				48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */,
 				E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */,
 			);
@@ -813,14 +817,18 @@
 		479AE49C24755A1B01872EB5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RLK76T8Y89;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.imagepet;
+				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.ImagePetCLI;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -884,14 +892,18 @@
 		6F3E5A1E53B9CBAADE4D5B24 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = RLK76T8Y89;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.imagepet;
+				PRODUCT_BUNDLE_IDENTIFIER = org.gewill.ImagePetCLI;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Release;

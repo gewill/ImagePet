@@ -78,6 +78,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePet
         CODE_SIGN_ENTITLEMENTS: Entitlements/ImagePet.entitlements
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: RLK76T8Y89
         ENABLE_APP_SANDBOX: YES
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -117,8 +118,12 @@ targets:
         product: ArgumentParser
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.gewill.imagepet
+        PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetCLI
+        CODE_SIGN_IDENTITY: Apple Development
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: RLK76T8Y89
         GENERATE_INFOPLIST_FILE: YES
+        PROVISIONING_PROFILE_SPECIFIER: ""
         LD_RUNPATH_SEARCH_PATHS:
           - $(inherited)
           - "@executable_path"

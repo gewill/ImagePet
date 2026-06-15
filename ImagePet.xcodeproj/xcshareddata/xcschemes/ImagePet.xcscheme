@@ -29,6 +29,20 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A019B6FD0C3FEEB5D17CC971"
+               BuildableName = "ImagePetCLI"
+               BlueprintName = "ImagePetCLI"
+               ReferencedContainer = "container:ImagePet.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "CC40E5DDAFA5E6B0AC3C2D1D"
                BuildableName = "ImagePetTests.xctest"
                BlueprintName = "ImagePetTests"
@@ -46,20 +60,6 @@
                BlueprintIdentifier = "641A748387C30D9499A89C26"
                BuildableName = "ImagePetUITests.xctest"
                BlueprintName = "ImagePetUITests"
-               ReferencedContainer = "container:ImagePet.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A019B6FD0C3FEEB5D17CC971"
-               BuildableName = "ImagePetCLI"
-               BlueprintName = "ImagePetCLI"
                ReferencedContainer = "container:ImagePet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
