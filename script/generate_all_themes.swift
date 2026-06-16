@@ -136,78 +136,78 @@ func poseFor(animation: String, frameIndex: Int, totalFrames: Int) -> Pose {
 
     switch animation {
     case "idle":
-        pose.bodyScaleY = 1 + 0.025 * wave
-        pose.bodyScaleX = 1 - 0.012 * wave
-        pose.bodyOffsetY = -1.5 * wave
-        pose.headOffsetY = -0.7 * wave
-        pose.tailAngle = 0.18 * cos(t * 2 * .pi)
+        pose.bodyScaleY = 1 + 0.05 * wave
+        pose.bodyScaleX = 1 - 0.025 * wave
+        pose.bodyOffsetY = -3.0 * wave
+        pose.headOffsetY = -1.5 * wave
+        pose.tailAngle = 0.35 * cos(t * 2 * .pi)
         pose.eyeStyle = frameIndex == 4 ? .blink : .normal
     case "dragHover":
-        pose.bodyScaleX = 1.05
-        pose.bodyScaleY = 0.97
-        pose.headOffsetX = 3
-        pose.headOffsetY = -4
-        pose.tailAngle = 0.42 + 0.1 * wave
-        pose.mouthOpen = 8 + 1.5 * max(0, wave)
-        pose.pawLift = 8
+        pose.bodyScaleX = 1.12
+        pose.bodyScaleY = 0.88
+        pose.headOffsetX = 6
+        pose.headOffsetY = -8
+        pose.tailAngle = 0.6 + 0.25 * wave
+        pose.mouthOpen = 14 + 3.5 * max(0, wave)
+        pose.pawLift = 12
         pose.eyeStyle = .lookUp
         pose.showImageSnack = true
     case "eating":
-        pose.bodyOffsetY = -1.5 * fastWave
-        pose.bodyScaleX = 1 + 0.025 * fastWave
-        pose.bodyScaleY = 1 - 0.02 * fastWave
-        pose.headOffsetX = 2
-        pose.mouthOpen = 5 + 4 * max(0, fastWave)
-        pose.cheekPuff = 2 + 1.5 * max(0, fastWave)
-        pose.tailAngle = 0.25 * cos(t * 4 * .pi)
+        pose.bodyOffsetY = -3.5 * fastWave
+        pose.bodyScaleX = 1 + 0.05 * fastWave
+        pose.bodyScaleY = 1 - 0.04 * fastWave
+        pose.headOffsetX = 3.5
+        pose.mouthOpen = 8 + 7 * max(0, fastWave)
+        pose.cheekPuff = 4 + 2.5 * max(0, fastWave)
+        pose.tailAngle = 0.45 * cos(t * 4 * .pi)
         pose.eyeStyle = .content
         pose.showCrumbs = true
     case "done":
-        let jump = -22 * sin(t * .pi)
+        let jump = -36 * sin(t * .pi)
         pose.bodyOffsetY = jump
-        pose.headOffsetY = jump * 0.18
-        pose.bodyScaleX = 1 + 0.05 * sin(t * .pi)
-        pose.bodyScaleY = 1 - 0.04 * sin(t * .pi)
-        pose.tailAngle = 0.55 * sin(t * 2 * .pi) + 0.3
+        pose.headOffsetY = jump * 0.22
+        pose.bodyScaleX = 1 + 0.12 * sin(t * .pi)
+        pose.bodyScaleY = 1 - 0.09 * sin(t * .pi)
+        pose.tailAngle = 0.85 * sin(t * 2 * .pi) + 0.4
         pose.eyeStyle = .happy
         pose.showBlush = true
         pose.showConfetti = frameIndex > 1 && frameIndex < totalFrames - 1
     case "issues":
-        pose.headRotation = -0.16 + 0.04 * wave
-        pose.headOffsetX = -2
-        pose.tailAngle = -0.25 + 0.06 * wave
+        pose.headRotation = -0.24 + 0.06 * wave
+        pose.headOffsetX = -4
+        pose.tailAngle = -0.4 + 0.1 * wave
         pose.eyeStyle = frameIndex.isMultiple(of: 2) ? .worried : .dizzy
         pose.showSweat = true
         pose.showQuestion = true
     case "stretch":
         let stretch = sin(t * .pi)
-        pose.bodyScaleX = 1 + 0.16 * stretch
-        pose.bodyScaleY = 1 - 0.13 * stretch
-        pose.headOffsetY = 4 * stretch
-        pose.headRotation = -0.06 * stretch
-        pose.tailAngle = 0.65 * stretch
-        pose.pawLift = -5 * stretch
+        pose.bodyScaleX = 1 + 0.26 * stretch
+        pose.bodyScaleY = 1 - 0.20 * stretch
+        pose.headOffsetY = 6 * stretch
+        pose.headRotation = -0.12 * stretch
+        pose.tailAngle = 0.9 * stretch
+        pose.pawLift = -8 * stretch
         pose.eyeStyle = .sleepy
     case "yawn":
         let open = sin(t * .pi)
-        pose.bodyScaleY = 0.96 + 0.03 * wave
-        pose.headOffsetY = 2 * wave
-        pose.earDroop = 5 * open
-        pose.mouthOpen = 13 * open
-        pose.tailAngle = 0.12 * wave
+        pose.bodyScaleY = 0.94 + 0.05 * wave
+        pose.headOffsetY = 3.5 * wave
+        pose.earDroop = 8 * open
+        pose.mouthOpen = 18 * open
+        pose.tailAngle = 0.2 * wave
         pose.eyeStyle = .sleepy
     case "petting":
-        pose.bodyScaleY = 1 + 0.02 * fastWave
-        pose.headOffsetY = -1
-        pose.tailAngle = 0.55 * sin(t * 4 * .pi)
+        pose.bodyScaleY = 1 + 0.04 * fastWave
+        pose.headOffsetY = -2
+        pose.tailAngle = 0.85 * sin(t * 4 * .pi)
         pose.eyeStyle = .content
         pose.showBlush = true
         pose.showHeart = frameIndex > 1
     case "sleep":
-        pose.bodyScaleY = 1 + 0.018 * wave
-        pose.bodyScaleX = 1 - 0.009 * wave
-        pose.headOffsetY = 1.2 * wave
-        pose.tailAngle = 0.08 * wave
+        pose.bodyScaleY = 1 + 0.035 * wave
+        pose.bodyScaleX = 1 - 0.018 * wave
+        pose.headOffsetY = 2.2 * wave
+        pose.tailAngle = 0.15 * wave
         pose.eyeStyle = .sleepy
         pose.showSleepMarks = true
     default:
@@ -298,6 +298,43 @@ func drawSlime(in context: CGContext, pose: Pose, themeName: String, frameIndex:
     context.setLineWidth(4.5)
     context.drawPath(using: .fillStroke)
 
+    // Glossy reflection highlight on the top left
+    drawEllipse(in: context, rect: CGRect(x: -34, y: -26, width: 18, height: 9), fill: cgColor(1, 1, 1, 0.42), stroke: nil, lineWidth: 0)
+
+    // Draw a cute green sprout on top of slime head
+    context.saveGState()
+    context.translateBy(x: 0, y: -44)
+    
+    let leafColor = cgColor(0.40, 0.80, 0.20, 1.0)
+    let leafOutline = cgColor(0.12, 0.35, 0.08, 1.0)
+    
+    // Stem
+    context.beginPath()
+    context.move(to: CGPoint(x: 0, y: 2))
+    context.addQuadCurve(to: CGPoint(x: -2, y: -10), control: CGPoint(x: -1, y: -4))
+    context.setStrokeColor(leafOutline)
+    context.setLineWidth(3.0)
+    context.setLineCap(.round)
+    context.strokePath()
+    
+    // Left leaf
+    let leftLeaf = CGMutablePath()
+    leftLeaf.move(to: CGPoint(x: -2, y: -10))
+    leftLeaf.addQuadCurve(to: CGPoint(x: -14, y: -15), control: CGPoint(x: -11, y: -9))
+    leftLeaf.addQuadCurve(to: CGPoint(x: -2, y: -10), control: CGPoint(x: -6, y: -17))
+    leftLeaf.closeSubpath()
+    drawPath(in: context, path: leftLeaf, fill: leafColor, stroke: leafOutline, lineWidth: 2.2)
+    
+    // Right leaf
+    let rightLeaf = CGMutablePath()
+    rightLeaf.move(to: CGPoint(x: -2, y: -10))
+    rightLeaf.addQuadCurve(to: CGPoint(x: 10, y: -13), control: CGPoint(x: 8, y: -7))
+    rightLeaf.addQuadCurve(to: CGPoint(x: -2, y: -10), control: CGPoint(x: 4, y: -15))
+    rightLeaf.closeSubpath()
+    drawPath(in: context, path: rightLeaf, fill: leafColor, stroke: leafOutline, lineWidth: 2.2)
+    
+    context.restoreGState() // Sprout
+
     // Draw Face directly on Slime Body
     context.saveGState()
     context.translateBy(x: pose.headOffsetX, y: pose.headOffsetY + 8)
@@ -309,6 +346,10 @@ func drawSlime(in context: CGContext, pose: Pose, themeName: String, frameIndex:
     if pose.showBlush {
         drawEllipse(in: context, rect: CGRect(x: -32, y: 2, width: 12, height: 7), fill: blush, stroke: nil, lineWidth: 0)
         drawEllipse(in: context, rect: CGRect(x: 20, y: 2, width: 12, height: 7), fill: blush, stroke: nil, lineWidth: 0)
+    } else {
+        let faintBlush = blush.copy(alpha: blush.alpha * 0.45)!
+        drawEllipse(in: context, rect: CGRect(x: -31, y: 2, width: 10, height: 6), fill: faintBlush, stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: 21, y: 2, width: 10, height: 6), fill: faintBlush, stroke: nil, lineWidth: 0)
     }
 
     context.restoreGState() // Face
@@ -400,8 +441,8 @@ func drawBody(in context: CGContext, fill: CGColor, stroke: CGColor, cream: CGCo
     context.saveGState()
     context.translateBy(x: 124, y: 157)
     context.scaleBy(x: pose.bodyScaleX, y: pose.bodyScaleY)
-    drawEllipse(in: context, rect: CGRect(x: -46, y: -42, width: 92, height: 82), fill: fill, stroke: stroke, lineWidth: 3.5)
-    drawEllipse(in: context, rect: CGRect(x: -29, y: -18, width: 58, height: 43), fill: cream, stroke: nil, lineWidth: 0)
+    drawEllipse(in: context, rect: CGRect(x: -43, y: -38, width: 86, height: 76), fill: fill, stroke: stroke, lineWidth: 3.5)
+    drawEllipse(in: context, rect: CGRect(x: -27, y: -17, width: 54, height: 40), fill: cream, stroke: nil, lineWidth: 0)
     context.restoreGState()
 }
 
@@ -431,21 +472,21 @@ func drawHead(
 
     if isShiba {
         // Shiba triangle ears
-        drawShibaEar(in: context, baseX: -32, baseY: -24, tipX: -40, tipY: -56 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
-        drawShibaEar(in: context, baseX: 26, baseY: -24, tipX: 34, tipY: -54 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
+        drawShibaEar(in: context, baseX: -35, baseY: -24, tipX: -44, tipY: -58 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
+        drawShibaEar(in: context, baseX: 29, baseY: -24, tipX: 38, tipY: -56 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
     } else {
         // Cat curved ears
-        drawEar(in: context, baseX: -31, baseY: -24, tipX: -42, tipY: -58 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
-        drawEar(in: context, baseX: 28, baseY: -24, tipX: 46, tipY: -56 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
+        drawEar(in: context, baseX: -34, baseY: -24, tipX: -46, tipY: -60 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
+        drawEar(in: context, baseX: 31, baseY: -24, tipX: 50, tipY: -58 + pose.earDroop, fill: fill, stroke: stroke, inner: innerEar)
     }
 
-    drawRoundedRect(in: context, rect: CGRect(x: -47, y: -34, width: 94, height: 68), radius: 24, fill: fill, stroke: stroke, lineWidth: 3.5)
+    drawRoundedRect(in: context, rect: CGRect(x: -52, y: -37, width: 104, height: 74), radius: 26, fill: fill, stroke: stroke, lineWidth: 3.5)
     
     if isShiba {
         // Draw white snout for shiba
-        drawEllipse(in: context, rect: CGRect(x: -16, y: 3, width: 32, height: 21), fill: cream, stroke: stroke, lineWidth: 2)
+        drawEllipse(in: context, rect: CGRect(x: -18, y: 3, width: 36, height: 23), fill: cream, stroke: stroke, lineWidth: 2)
     } else {
-        drawEllipse(in: context, rect: CGRect(x: -22, y: 8, width: 44, height: 24), fill: cgColor(1, 0.76, 0.42, 0.35), stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: -24, y: 8, width: 48, height: 26), fill: cgColor(1, 0.76, 0.42, 0.35), stroke: nil, lineWidth: 0)
     }
 
     drawFace(in: context, pose: pose, dark: dark, cream: cream, blush: blush, isShiba: isShiba)
@@ -518,14 +559,18 @@ func drawFace(in context: CGContext, pose: Pose, dark: CGColor, cream: CGColor, 
     }
 
     if pose.showBlush {
-        drawEllipse(in: context, rect: CGRect(x: -36, y: 3, width: 13, height: 8), fill: blush, stroke: nil, lineWidth: 0)
-        drawEllipse(in: context, rect: CGRect(x: 22, y: 3, width: 13, height: 8), fill: blush, stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: -38, y: 3, width: 14, height: 9), fill: blush, stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: 24, y: 3, width: 14, height: 9), fill: blush, stroke: nil, lineWidth: 0)
+    } else {
+        let faintBlush = blush.copy(alpha: blush.alpha * 0.45)!
+        drawEllipse(in: context, rect: CGRect(x: -37, y: 3, width: 12, height: 7), fill: faintBlush, stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: 25, y: 3, width: 12, height: 7), fill: faintBlush, stroke: nil, lineWidth: 0)
     }
 }
 
 func drawEyes(in context: CGContext, style: EyeStyle, dark: CGColor, cream: CGColor) {
-    let left = CGPoint(x: -19, y: -7)
-    let right = CGPoint(x: 16, y: -7)
+    let left = CGPoint(x: -21, y: -7)
+    let right = CGPoint(x: 18, y: -7)
 
     context.setLineCap(.round)
     context.setLineJoin(.round)
@@ -535,11 +580,11 @@ func drawEyes(in context: CGContext, style: EyeStyle, dark: CGColor, cream: CGCo
 
     switch style {
     case .normal:
-        drawEyeDot(in: context, center: left, cream: cream)
-        drawEyeDot(in: context, center: right, cream: cream)
+        drawEyeDot(in: context, center: left, cream: cream, dark: dark)
+        drawEyeDot(in: context, center: right, cream: cream, dark: dark)
     case .lookUp:
-        drawEyeDot(in: context, center: CGPoint(x: left.x, y: left.y - 3), cream: cream)
-        drawEyeDot(in: context, center: CGPoint(x: right.x, y: right.y - 3), cream: cream)
+        drawEyeDot(in: context, center: CGPoint(x: left.x, y: left.y - 3), cream: cream, dark: dark)
+        drawEyeDot(in: context, center: CGPoint(x: right.x, y: right.y - 3), cream: cream, dark: dark)
     case .blink:
         drawArcEye(in: context, center: left, happy: false)
         drawArcEye(in: context, center: right, happy: false)
@@ -550,13 +595,13 @@ func drawEyes(in context: CGContext, style: EyeStyle, dark: CGColor, cream: CGCo
         drawClosedEye(in: context, center: left)
         drawClosedEye(in: context, center: right)
     case .worried:
-        drawEyeDot(in: context, center: left, cream: cream)
-        drawEyeDot(in: context, center: right, cream: cream)
+        drawEyeDot(in: context, center: left, cream: cream, dark: dark)
+        drawEyeDot(in: context, center: right, cream: cream, dark: dark)
         context.beginPath()
-        context.move(to: CGPoint(x: -26, y: -17))
-        context.addLine(to: CGPoint(x: -14, y: -20))
-        context.move(to: CGPoint(x: 10, y: -20))
-        context.addLine(to: CGPoint(x: 24, y: -16))
+        context.move(to: CGPoint(x: -28, y: -17))
+        context.addLine(to: CGPoint(x: -16, y: -20))
+        context.move(to: CGPoint(x: 12, y: -20))
+        context.addLine(to: CGPoint(x: 26, y: -16))
         context.strokePath()
     case .dizzy:
         drawCrossEye(in: context, center: left)
@@ -564,11 +609,12 @@ func drawEyes(in context: CGContext, style: EyeStyle, dark: CGColor, cream: CGCo
     }
 }
 
-func drawEyeDot(in context: CGContext, center: CGPoint, cream: CGColor) {
-    context.fillEllipse(in: CGRect(x: center.x - 5, y: center.y - 5, width: 10, height: 10))
+func drawEyeDot(in context: CGContext, center: CGPoint, cream: CGColor, dark: CGColor) {
+    context.setFillColor(dark)
+    context.fillEllipse(in: CGRect(x: center.x - 6.5, y: center.y - 6.5, width: 13, height: 13))
     context.setFillColor(cream)
-    context.fillEllipse(in: CGRect(x: center.x - 2, y: center.y - 3, width: 3.2, height: 3.2))
-    context.setFillColor(cgColor(0.22, 0.16, 0.12, 1))
+    context.fillEllipse(in: CGRect(x: center.x - 3.5, y: center.y - 4.5, width: 4.5, height: 4.5))
+    context.setFillColor(dark)
 }
 
 func drawArcEye(in context: CGContext, center: CGPoint, happy: Bool) {
