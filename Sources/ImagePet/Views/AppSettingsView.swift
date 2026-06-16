@@ -123,6 +123,14 @@ private struct DesktopPetSection: View {
                             .accessibilityIdentifier("themeCard_ShibaInu")
 
                             SettingsThemeCard(
+                                name: "Mochi Bunny",
+                                description: "A gentle bunny with mint scarf.",
+                                themeName: "MochiBunny",
+                                selectedTheme: $store.selectedThemeName
+                            )
+                            .accessibilityIdentifier("themeCard_MochiBunny")
+
+                            SettingsThemeCard(
                                 name: "Cute Cat",
                                 description: "A playful, hand-drawn kitty.",
                                 themeName: "CuteCat",

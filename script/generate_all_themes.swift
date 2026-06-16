@@ -89,10 +89,11 @@ enum AssetError: Error {
     case contextCreationFailed
     case imageCreationFailed
     case pngEncodingFailed
+    case unknownTheme(String)
 }
 
 func renderFrame(themeName: String, animation: String, frameIndex: Int, totalFrames: Int) throws -> CGImage {
-    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
     let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
 
     guard let context = CGContext(
@@ -118,6 +119,8 @@ func renderFrame(themeName: String, animation: String, frameIndex: Int, totalFra
     
     if themeName == "PixelSlime" {
         drawSlime(in: context, pose: pose, themeName: themeName, frameIndex: frameIndex)
+    } else if themeName == "MochiBunny" {
+        drawBunny(in: context, pose: pose, frameIndex: frameIndex)
     } else {
         drawCatOrShiba(in: context, pose: pose, themeName: themeName, frameIndex: frameIndex)
     }
@@ -237,7 +240,7 @@ func drawCatOrShiba(in context: CGContext, pose: Pose, themeName: String, frameI
     }
 
     context.saveGState()
-    context.translateBy(x: 0, y: pose.bodyOffsetY)
+    context.translateBy(x: 0, y: pose.bodyOffsetY + 8)
 
     drawShadow(in: context)
     drawTail(in: context, fill: fur, stroke: outline, angle: pose.tailAngle, isShiba: themeName == "ShibaInu")
@@ -378,6 +381,196 @@ func drawSlime(in context: CGContext, pose: Pose, themeName: String, frameIndex:
     }
 
     context.restoreGState()
+}
+
+func drawBunny(in context: CGContext, pose: Pose, frameIndex: Int) {
+    let fur = cgColor(0.98, 0.92, 0.84, 1.0)
+    let furLight = cgColor(1.0, 0.97, 0.91, 1.0)
+    let outline = cgColor(0.36, 0.26, 0.20, 1.0)
+    let innerEar = cgColor(1.0, 0.66, 0.70, 1.0)
+    let dark = cgColor(0.24, 0.18, 0.15, 1.0)
+    let blush = cgColor(1.0, 0.50, 0.58, 0.58)
+    let blue = cgColor(0.20, 0.55, 1.0, 0.9)
+    let warning = cgColor(0.95, 0.24, 0.18, 0.9)
+    let mint = cgColor(0.56, 0.83, 0.70, 1.0)
+    let mintDark = cgColor(0.18, 0.47, 0.37, 1.0)
+
+    context.saveGState()
+    context.translateBy(x: 0, y: pose.bodyOffsetY)
+
+    drawShadow(in: context)
+    drawBunnyTail(in: context, fill: furLight, stroke: outline, wobble: pose.tailAngle)
+    drawBunnyEars(in: context, pose: pose, fill: fur, stroke: outline, inner: innerEar)
+    drawBunnyBackPaws(in: context, fill: furLight, stroke: outline)
+    drawBunnyBody(in: context, fill: fur, stroke: outline, cream: furLight, pose: pose)
+    drawBunnyFrontPaws(in: context, fill: furLight, stroke: outline, lift: pose.pawLift)
+    drawBunnyHead(in: context, pose: pose, fill: fur, stroke: outline, innerEar: innerEar, dark: dark, blush: blush)
+    drawBunnyScarf(in: context, fill: mint, stroke: mintDark)
+
+    if pose.showImageSnack {
+        drawImageSnack(in: context, x: 180, y: 120, rotation: -0.12)
+    }
+    if pose.showCrumbs {
+        drawCrumbs(in: context, frameIndex: frameIndex)
+    }
+    if pose.showConfetti {
+        drawConfetti(in: context, frameIndex: frameIndex)
+    }
+    if pose.showSweat {
+        drawSweat(in: context, color: blue)
+    }
+    if pose.showQuestion {
+        drawQuestionBubble(in: context, color: warning)
+    }
+    if pose.showHeart {
+        drawHeart(in: context)
+    }
+    if pose.showSleepMarks {
+        drawSleepMarks(in: context)
+    }
+
+    context.restoreGState()
+}
+
+func drawBunnyEars(in context: CGContext, pose: Pose, fill: CGColor, stroke: CGColor, inner: CGColor) {
+    let headCenter = CGPoint(x: 130 + pose.headOffsetX, y: 126 + pose.headOffsetY)
+    drawBunnyEar(
+        in: context,
+        center: CGPoint(x: headCenter.x - 25, y: headCenter.y - 30 + pose.earDroop * 0.35),
+        tilt: -0.30 + pose.tailAngle * 0.10 + pose.headRotation * 0.5,
+        fill: fill,
+        stroke: stroke,
+        inner: inner
+    )
+    drawBunnyEar(
+        in: context,
+        center: CGPoint(x: headCenter.x + 27, y: headCenter.y - 30 + pose.earDroop * 0.45),
+        tilt: 0.26 + pose.tailAngle * 0.08 + pose.headRotation * 0.5,
+        fill: fill,
+        stroke: stroke,
+        inner: inner
+    )
+}
+
+func drawBunnyEar(in context: CGContext, center: CGPoint, tilt: CGFloat, fill: CGColor, stroke: CGColor, inner: CGColor) {
+    context.saveGState()
+    context.translateBy(x: center.x, y: center.y)
+    context.rotate(by: tilt)
+
+    let outer = CGPath(roundedRect: CGRect(x: -12, y: -48, width: 24, height: 66), cornerWidth: 13, cornerHeight: 18, transform: nil)
+    drawPath(in: context, path: outer, fill: fill, stroke: stroke, lineWidth: 3.5)
+
+    let innerPath = CGPath(roundedRect: CGRect(x: -6, y: -38, width: 12, height: 45), cornerWidth: 7, cornerHeight: 12, transform: nil)
+    drawPath(in: context, path: innerPath, fill: inner.copy(alpha: 0.86)!, stroke: nil, lineWidth: 0)
+    context.restoreGState()
+}
+
+func drawBunnyTail(in context: CGContext, fill: CGColor, stroke: CGColor, wobble: CGFloat) {
+    let offset = 2.8 * sin(wobble)
+    drawEllipse(in: context, rect: CGRect(x: 172 + offset, y: 158 - offset * 0.4, width: 26, height: 25), fill: fill, stroke: stroke, lineWidth: 3)
+    drawEllipse(in: context, rect: CGRect(x: 181 + offset, y: 163 - offset * 0.4, width: 8, height: 7), fill: cgColor(1, 1, 1, 0.45), stroke: nil, lineWidth: 0)
+}
+
+func drawBunnyBackPaws(in context: CGContext, fill: CGColor, stroke: CGColor) {
+    drawEllipse(in: context, rect: CGRect(x: 77, y: 192, width: 34, height: 19), fill: fill, stroke: stroke, lineWidth: 3)
+    drawEllipse(in: context, rect: CGRect(x: 146, y: 192, width: 35, height: 19), fill: fill, stroke: stroke, lineWidth: 3)
+    context.setStrokeColor(stroke.copy(alpha: 0.45)!)
+    context.setLineWidth(1.3)
+    context.beginPath()
+    context.move(to: CGPoint(x: 91, y: 198))
+    context.addLine(to: CGPoint(x: 91, y: 204))
+    context.move(to: CGPoint(x: 162, y: 198))
+    context.addLine(to: CGPoint(x: 162, y: 204))
+    context.strokePath()
+}
+
+func drawBunnyBody(in context: CGContext, fill: CGColor, stroke: CGColor, cream: CGColor, pose: Pose) {
+    context.saveGState()
+    context.translateBy(x: 128, y: 164)
+    context.scaleBy(x: pose.bodyScaleX * 0.98, y: pose.bodyScaleY)
+    drawEllipse(in: context, rect: CGRect(x: -43, y: -40, width: 86, height: 80), fill: fill, stroke: stroke, lineWidth: 3.5)
+    drawEllipse(in: context, rect: CGRect(x: -25, y: -16, width: 50, height: 42), fill: cream, stroke: nil, lineWidth: 0)
+    context.restoreGState()
+}
+
+func drawBunnyFrontPaws(in context: CGContext, fill: CGColor, stroke: CGColor, lift: CGFloat) {
+    drawEllipse(in: context, rect: CGRect(x: 91, y: 154 - lift, width: 25, height: 18), fill: fill, stroke: stroke, lineWidth: 3)
+    drawEllipse(in: context, rect: CGRect(x: 140, y: 154 - lift * 0.75, width: 25, height: 18), fill: fill, stroke: stroke, lineWidth: 3)
+}
+
+func drawBunnyHead(
+    in context: CGContext,
+    pose: Pose,
+    fill: CGColor,
+    stroke: CGColor,
+    innerEar: CGColor,
+    dark: CGColor,
+    blush: CGColor
+) {
+    let headCenter = CGPoint(x: 130 + pose.headOffsetX, y: 126 + pose.headOffsetY)
+
+    context.saveGState()
+    context.translateBy(x: headCenter.x, y: headCenter.y)
+    context.rotate(by: pose.headRotation)
+
+    drawRoundedRect(in: context, rect: CGRect(x: -53, y: -39, width: 106, height: 78), radius: 31, fill: fill, stroke: stroke, lineWidth: 3.5)
+    drawEllipse(in: context, rect: CGRect(x: -23, y: 7, width: 46, height: 27), fill: cgColor(1.0, 0.97, 0.91, 0.74), stroke: nil, lineWidth: 0)
+    drawBunnyFace(in: context, pose: pose, dark: dark, blush: blush)
+
+    context.restoreGState()
+}
+
+func drawBunnyFace(in context: CGContext, pose: Pose, dark: CGColor, blush: CGColor) {
+    if pose.cheekPuff > 0 {
+        drawEllipse(in: context, rect: CGRect(x: -34, y: -2, width: 18 + pose.cheekPuff, height: 14), fill: cgColor(1.0, 0.97, 0.91, 0.55), stroke: nil, lineWidth: 0)
+        drawEllipse(in: context, rect: CGRect(x: 16, y: -2, width: 18 + pose.cheekPuff, height: 14), fill: cgColor(1.0, 0.97, 0.91, 0.55), stroke: nil, lineWidth: 0)
+    }
+
+    drawEyes(in: context, style: pose.eyeStyle, dark: dark, cream: cgColor(1, 1, 1, 1))
+
+    drawEllipse(in: context, rect: CGRect(x: -5, y: 2, width: 10, height: 7), fill: cgColor(1.0, 0.44, 0.55, 1.0), stroke: dark, lineWidth: 1.4)
+
+    context.setStrokeColor(dark)
+    context.setLineWidth(2.2)
+    context.setLineCap(.round)
+    if pose.mouthOpen > 1 {
+        drawEllipse(in: context, rect: CGRect(x: -6, y: 10, width: 12, height: max(7, pose.mouthOpen)), fill: cgColor(0.72, 0.22, 0.25, 1), stroke: dark, lineWidth: 2)
+    } else {
+        context.beginPath()
+        context.move(to: CGPoint(x: 0, y: 8))
+        context.addCurve(to: CGPoint(x: -8, y: 14), control1: CGPoint(x: -2, y: 13), control2: CGPoint(x: -6, y: 15))
+        context.move(to: CGPoint(x: 0, y: 8))
+        context.addCurve(to: CGPoint(x: 8, y: 14), control1: CGPoint(x: 2, y: 13), control2: CGPoint(x: 6, y: 15))
+        context.strokePath()
+    }
+
+    context.setStrokeColor(dark.copy(alpha: 0.38)!)
+    context.setLineWidth(1.3)
+    context.beginPath()
+    context.move(to: CGPoint(x: -31, y: 8))
+    context.addLine(to: CGPoint(x: -45, y: 5))
+    context.move(to: CGPoint(x: -31, y: 14))
+    context.addLine(to: CGPoint(x: -46, y: 15))
+    context.move(to: CGPoint(x: 31, y: 8))
+    context.addLine(to: CGPoint(x: 45, y: 5))
+    context.move(to: CGPoint(x: 31, y: 14))
+    context.addLine(to: CGPoint(x: 46, y: 15))
+    context.strokePath()
+
+    let blushAlpha = pose.showBlush ? blush.alpha : blush.alpha * 0.45
+    drawEllipse(in: context, rect: CGRect(x: -39, y: 3, width: 14, height: 9), fill: blush.copy(alpha: blushAlpha)!, stroke: nil, lineWidth: 0)
+    drawEllipse(in: context, rect: CGRect(x: 25, y: 3, width: 14, height: 9), fill: blush.copy(alpha: blushAlpha)!, stroke: nil, lineWidth: 0)
+}
+
+func drawBunnyScarf(in context: CGContext, fill: CGColor, stroke: CGColor) {
+    drawRoundedRect(in: context, rect: CGRect(x: 98, y: 141, width: 61, height: 15), radius: 7, fill: fill, stroke: stroke, lineWidth: 2.2)
+
+    let knot = CGMutablePath()
+    knot.move(to: CGPoint(x: 151, y: 150))
+    knot.addLine(to: CGPoint(x: 174, y: 145))
+    knot.addLine(to: CGPoint(x: 169, y: 165))
+    knot.closeSubpath()
+    drawPath(in: context, path: knot, fill: fill, stroke: stroke, lineWidth: 2.0)
 }
 
 func drawShadow(in context: CGContext) {
@@ -828,11 +1021,23 @@ func cgColor(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFloat
     CGColor(red: red, green: green, blue: blue, alpha: alpha)
 }
 
-// Generate all themes
+let allThemes = [
+    "CuteCat",
+    "ShibaInu",
+    "PixelSlime",
+    "MochiBunny"
+]
+
+let requestedThemes = Array(CommandLine.arguments.dropFirst())
+let themesToGenerate = requestedThemes.isEmpty ? allThemes : requestedThemes
+
 do {
-    try generateTheme(themeName: "CuteCat")
-    try generateTheme(themeName: "ShibaInu")
-    try generateTheme(themeName: "PixelSlime")
+    for theme in themesToGenerate {
+        guard allThemes.contains(theme) else {
+            throw AssetError.unknownTheme(theme)
+        }
+        try generateTheme(themeName: theme)
+    }
 } catch {
     print("Theme generation failed: \(error)")
     exit(1)

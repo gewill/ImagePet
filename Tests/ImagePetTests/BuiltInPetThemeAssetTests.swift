@@ -1,7 +1,14 @@
 import AppKit
 import XCTest
 
-final class CuteCatAssetTests: XCTestCase {
+final class BuiltInPetThemeAssetTests: XCTestCase {
+    private let builtInThemes = [
+        "ShibaInu",
+        "MochiBunny",
+        "CuteCat",
+        "PixelSlime"
+    ]
+
     private let animationSpecs: [(name: String, frames: Int)] = [
         ("idle", 8),
         ("dragHover", 4),
@@ -14,8 +21,15 @@ final class CuteCatAssetTests: XCTestCase {
         ("sleep", 8)
     ]
 
-    func testCuteCatAssetsMatchAnimationBudget() throws {
-        let resourcesURL = try cuteCatResourcesURL()
+    func testBuiltInPetThemesMatchAnimationBudget() throws {
+        for theme in builtInThemes {
+            try assertThemeAssetsMatchAnimationBudget(theme)
+        }
+    }
+
+    private func assertThemeAssetsMatchAnimationBudget(_ theme: String) throws {
+        let resourcesURL = themeResourcesURL(theme)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: resourcesURL.path), "\(theme) theme folder should exist")
         var totalBytes = 0
 
         for spec in animationSpecs {
@@ -27,7 +41,7 @@ final class CuteCatAssetTests: XCTestCase {
                 .filter { $0.pathExtension.lowercased() == "png" }
                 .sorted { $0.lastPathComponent < $1.lastPathComponent }
 
-            XCTAssertEqual(files.count, spec.frames, "\(spec.name) should have the expected frame count")
+            XCTAssertEqual(files.count, spec.frames, "\(theme)/\(spec.name) should have the expected frame count")
 
             for (index, fileURL) in files.enumerated() {
                 XCTAssertEqual(fileURL.lastPathComponent, String(format: "frame_%03d.png", index))
@@ -37,16 +51,16 @@ final class CuteCatAssetTests: XCTestCase {
 
                 let image = try XCTUnwrap(NSImage(contentsOf: fileURL), "Missing PNG at \(fileURL.path)")
                 let cgImage = try XCTUnwrap(image.cgImage(forProposedRect: nil, context: nil, hints: nil))
-                XCTAssertEqual(cgImage.width, 256)
-                XCTAssertEqual(cgImage.height, 256)
-                XCTAssertTrue(hasVisiblePixels(cgImage), "\(fileURL.lastPathComponent) should not be blank")
+                XCTAssertEqual(cgImage.width, 256, "\(fileURL.path) should be 256 px wide")
+                XCTAssertEqual(cgImage.height, 256, "\(fileURL.path) should be 256 px tall")
+                XCTAssertTrue(hasVisiblePixels(cgImage), "\(theme)/\(spec.name)/\(fileURL.lastPathComponent) should not be blank")
             }
         }
 
-        XCTAssertLessThanOrEqual(totalBytes, 3 * 1024 * 1024, "CuteCat theme should stay under the PRD 3 MB budget")
+        XCTAssertLessThanOrEqual(totalBytes, 3 * 1024 * 1024, "\(theme) theme should stay under the PRD 3 MB budget")
     }
 
-    private func cuteCatResourcesURL() throws -> URL {
+    private func themeResourcesURL(_ theme: String) -> URL {
         let currentFile = URL(fileURLWithPath: #filePath)
         let projectRoot = currentFile
             .deletingLastPathComponent()
@@ -57,7 +71,7 @@ final class CuteCatAssetTests: XCTestCase {
             .appendingPathComponent("Sources")
             .appendingPathComponent("ImagePet")
             .appendingPathComponent("Resources")
-            .appendingPathComponent("CuteCat")
+            .appendingPathComponent(theme)
     }
 
     private func hasVisiblePixels(_ image: CGImage) -> Bool {

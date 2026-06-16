@@ -208,7 +208,7 @@ private enum HelpContent {
                         "Choose a pet theme in Settings → Desktop Pet."
                     ],
                     bullets: [
-                        "Shiba Inu, Cute Cat, and Pixel Slime themes are available.",
+                        "Shiba Inu, Mochi Bunny, Cute Cat, and Pixel Slime themes are available.",
                         "Enable Idle Variants lets the pet yawn or stretch during inactivity.",
                         "Enable Hover Feedback animates the pet when the pointer hovers over it.",
                         "Energy Saving Mode reduces animation frame rate for lower CPU usage."

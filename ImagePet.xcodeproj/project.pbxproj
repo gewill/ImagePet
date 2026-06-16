@@ -70,7 +70,7 @@
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
 		F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */; };
-		F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */; };
+		F104BEBB130DB76EDE96A7EF /* BuiltInPetThemeAssetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */; };
 		F4D39B0292E06F377A1CCEC3 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */; };
 		F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 /* End PBXBuildFile section */
@@ -173,7 +173,7 @@
 		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
-		9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteCatAssetGenerator.swift; sourceTree = "<group>"; };
+		9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInPetThemeAssetTests.swift; sourceTree = "<group>"; };
 		A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncoderCapabilities.swift; sourceTree = "<group>"; };
 		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
@@ -347,7 +347,7 @@
 				D62D2DCA7CE90024BFB059F7 /* CompressionBatchSummary.swift */,
 				4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */,
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
-				9E2E97F825581B08728435D4 /* CuteCatAssetGenerator.swift */,
+				9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */,
 				ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */,
 				029178F82948933AB5279570 /* FileSizeFormatting.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
@@ -638,7 +638,7 @@
 				D9E41B6F23F5D167FC009FD6 /* CompressionBatchSummary.swift in Sources */,
 				1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */,
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
-				F104BEBB130DB76EDE96A7EF /* CuteCatAssetGenerator.swift in Sources */,
+				F104BEBB130DB76EDE96A7EF /* BuiltInPetThemeAssetTests.swift in Sources */,
 				DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */,
 				D9E9FED5C374031DCC00E343 /* FileSizeFormatting.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,

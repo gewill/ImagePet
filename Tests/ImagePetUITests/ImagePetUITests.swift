@@ -670,6 +670,10 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(shibaCard.exists)
         shibaCard.click()
 
+        let bunnyCard = window.buttons["themeCard_MochiBunny"]
+        XCTAssertTrue(bunnyCard.exists)
+        bunnyCard.click()
+
         let slimeCard = window.buttons["themeCard_PixelSlime"]
         XCTAssertTrue(slimeCard.exists)
         slimeCard.click()
