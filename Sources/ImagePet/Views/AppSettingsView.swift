@@ -1,6 +1,7 @@
 import KeyboardShortcuts
 import ImagePetCore
 import SwiftUI
+import AppKit
 
 struct AppSettingsView: View {
     @ObservedObject var store: ImagePetStore
@@ -440,9 +441,41 @@ private struct HelpAboutSection: View {
             SettingSummaryRow(title: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
             SettingSummaryRow(title: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown")
             SettingSummaryRow(title: "Privacy", value: "Local processing, no uploads")
-            SettingSummaryRow(title: "Third-party notices", value: "docs/THIRD_PARTY_NOTICES.md")
+            
+            HStack(alignment: .firstTextBaseline) {
+                Text("Third-party notices")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+                
+                Button("View THIRD_PARTY_NOTICES.md") {
+                    openThirdPartyNotices()
+                }
+                .buttonStyle(.link)
+                .font(.callout)
+                .help("Open Third-party notices file in default editor")
+                .accessibilityIdentifier("openThirdPartyNoticesButton")
+            }
         }
         .accessibilityIdentifier("helpAboutSummary")
+    }
+
+    private func openThirdPartyNotices() {
+        #if SWIFT_PACKAGE
+        let bundle = Bundle.module
+        #else
+        let bundle = Bundle.main
+        #endif
+        
+        if let url = bundle.url(forResource: "THIRD_PARTY_NOTICES", withExtension: "md") {
+            NSWorkspace.shared.open(url)
+        } else if let fallbackUrl = bundle.url(forResource: "Resources/THIRD_PARTY_NOTICES", withExtension: "md") {
+            NSWorkspace.shared.open(fallbackUrl)
+        } else {
+            let localDocs = URL(fileURLWithPath: "docs/THIRD_PARTY_NOTICES.md")
+            if FileManager.default.fileExists(atPath: localDocs.path) {
+                NSWorkspace.shared.open(localDocs)
+            }
+        }
     }
 }
 
