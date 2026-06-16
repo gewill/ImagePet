@@ -572,13 +572,15 @@ private struct JobListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
+            HStack(spacing: 12) {
+                Spacer()
+                    .frame(width: 18)
                 Text("File")
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text("Status")
-                    .frame(width: 160, alignment: .leading)
+                    .frame(width: 200, alignment: .leading)
                 Text("Size / Saved")
-                    .frame(width: 240, alignment: .trailing)
+                    .frame(width: 220, alignment: .trailing)
             }
             .padding(.horizontal, 12)
             .frame(height: 34)
@@ -658,7 +660,9 @@ private struct JobRowView: View {
             Text(statusText)
                 .foregroundStyle(statusColor)
                 .lineLimit(1)
-                .frame(width: 160, alignment: .leading)
+                .minimumScaleFactor(0.85)
+                .help(statusText)
+                .frame(width: 200, alignment: .leading)
                 .accessibilityIdentifier("jobStatusText_\(job.fileName)")
                 .accessibilityLabel(statusText)
 
@@ -667,7 +671,7 @@ private struct JobRowView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
-                .frame(width: 240, alignment: .trailing)
+                .frame(width: 220, alignment: .trailing)
                 .accessibilityIdentifier("jobSizeText_\(job.fileName)")
                 .accessibilityLabel(sizeText)
         }
