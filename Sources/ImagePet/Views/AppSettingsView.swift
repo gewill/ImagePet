@@ -115,39 +115,35 @@ private struct DesktopPetSection: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 16) {
-                            SettingsThemeCard(
-                                name: "Shiba Inu",
-                                description: "An energetic, loyal puppy.",
-                                themeName: "ShibaInu",
-                                selectedTheme: $store.selectedThemeName
-                            )
-                            .accessibilityIdentifier("themeCard_ShibaInu")
-
-                            SettingsThemeCard(
-                                name: "Mochi Bunny",
-                                description: "A gentle bunny with mint scarf.",
-                                themeName: "MochiBunny",
-                                selectedTheme: $store.selectedThemeName
-                            )
-                            .accessibilityIdentifier("themeCard_MochiBunny")
-
-                            SettingsThemeCard(
-                                name: "Cute Cat",
-                                description: "A playful, hand-drawn kitty.",
-                                themeName: "CuteCat",
-                                selectedTheme: $store.selectedThemeName
-                            )
-                            .accessibilityIdentifier("themeCard_CuteCat")
-
-                            SettingsThemeCard(
-                                name: "Pixel Slime",
-                                description: "Retro bounce pixel slime.",
-                                themeName: "PixelSlime",
-                                selectedTheme: $store.selectedThemeName
-                            )
-                            .accessibilityIdentifier("themeCard_PixelSlime")
+                            ForEach(store.builtInThemes) { theme in
+                                SettingsThemeCard(
+                                    theme: theme,
+                                    selectedTheme: $store.selectedThemeName
+                                )
+                                .accessibilityIdentifier("themeCard_\(theme.id)")
+                            }
                         }
                     }
+                }
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Pet Size")
+                        .font(.headline)
+
+                    Picker("Pet Size", selection: $store.petSizeTier) {
+                        ForEach(DesktopPetSizeTier.allCases) { tier in
+                            Text(tier.title).tag(tier)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("petSizeTierPicker")
+
+                    Text("\(store.petSizeTier.title) keeps the pet around \(store.petSizeTier.detail.lowercased()) in mini mode.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("petSizeTierDescription")
                 }
 
                 Divider()
@@ -480,27 +476,25 @@ private struct HelpAboutSection: View {
 }
 
 private struct SettingsThemeCard: View {
-    let name: String
-    let description: String
-    let themeName: String
+    let theme: BuiltInPetTheme
     @Binding var selectedTheme: String
 
     @State private var isHovered = false
 
     private var isSelected: Bool {
-        selectedTheme == themeName
+        selectedTheme == theme.id
     }
 
     var body: some View {
         Button {
-            selectedTheme = themeName
+            selectedTheme = theme.id
         } label: {
             VStack(alignment: .leading, spacing: 10) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
 
-                    if let image = ThemeCache.loadStaticImage(themeName: themeName, animation: .idle) {
+                    if let image = ThemeCache.loadStaticImage(themeName: theme.id, animation: .idle) {
                         Image(decorative: image, scale: 1.0)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -513,16 +507,16 @@ private struct SettingsThemeCard: View {
                 }
                 .frame(height: 72)
 
-                Text(name)
+                Text(theme.displayName)
                     .font(.headline)
                     .foregroundStyle(.primary)
 
-                Text(description)
+                Text(theme.description)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
 
-                Text(isSelected ? "Selected" : "Select")
+                Text("Default \(theme.defaultFPS) fps")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
             }
@@ -537,7 +531,7 @@ private struct SettingsThemeCard: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
-        .accessibilityLabel("Theme: \(name)")
+        .accessibilityLabel("Theme: \(theme.displayName)")
         .accessibilityValue(isSelected ? "Selected" : "Not selected")
     }
 }

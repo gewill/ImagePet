@@ -654,29 +654,36 @@ final class ImagePetUITests: XCTestCase {
         let enabledToggle = window.descendants(matching: .any)["petSettingsEnabledToggle"]
         XCTAssertTrue(enabledToggle.exists)
 
-        let catCard = window.buttons["themeCard_CuteCat"]
-        XCTAssertTrue(catCard.exists)
-        XCTAssertTrue(catCard.isEnabled)
+        let dogCard = window.buttons["themeCard_Dog"]
+        XCTAssertTrue(dogCard.exists)
+        XCTAssertTrue(dogCard.isEnabled)
 
         // Toggle it off, cards should be disabled
         enabledToggle.click()
-        XCTAssertFalse(catCard.isEnabled)
+        XCTAssertFalse(dogCard.isEnabled)
 
         // Toggle it back on
         enabledToggle.click()
-        XCTAssertTrue(catCard.isEnabled)
+        XCTAssertTrue(dogCard.isEnabled)
 
-        let shibaCard = window.buttons["themeCard_ShibaInu"]
-        XCTAssertTrue(shibaCard.exists)
-        shibaCard.click()
+        let pufferfishCard = window.buttons["themeCard_Pufferfish"]
+        XCTAssertTrue(pufferfishCard.exists)
+        pufferfishCard.click()
 
-        let bunnyCard = window.buttons["themeCard_MochiBunny"]
-        XCTAssertTrue(bunnyCard.exists)
-        bunnyCard.click()
+        let squirrelCard = window.buttons["themeCard_Squirrel"]
+        XCTAssertTrue(squirrelCard.exists)
+        squirrelCard.click()
 
-        let slimeCard = window.buttons["themeCard_PixelSlime"]
-        XCTAssertTrue(slimeCard.exists)
-        slimeCard.click()
+        let rabbitCard = window.buttons["themeCard_Rabbit"]
+        XCTAssertTrue(rabbitCard.exists)
+        rabbitCard.click()
+
+        let sizePicker = window.segmentedControls["petSizeTierPicker"]
+        XCTAssertTrue(sizePicker.exists)
+        if sizePicker.buttons.count >= 3 {
+            sizePicker.buttons.element(boundBy: 2).click()
+            sizePicker.buttons.element(boundBy: 0).click()
+        }
 
         let launchToggle = window.descendants(matching: .any)["launchAtLoginToggle"]
         XCTAssertTrue(launchToggle.exists)

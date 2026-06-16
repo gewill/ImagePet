@@ -18,6 +18,7 @@
 		1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */; };
 		1D7D38437A6F81FBD3BD3300 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4193FE83DCD3C342B858EE45 /* LocalNotificationManager.swift */; };
 		20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */; };
+		20C1CC3A21BA81F6F38999B1 /* BuiltInPetTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30830DF6500A0BD123B277B /* BuiltInPetTheme.swift */; };
 		2BDCAAEB14319197828116A8 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B768CED9CE7C2047CF0495 /* FolderMonitor.swift */; };
 		32A57C46BE11190CEBB47EE6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FD78B2591A703F59ECE6F7 /* HelpView.swift */; };
 		39D8473A58EBDD037557FD17 /* MozJPEGEncodingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFF8AF7B27658DBE4D17CEDC /* MozJPEGEncodingEngine.swift */; };
@@ -39,7 +40,6 @@
 		6E1D8DF5CF4B366725F9F100 /* CompressionBatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7E1B8A4827313A572EA88 /* CompressionBatchSummary.swift */; };
 		762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */; };
 		77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F9729CED642EBCF472BAC1 /* ContentView.swift */; };
-		7D20F29A3F1A40159F0DCA21 /* SoftNativeStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */; };
 		84DF67E7F26FB52ADF4008D2 /* OutputNameAllocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */; };
 		8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */; };
 		85964FC9A85A3838F50BD640 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = F6B0246EDBD395211A9A2FCF /* ArgumentParser */; };
@@ -52,10 +52,12 @@
 		98E3A9EE00DCE60CAC8E9226 /* FolderWatchingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63122AAD9F56829BED8AD2B /* FolderWatchingSection.swift */; };
 		9BD9669BB632736925B748F2 /* ShortcutsIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDE7C87B4DA93B9D2470D4B /* ShortcutsIntent.swift */; };
 		9D953C4053E329B3478CEB34 /* FrameAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426BA951424DECEFB023D3A9 /* FrameAnimator.swift */; };
+		9E3987C9586C4E31283B8972 /* DesktopPetSizeTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDFFC2FA9A79727877301E /* DesktopPetSizeTier.swift */; };
 		A398F56170D6E35B9EA6B3BB /* GlobalShortcutCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4694488B654E7D1FED3A6E8E /* GlobalShortcutCoordinator.swift */; };
 		A7B37423809D305446A9183B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF65F5E10809D82C7FDDF5 /* main.swift */; };
 		B4F6FCE78F7F45C64B5B29F5 /* InputFilePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238810C4DF3FE71683DC9479 /* InputFilePanel.swift */; };
 		B8EC5E1F78868A070F898F73 /* CompressionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1510894ED17C31329941EA /* CompressionResult.swift */; };
+		B9291BBC674E159A9CD2D1A1 /* SoftNativeStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5602D33964FF3E3B78C6D87 /* SoftNativeStyle.swift */; };
 		B9CAC9DBC573955EBDA5A0CA /* ImagePetCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */; };
 		C317480A514502ED823DA1DB /* SoundManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */; };
@@ -63,15 +65,16 @@
 		CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A93444765F4DF14ABA2386D /* PetAnimation.swift */; };
 		D4AD9A7FDFCE2F316724F0E3 /* ImagePetCLITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CDBE79A22A8C6B89E80C52 /* ImagePetCLITests.swift */; };
 		D839C0794DE23A7E13724CE1 /* OutputDirectoryBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C51CB2ABE4CF5EB8A34389 /* OutputDirectoryBookmarkStore.swift */; };
+		D897C66374EBF025AB7AA522 /* BuiltInPetThemeAssetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CF84A3CFE6A59AF5DC25D2 /* BuiltInPetThemeAssetTests.swift */; };
 		D9E41B6F23F5D167FC009FD6 /* CompressionBatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62D2DCA7CE90024BFB059F7 /* CompressionBatchSummary.swift */; };
 		D9E9FED5C374031DCC00E343 /* FileSizeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029178F82948933AB5279570 /* FileSizeFormatting.swift */; };
 		DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */; };
 		E6BD71247B9D2017B1A52CB9 /* LocalNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A775F6539AF723DFC8D3D1 /* LocalNotificationManager.swift */; };
+		E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F8FC16873CD4ECB419915BB /* Assets.xcassets */; };
 		E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */; };
 		EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */; };
 		EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2845AD061C173BB07CE9F82B /* DesktopPetView.swift */; };
 		F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEAA8EA4335FD47CFC64340 /* DesktopPetSnapshot.swift */; };
-		F104BEBB130DB76EDE96A7EF /* BuiltInPetThemeAssetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */; };
 		F4D39B0292E06F377A1CCEC3 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */; };
 		F56B3D51EAA44A889540865E /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 /* End PBXBuildFile section */
@@ -148,6 +151,7 @@
 		358A8E829CFFE85676AC8B9E /* SwiftWebPEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftWebPEngine.swift; sourceTree = "<group>"; };
 		37C451AC6AE440D62C0D0FDE /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		3BFB80BB6D7CAAA89B8922DE /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
+		3F8FC16873CD4ECB419915BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4193FE83DCD3C342B858EE45 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		41C9C2454F8AEDC0086B9A67 /* DesktopPetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetWindowController.swift; sourceTree = "<group>"; };
 		426BA951424DECEFB023D3A9 /* FrameAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameAnimator.swift; sourceTree = "<group>"; };
@@ -170,13 +174,13 @@
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
-		7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftNativeStyle.swift; sourceTree = "<group>"; };
 		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; includeInIndex = 0; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
-		9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInPetThemeAssetTests.swift; sourceTree = "<group>"; };
 		A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncoderCapabilities.swift; sourceTree = "<group>"; };
+		A30830DF6500A0BD123B277B /* BuiltInPetTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInPetTheme.swift; sourceTree = "<group>"; };
+		A4CF84A3CFE6A59AF5DC25D2 /* BuiltInPetThemeAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInPetThemeAssetTests.swift; sourceTree = "<group>"; };
 		A82F1C37DAB3395B3B81DD1B /* PerformanceAndRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAndRobustnessTests.swift; sourceTree = "<group>"; };
 		AD1510894ED17C31329941EA /* CompressionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResult.swift; sourceTree = "<group>"; };
 		AD4485EE348B2FF15115C4B1 /* FolderWatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatchManager.swift; sourceTree = "<group>"; };
@@ -185,6 +189,7 @@
 		B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputFolderPanel.swift; sourceTree = "<group>"; };
 		CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ImagePetCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFF8AF7B27658DBE4D17CEDC /* MozJPEGEncodingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozJPEGEncodingEngine.swift; sourceTree = "<group>"; };
+		D5602D33964FF3E3B78C6D87 /* SoftNativeStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftNativeStyle.swift; sourceTree = "<group>"; };
 		D62D2DCA7CE90024BFB059F7 /* CompressionBatchSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionBatchSummary.swift; sourceTree = "<group>"; };
 		D63122AAD9F56829BED8AD2B /* FolderWatchingSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatchingSection.swift; sourceTree = "<group>"; };
 		D6E9A10CEBCF1D610F452175 /* ImageJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageJob.swift; sourceTree = "<group>"; };
@@ -194,6 +199,7 @@
 		EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressorTests.swift; sourceTree = "<group>"; };
 		F0A4EACDDC9C17F5FDB0FAC9 /* ImagePetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePetApp.swift; sourceTree = "<group>"; };
 		F23678BFAD16795886D53796 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
+		F4EDFFC2FA9A79727877301E /* DesktopPetSizeTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPetSizeTier.swift; sourceTree = "<group>"; };
 		F6B768CED9CE7C2047CF0495 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -249,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				F9DB3FDC08DCD868FFCA55A6 /* AppIcon.icon */,
+				3F8FC16873CD4ECB419915BB /* Assets.xcassets */,
 				6F8F586A1135EAED6910EB32 /* Resources */,
 				9DD5A4DE7991CFEF8ABD7776 /* App */,
 				0A7B243E7154709CDB185F20 /* Models */,
@@ -263,7 +270,9 @@
 		0A7B243E7154709CDB185F20 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A30830DF6500A0BD123B277B /* BuiltInPetTheme.swift */,
 				28B7E1B8A4827313A572EA88 /* CompressionBatchSummary.swift */,
+				F4EDFFC2FA9A79727877301E /* DesktopPetSizeTier.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -346,10 +355,10 @@
 			isa = PBXGroup;
 			children = (
 				6B90B4ABBB320F9A6F3988A2 /* AppleFixtureCompressionTests.swift */,
+				A4CF84A3CFE6A59AF5DC25D2 /* BuiltInPetThemeAssetTests.swift */,
 				D62D2DCA7CE90024BFB059F7 /* CompressionBatchSummary.swift */,
 				4D54ACEDC7E18E57A1537037 /* CompressionOptionsTests.swift */,
 				7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */,
-				9E2E97F825581B08728435D4 /* BuiltInPetThemeAssetTests.swift */,
 				ED5375E01D118F54DEB0AE1C /* EncoderCapabilitiesTests.swift */,
 				029178F82948933AB5279570 /* FileSizeFormatting.swift */,
 				EF2FB06B215254136C1E9E42 /* ImageCompressorTests.swift */,
@@ -393,7 +402,7 @@
 				2845AD061C173BB07CE9F82B /* DesktopPetView.swift */,
 				D63122AAD9F56829BED8AD2B /* FolderWatchingSection.swift */,
 				83FD78B2591A703F59ECE6F7 /* HelpView.swift */,
-				7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */,
+				D5602D33964FF3E3B78C6D87 /* SoftNativeStyle.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -594,6 +603,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4D39B0292E06F377A1CCEC3 /* AppIcon.icon in Resources */,
+				E737E4449294577F99BA13A5 /* Assets.xcassets in Resources */,
 				468ABFAA6A7B08517772B948 /* Resources in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -607,14 +617,15 @@
 			files = (
 				0833A37D66B17440D43822C3 /* AppNavigation.swift in Sources */,
 				468BDB0185A3FB1706EBCCD3 /* AppSettingsView.swift in Sources */,
+				20C1CC3A21BA81F6F38999B1 /* BuiltInPetTheme.swift in Sources */,
 				6E1D8DF5CF4B366725F9F100 /* CompressionBatchSummary.swift in Sources */,
 				77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */,
 				BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */,
+				9E3987C9586C4E31283B8972 /* DesktopPetSizeTier.swift in Sources */,
 				F0A37C2C267FEF35E0DCAE5B /* DesktopPetSnapshot.swift in Sources */,
 				EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */,
 				EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */,
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,
-				7D20F29A3F1A40159F0DCA21 /* SoftNativeStyle.swift in Sources */,
 				2BDCAAEB14319197828116A8 /* FolderMonitor.swift in Sources */,
 				897CF058BBC73FBD1848DAB6 /* FolderWatchManager.swift in Sources */,
 				98E3A9EE00DCE60CAC8E9226 /* FolderWatchingSection.swift in Sources */,
@@ -629,6 +640,7 @@
 				762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */,
 				CC16336E040E24B06F06D654 /* PetAnimation.swift in Sources */,
 				9BD9669BB632736925B748F2 /* ShortcutsIntent.swift in Sources */,
+				B9291BBC674E159A9CD2D1A1 /* SoftNativeStyle.swift in Sources */,
 				48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */,
 				E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */,
 			);
@@ -639,10 +651,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				89B7A985CBCE01645C7BB27C /* AppleFixtureCompressionTests.swift in Sources */,
+				D897C66374EBF025AB7AA522 /* BuiltInPetThemeAssetTests.swift in Sources */,
 				D9E41B6F23F5D167FC009FD6 /* CompressionBatchSummary.swift in Sources */,
 				1D77192E3BD702B0AB371370 /* CompressionOptionsTests.swift in Sources */,
 				8C81429E45671E8A94D9AD9A /* CompressionPresetTests.swift in Sources */,
-				F104BEBB130DB76EDE96A7EF /* BuiltInPetThemeAssetTests.swift in Sources */,
 				DA2BD1FD62035FAA84694D95 /* EncoderCapabilitiesTests.swift in Sources */,
 				D9E9FED5C374031DCC00E343 /* FileSizeFormatting.swift in Sources */,
 				5FC9A58F183D60A2638D1DA2 /* ImageCompressorTests.swift in Sources */,

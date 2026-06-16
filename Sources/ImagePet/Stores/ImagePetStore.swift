@@ -168,9 +168,19 @@ final class ImagePetStore: ObservableObject {
             defaults.set(energySavingMode, forKey: energySavingModeKey)
         }
     }
-    @Published var selectedThemeName = "ShibaInu" {
+    @Published var selectedThemeName = BuiltInPetTheme.fallback.id {
         didSet {
-            defaults.set(selectedThemeName, forKey: selectedThemeNameKey)
+            let resolved = BuiltInPetTheme.resolvedTheme(named: selectedThemeName).id
+            if selectedThemeName != resolved {
+                selectedThemeName = resolved
+                return
+            }
+            defaults.set(resolved, forKey: selectedThemeNameKey)
+        }
+    }
+    @Published var petSizeTier: DesktopPetSizeTier = .standard {
+        didSet {
+            defaults.set(petSizeTier.rawValue, forKey: petSizeTierKey)
         }
     }
     @Published var issuesVisuallyDegraded = false
@@ -230,6 +240,7 @@ final class ImagePetStore: ObservableObject {
     private let enableSuccessSoundKey = "ImagePet.enableSuccessSound"
     private let energySavingModeKey = "ImagePet.energySavingMode"
     private let selectedThemeNameKey = "ImagePet.selectedThemeName"
+    private let petSizeTierKey = "ImagePet.petSizeTier"
 
     // PRD v0.7 Keys
     private let launchAtLoginKey = "ImagePet.launchAtLogin"
@@ -263,7 +274,8 @@ final class ImagePetStore: ObservableObject {
         self.enableHoverFeedback = true
         self.enableSuccessSound = true
         self.energySavingMode = false
-        self.selectedThemeName = "ShibaInu"
+        self.selectedThemeName = BuiltInPetTheme.fallback.id
+        self.petSizeTier = .standard
 
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
@@ -372,7 +384,11 @@ final class ImagePetStore: ObservableObject {
                 self.energySavingMode = defaults.bool(forKey: energySavingModeKey)
             }
             if let theme = defaults.string(forKey: selectedThemeNameKey) {
-                self.selectedThemeName = theme
+                self.selectedThemeName = BuiltInPetTheme.resolvedTheme(named: theme).id
+            }
+            if let rawTier = defaults.string(forKey: petSizeTierKey),
+               let tier = DesktopPetSizeTier(rawValue: rawTier) {
+                self.petSizeTier = tier
             }
 
             if defaults.object(forKey: launchAtLoginKey) != nil {
@@ -410,6 +426,14 @@ final class ImagePetStore: ObservableObject {
 
     var completedCount: Int {
         jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
+    }
+
+    var builtInThemes: [BuiltInPetTheme] {
+        BuiltInPetTheme.all
+    }
+
+    var selectedTheme: BuiltInPetTheme {
+        BuiltInPetTheme.resolvedTheme(named: selectedThemeName)
     }
 
     var availableOutputFormats: [OutputFormat] {

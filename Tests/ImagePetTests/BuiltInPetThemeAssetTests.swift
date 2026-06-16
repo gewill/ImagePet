@@ -3,10 +3,12 @@ import XCTest
 
 final class BuiltInPetThemeAssetTests: XCTestCase {
     private let builtInThemes = [
-        "ShibaInu",
-        "MochiBunny",
-        "CuteCat",
-        "PixelSlime"
+        "Dog",
+        "Pufferfish",
+        "Squirrel",
+        "Hamster",
+        "Cat",
+        "Rabbit"
     ]
 
     private let animationSpecs: [(name: String, frames: Int)] = [

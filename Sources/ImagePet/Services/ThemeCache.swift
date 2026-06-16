@@ -6,12 +6,13 @@ struct ThemeCache {
     let frames: [PetAnimation: [CGImage]]
     
     static func load(themeName: String) -> ThemeCache {
+        let resolvedThemeName = BuiltInPetTheme.resolvedTheme(named: themeName).id
         let startTime = DispatchTime.now()
         var loadedFrames: [PetAnimation: [CGImage]] = [:]
         
-        guard let themeURL = findResourcesURL(themeName: themeName) else {
+        guard let themeURL = findResourcesURL(themeName: resolvedThemeName) else {
             #if DEBUG
-            print("[ThemeCache] Error: Could not locate resource folder for theme '\(themeName)'")
+            print("[ThemeCache] Error: Could not locate resource folder for theme '\(resolvedThemeName)'")
             #endif
             return ThemeCache(frames: [:])
         }
@@ -45,7 +46,7 @@ struct ThemeCache {
         let durationMs = Double(nanoTime) / 1_000_000.0
         
         #if DEBUG
-        print("[ThemeCache] Loaded theme '\(themeName)' in \(String(format: "%.2f", durationMs)) ms")
+        print("[ThemeCache] Loaded theme '\(resolvedThemeName)' in \(String(format: "%.2f", durationMs)) ms")
         if durationMs > 200 {
             print("[ThemeCache] WARNING: Theme loading took \(String(format: "%.2f", durationMs)) ms, exceeding the 200ms budget target.")
         }
@@ -55,7 +56,8 @@ struct ThemeCache {
     }
     
     static func loadStaticImage(themeName: String, animation: PetAnimation = .idle) -> CGImage? {
-        guard let themeURL = findResourcesURL(themeName: themeName) else { return nil }
+        let resolvedThemeName = BuiltInPetTheme.resolvedTheme(named: themeName).id
+        guard let themeURL = findResourcesURL(themeName: resolvedThemeName) else { return nil }
         let folderURL = themeURL.appendingPathComponent(animation.rawValue)
         let fileManager = FileManager.default
         guard let files = try? fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else {

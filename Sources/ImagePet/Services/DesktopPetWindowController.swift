@@ -5,8 +5,6 @@ import Combine
 @MainActor
 final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private static let frameAutosaveName = "ImagePetDesktopPetWindow"
-    private static let miniSize = NSSize(width: 80, height: 80)
-    private static let fullSize = NSSize(width: 192, height: 176)
 
     private let store: ImagePetStore
     private var window: NSWindow?
@@ -20,6 +18,13 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         store.$petViewMode
             .sink { [weak self] mode in
                 self?.updateWindowSize(for: mode)
+            }
+            .store(in: &cancellables)
+
+        store.$petSizeTier
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.updateWindowSize(for: self.store.petViewMode)
             }
             .store(in: &cancellables)
 
@@ -68,7 +73,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private func updateWindowSize(for mode: DesktopPetViewMode) {
         guard let window = self.window else { return }
         window.hasShadow = (mode == .full)
-        let newSize = mode == .mini ? Self.miniSize : Self.fullSize
+        let newSize = nsSize(for: store.petSizeTier.windowSize(for: mode))
         let currentFrame = window.frame
         let newOrigin: NSPoint
         if currentFrame.size == newSize {
@@ -94,7 +99,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
             UserDefaults.standard.removeObject(forKey: "NSWindow Frame \(Self.frameAutosaveName)")
         }
 
-        let size = store.petViewMode == .mini ? Self.miniSize : Self.fullSize
+        let size = nsSize(for: store.petSizeTier.windowSize(for: store.petViewMode))
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),
             styleMask: [.borderless],
@@ -141,7 +146,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
     private func defaultOrigin(for size: NSSize) -> NSPoint {
         let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
-        let expandedWidth = max(size.width, Self.fullSize.width)
+        let expandedWidth = max(size.width, store.petSizeTier.fullWindow.width)
         let horizontalInset = 28 + (expandedWidth - size.width) / 2
         return NSPoint(
             x: visibleFrame.maxX - size.width - horizontalInset,
@@ -177,6 +182,10 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
             .map { screen in (screen, frame.intersection(screen.visibleFrame).width * frame.intersection(screen.visibleFrame).height) }
             .max { $0.1 < $1.1 }?
             .0 ?? NSScreen.main
+    }
+
+    private func nsSize(for size: CGSize) -> NSSize {
+        NSSize(width: size.width, height: size.height)
     }
 }
 

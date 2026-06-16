@@ -12,6 +12,14 @@ struct DesktopPetView: View {
     @State private var controlsOpacity: CGFloat = 0.0
     @State private var controlsOffset: CGFloat = 8.0
 
+    private var sizeTier: DesktopPetSizeTier {
+        store.petSizeTier
+    }
+
+    private var currentWindowSize: CGSize {
+        sizeTier.windowSize(for: currentMode)
+    }
+
     init(store: ImagePetStore) {
         self.store = store
         self._animator = StateObject(wrappedValue: FrameAnimator(themeName: store.selectedThemeName))
@@ -26,7 +34,7 @@ struct DesktopPetView: View {
                 fullView(for: snapshot)
             }
         }
-        .frame(width: currentMode == .mini ? 80 : 192, height: currentMode == .mini ? 80 : 176)
+        .frame(width: currentWindowSize.width, height: currentWindowSize.height)
         .background(
             Group {
                 if currentMode == .mini {
@@ -65,7 +73,7 @@ struct DesktopPetView: View {
             }
         )
         .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
-        .contentShape(RoundedRectangle(cornerRadius: currentMode == .mini ? 40 : 8))
+        .contentShape(RoundedRectangle(cornerRadius: currentMode == .mini ? currentWindowSize.width / 2 : 8))
     }
 
     var body: some View {
@@ -135,6 +143,9 @@ struct DesktopPetView: View {
             .onChange(of: store.selectedThemeName) { newTheme in
                 animator.updateTheme(themeName: newTheme)
                 updateAnimator()
+            }
+            .onChange(of: store.petSizeTier) { _ in
+                currentMode = store.petViewMode
             }
             .onChange(of: store.enableIdleVariants) { val in
                 animator.enableIdleVariants = val
@@ -244,7 +255,7 @@ struct DesktopPetView: View {
                     Color.clear
                 }
             }
-            .frame(width: 64, height: 56)
+            .frame(width: sizeTier.petArtFrame.width, height: sizeTier.petArtFrame.height)
             .scaleEffect(faceScale(for: snapshot.state))
             .animation(reduceMotion ? nil : faceAnimation(for: snapshot.state), value: snapshot.state)
             .accessibilityElement(children: .ignore)
@@ -272,7 +283,7 @@ struct DesktopPetView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
         }
-        .frame(width: 66, height: 58)
+        .frame(width: sizeTier.petFaceFrame.width, height: sizeTier.petFaceFrame.height)
         .shadow(
             color: accentColor(for: snapshot.state).opacity(currentMode == .mini ? 0.08 : 0.18),
             radius: currentMode == .mini ? 3 : (isDropTargeted ? 10 : 6),
@@ -282,7 +293,7 @@ struct DesktopPetView: View {
 
     private func miniView(for snapshot: DesktopPetSnapshot) -> some View {
         petFace(for: snapshot)
-            .frame(width: 72, height: 72)
+            .frame(width: sizeTier.miniPetFrame.width, height: sizeTier.miniPetFrame.height)
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture {
                 store.handlePetAction(.expand)

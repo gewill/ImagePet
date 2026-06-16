@@ -16,7 +16,7 @@ class FrameAnimator: ObservableObject {
     private var isPlayingVariant: Bool = false
     private var lastVariantTime: Date = Date.distantPast
     
-    var fps: Int = 10 {
+    var fps: Int = BuiltInPetTheme.fallback.defaultFPS {
         didSet {
             restartTimer()
         }
@@ -40,8 +40,10 @@ class FrameAnimator: ObservableObject {
     private var isSystemSleeping = false
     private var isScreenSleeping = false
     
-    init(themeName: String = "CuteCat") {
-        self.cache = ThemeCache.load(themeName: themeName)
+    init(themeName: String = BuiltInPetTheme.fallback.id) {
+        let theme = BuiltInPetTheme.resolvedTheme(named: themeName)
+        self.cache = ThemeCache.load(themeName: theme.id)
+        self.fps = theme.defaultFPS
         updateFrame()
         setupNotificationObservers()
         restartTimer()
@@ -100,7 +102,9 @@ class FrameAnimator: ObservableObject {
     }
     
     func updateTheme(themeName: String) {
-        self.cache = ThemeCache.load(themeName: themeName)
+        let theme = BuiltInPetTheme.resolvedTheme(named: themeName)
+        self.cache = ThemeCache.load(themeName: theme.id)
+        fps = theme.defaultFPS
         frameIndex = 0
         updateFrame()
     }
