@@ -98,9 +98,9 @@ private struct HeaderView: View {
         VStack(spacing: 16) {
             HStack(spacing: 12) {
                 Text("ImagePet")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(SoftNativeStyle.accent)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 HStack(spacing: 8) {
                     Button {
@@ -240,135 +240,183 @@ private struct ControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            controlOptions
-
-            if store.qualityMode == .custom && store.outputFormat != .png {
-                HStack(spacing: 10) {
-                    Text("Quality \(store.customQuality)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 70, alignment: .leading)
-                    Slider(
-                        value: Binding(
-                            get: { Double(store.customQuality) },
-                            set: { store.customQuality = Int($0.rounded()) }
-                        ),
-                        in: 30...95,
-                        step: 1
-                    )
-                    .disabled(store.isProcessing)
-                    .accessibilityIdentifier("customQualitySlider")
+        VStack(alignment: .leading, spacing: store.isParametersExpanded ? 12 : 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    store.isParametersExpanded.toggle()
                 }
-                .padding(.horizontal, 4)
-            }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.body)
+                        .foregroundStyle(SoftNativeStyle.accent)
 
-            // Options details based on selection
-            Group {
-                if store.saveLocationMode == .overwrite {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
-                        Text("Mode Overwrite will replace your source files directly and keep each file's original format. This action cannot be undone.")
-                            .font(.callout)
-                            .foregroundStyle(.red.opacity(0.85))
-                            .fontWeight(.semibold)
-                    }
-                    .padding(8)
-                    .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-                } else {
-                    HStack(alignment: .center, spacing: 16) {
-                        // Suffix configurations
-                        HStack(spacing: 8) {
-                            Text("Filename Suffix:")
-                                .font(.callout)
-                            TextField("Suffix", text: $store.filenameSuffix)
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 130)
-                                .disabled(store.isProcessing)
-                                .accessibilityIdentifier("filenameSuffixField")
-                                .onChange(of: store.filenameSuffix) { _ in
-                                    store.sanitizeFilenameSuffix()
-                                }
-                        }
+                    Text("Compression Parameters")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
 
-                        Text(store.filenamePreview)
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .accessibilityIdentifier("filenamePreviewLabel")
-
-                        Spacer(minLength: 8)
-                    }
-
-                    if store.saveLocationMode == .designated {
-                        HStack(spacing: 8) {
-                            Image(systemName: "folder.badge.gearshape")
-                                .foregroundStyle(.secondary)
-
-                            Text(outputFolderText)
-                                .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
-                                .accessibilityIdentifier("outputFolderLabel")
-
-                            Button("Choose Folder") {
-                                store.chooseOutputDirectory()
+                    if !store.isParametersExpanded {
+                        HStack(spacing: 6) {
+                            Text("•")
+                            Text("Quality: \(store.qualitySummary)")
+                            Text("•")
+                            Text("Format: \(store.outputFormat.displayName)")
+                            if store.maxDimension != .none {
+                                Text("•")
+                                Text("Max Edge: \(store.maxDimension.displayName)")
                             }
-                            .keyboardShortcut("o", modifiers: [.command, .shift])
-                            .disabled(store.isProcessing)
-                            .help("Choose Output Folder (⇧⌘O)")
-                            .accessibilityIdentifier("chooseFolderButton")
-
-                            Spacer()
                         }
-                        .font(.callout)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .transition(.opacity.combined(with: .move(edge: .leading)))
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(store.isParametersExpanded ? 90 : 0))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("toggleParametersButton")
+
+            if store.isParametersExpanded {
+                VStack(alignment: .leading, spacing: 12) {
+                    controlOptions
+
+                    if store.qualityMode == .custom && store.outputFormat != .png {
+                        HStack(spacing: 10) {
+                            Text("Quality \(store.customQuality)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 70, alignment: .leading)
+                            Slider(
+                                value: Binding(
+                                    get: { Double(store.customQuality) },
+                                    set: { store.customQuality = Int($0.rounded()) }
+                                ),
+                                in: 30...95,
+                                step: 1
+                            )
+                            .disabled(store.isProcessing)
+                            .accessibilityIdentifier("customQualitySlider")
+                        }
+                        .padding(.horizontal, 4)
+                    }
+
+                    // Options details based on selection
+                    Group {
+                        if store.saveLocationMode == .overwrite {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.red)
+                                Text("Mode Overwrite will replace your source files directly and keep each file's original format. This action cannot be undone.")
+                                    .font(.callout)
+                                    .foregroundStyle(.red.opacity(0.85))
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(8)
+                            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                        } else {
+                            HStack(alignment: .center, spacing: 16) {
+                                // Suffix configurations
+                                HStack(spacing: 8) {
+                                    Text("Filename Suffix:")
+                                        .font(.callout)
+                                    TextField("Suffix", text: $store.filenameSuffix)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 130)
+                                        .disabled(store.isProcessing)
+                                        .accessibilityIdentifier("filenameSuffixField")
+                                        .onChange(of: store.filenameSuffix) { _ in
+                                            store.sanitizeFilenameSuffix()
+                                        }
+                                }
+
+                                Text(store.filenamePreview)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .accessibilityIdentifier("filenamePreviewLabel")
+
+                                Spacer(minLength: 8)
+                            }
+
+                            if store.saveLocationMode == .designated {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "folder.badge.gearshape")
+                                        .foregroundStyle(.secondary)
+
+                                    Text(outputFolderText)
+                                        .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                        .accessibilityIdentifier("outputFolderLabel")
+
+                                    Button("Choose Folder") {
+                                        store.chooseOutputDirectory()
+                                    }
+                                    .keyboardShortcut("o", modifiers: [.command, .shift])
+                                    .disabled(store.isProcessing)
+                                    .help("Choose Output Folder (⇧⌘O)")
+                                    .accessibilityIdentifier("chooseFolderButton")
+
+                                    Spacer()
+                                }
+                                .font(.callout)
+                            }
+                        }
+                    }
+
+                    // Option Toggles (Metadata and PNG Lossless notice)
+                    HStack(spacing: 18) {
+                        Toggle("Strip Metadata (GPS/EXIF/Camera Info)", isOn: $store.stripMetadata)
+                            .disabled(store.isProcessing)
+                            .accessibilityIdentifier("stripMetadataToggle")
+
+                        if store.canUseAdvancedJPEG {
+                            Toggle("Advanced JPEG", isOn: Binding(
+                                get: { store.jpegEncodingMode == .advanced },
+                                set: { store.jpegEncodingMode = $0 ? .advanced : .standard }
+                            ))
+                            .disabled(store.isProcessing)
+                            .help("Smaller JPEG output for web sharing.")
+                            .accessibilityIdentifier("advancedJPEGToggle")
+                        }
+
+                        if store.outputFormat == .png {
+                            Label("PNG uses lossless compression. Quality does not apply.", systemImage: "info.circle")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else if store.canUseAdvancedJPEG && store.jpegEncodingMode == .advanced {
+                            Label("Smaller JPEG output for web sharing.", systemImage: "info.circle")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else if store.outputFormat == .webp {
+                            Label("Best for web sharing. Static images only.", systemImage: "info.circle")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Label(
+                                "HDR or wide-gamut images will be exported as standard sRGB.",
+                                systemImage: "info.circle"
+                            )
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let message = store.outputFolderMessage, store.saveLocationMode == .designated {
+                        Label(message, systemImage: "exclamationmark.triangle")
+                            .font(.callout)
+                            .foregroundStyle(SoftNativeStyle.secondary)
                     }
                 }
-            }
-
-            // Option Toggles (Metadata and PNG Lossless notice)
-            HStack(spacing: 18) {
-                Toggle("Strip Metadata (GPS/EXIF/Camera Info)", isOn: $store.stripMetadata)
-                    .disabled(store.isProcessing)
-                    .accessibilityIdentifier("stripMetadataToggle")
-
-                if store.canUseAdvancedJPEG {
-                    Toggle("Advanced JPEG", isOn: Binding(
-                        get: { store.jpegEncodingMode == .advanced },
-                        set: { store.jpegEncodingMode = $0 ? .advanced : .standard }
-                    ))
-                    .disabled(store.isProcessing)
-                    .help("Smaller JPEG output for web sharing.")
-                    .accessibilityIdentifier("advancedJPEGToggle")
-                }
-
-                if store.outputFormat == .png {
-                    Label("PNG uses lossless compression. Quality does not apply.", systemImage: "info.circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else if store.canUseAdvancedJPEG && store.jpegEncodingMode == .advanced {
-                    Label("Smaller JPEG output for web sharing.", systemImage: "info.circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else if store.outputFormat == .webp {
-                    Label("Best for web sharing. Static images only.", systemImage: "info.circle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Label(
-                        "HDR or wide-gamut images will be exported as standard sRGB.",
-                        systemImage: "info.circle"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-            }
-
-            if let message = store.outputFolderMessage, store.saveLocationMode == .designated {
-                Label(message, systemImage: "exclamationmark.triangle")
-                    .font(.callout)
-                    .foregroundStyle(SoftNativeStyle.secondary)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding(14)
@@ -559,13 +607,13 @@ private struct JobListView: View {
                 }
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            Rectangle()
                 .stroke(SoftNativeStyle.border)
         )
         .frame(minHeight: jobs.isEmpty ? 150 : 140, maxHeight: .infinity)
-        .softNativeCard(radius: 10)
+        .softNativeCard(radius: 0)
     }
 }
 

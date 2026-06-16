@@ -186,6 +186,11 @@ final class ImagePetStore: ObservableObject {
     }
     @Published var launchAtLoginError: String? = nil
     @Published var hasReopened = false
+    @Published var isParametersExpanded = true {
+        didSet {
+            defaults.set(isParametersExpanded, forKey: isParametersExpandedKey)
+        }
+    }
     static var shared: ImagePetStore?
 
     private var isInitializing = true
@@ -230,6 +235,7 @@ final class ImagePetStore: ObservableObject {
     private let launchAtLoginKey = "ImagePet.launchAtLogin"
     private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
     private let petViewModeKey = "ImagePet.petViewMode"
+    private let isParametersExpandedKey = "ImagePet.isParametersExpanded"
 
     init(
         compressor: ImageCompressor? = nil,
@@ -261,6 +267,7 @@ final class ImagePetStore: ObservableObject {
 
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
+        self.isParametersExpanded = true
         ImagePetStore.shared = self
 
         self.folderWatchManager = FolderWatchManager(defaults: defaults)
@@ -380,6 +387,11 @@ final class ImagePetStore: ObservableObject {
                 self.petViewMode = mode
             } else {
                 self.petViewMode = .mini
+            }
+            if defaults.object(forKey: isParametersExpandedKey) != nil {
+                self.isParametersExpanded = defaults.bool(forKey: isParametersExpandedKey)
+            } else {
+                self.isParametersExpanded = true
             }
         }
 

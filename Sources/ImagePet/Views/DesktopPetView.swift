@@ -228,11 +228,11 @@ struct DesktopPetView: View {
 
     private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(faceSurfaceColor(for: snapshot.state).opacity(isDropTargeted ? 1.0 : 0.92))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 0.5)
                 )
 
             ZStack {
@@ -272,14 +272,14 @@ struct DesktopPetView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
         }
-        .frame(width: 72, height: 60)
+        .frame(width: 66, height: 58)
         .shadow(color: accentColor(for: snapshot.state).opacity(0.18), radius: isDropTargeted ? 10 : 6, y: 3)
     }
 
     private func miniView(for snapshot: DesktopPetSnapshot) -> some View {
         petFace(for: snapshot)
             .frame(width: 72, height: 72)
-            .contentShape(RoundedRectangle(cornerRadius: 18))
+            .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture {
                 store.handlePetAction(.expand)
             }
