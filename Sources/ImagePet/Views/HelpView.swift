@@ -281,16 +281,69 @@ private enum HelpContent {
                         "Choose Services (or Quick Actions) → Compress with ImagePet.",
                         "Compressed files will be saved in the same directory as the originals, named with the '_compressed' suffix."
                     ]
-                ),
+                )
+            ]
+        ),
+        HelpTopic(
+            id: "cli",
+            title: "Command Line (CLI)",
+            systemImage: "terminal",
+            sections: [
                 HelpSection(
-                    "Command Line Interface (CLI)",
+                    "Install",
                     paragraphs: [
-                        "The bundled 'imagepet' command-line tool allows developers to compress files from terminal scripts."
+                        "Build the CLI tool with SwiftPM and copy the binary to a directory in your PATH."
                     ],
                     bullets: [
-                        "Basic syntax: imagepet [options] <input-files...>",
-                        "Use '-p' to set a preset, '-o' to specify an output folder, or '--overwrite' to replace original files.",
-                        "Run 'imagepet --help' for a full list of available options, quality levels, formats, and dimension limits."
+                        "swift build -c release",
+                        "cp .build/release/imagepet /usr/local/bin/",
+                        "Or run directly: swift run imagepet [options] <files...>"
+                    ]
+                ),
+                HelpSection(
+                    "Basic Usage",
+                    paragraphs: [
+                        "imagepet [options] <input-files...>",
+                        "Pass one or more image files or directories. Directories are scanned recursively for supported images (JPG, PNG, HEIC, WebP)."
+                    ]
+                ),
+                HelpSection(
+                    "Options",
+                    bullets: [
+                        "-o <dir>        Output directory. Omit to save next to originals.",
+                        "-p <preset>     Quality preset: high, balanced (default), small.",
+                        "-q <1–100>      Custom quality. Cannot be combined with -p.",
+                        "-f <format>     Output format: original (default), jpeg, png, heic, webp.",
+                        "-m <limit>      Max edge dimension: none (default), 1024, 1920, 2048, 3840.",
+                        "--keep-metadata  Preserve EXIF/GPS metadata (default strips metadata).",
+                        "--overwrite      Replace original files in place. Cannot be combined with -o.",
+                        "--help           Show help and exit."
+                    ]
+                ),
+                HelpSection(
+                    "Examples",
+                    bullets: [
+                        "imagepet photo.jpg                        Compress one file to the same folder.",
+                        "imagepet -o ~/Output ~/Photos              Compress a folder to ~/Output.",
+                        "imagepet -p small -f jpeg *.png            Convert PNGs to small JPEG.",
+                        "imagepet -q 60 -m 1920 image.heic         Custom quality, limit to 1920 px.",
+                        "imagepet --overwrite photo.jpg             Replace the original file.",
+                        "imagepet --keep-metadata -o out/ *.jpg     Keep EXIF and save to out/."
+                    ]
+                ),
+                HelpSection(
+                    "Output",
+                    paragraphs: [
+                        "The CLI prints per-file results and a batch summary showing total files, successes, failures, original size (Ate), compressed size (Pooped), and bytes saved. The exit code is 0 on full success, 1 if any file fails."
+                    ]
+                ),
+                HelpSection(
+                    "Notes",
+                    bullets: [
+                        "The CLI always uses the Advanced JPEG engine for best compression.",
+                        "Compressed files are named with a '_compressed' suffix unless --overwrite is used.",
+                        "Max concurrency is 2 parallel jobs, matching the GUI app.",
+                        "The CLI does not require App Sandbox permissions."
                     ]
                 )
             ]
