@@ -10,16 +10,19 @@ struct ContentView: View {
             ZStack {
                 SoftNativeStyle.workspaceBackground
 
-                ScrollView {
-                    VStack(spacing: 14) {
-                        HeaderView(store: store)
-                        ControlsView(store: store)
-                        DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
-                        JobListView(jobs: store.jobs)
-                        SummaryView(store: store)
+                VStack(spacing: 14) {
+                    HeaderView(store: store)
+
+                    ScrollView {
+                        VStack(spacing: 14) {
+                            ControlsView(store: store)
+                            DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                            JobListView(jobs: store.jobs)
+                            SummaryView(store: store)
+                        }
                     }
-                    .padding(20)
                 }
+                .padding(20)
             }
             .tabItem {
                 Label("Compress", systemImage: "doc.on.doc")
@@ -97,92 +100,80 @@ private struct HeaderView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 12) {
-                Text("ImagePet")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(SoftNativeStyle.accent)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack(alignment: .bottomTrailing) {
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    Text("ImagePet")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundStyle(SoftNativeStyle.accent)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                HStack(spacing: 8) {
-                    Button {
-                        store.toggleDesktopPet()
-                    } label: {
-                        Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
-                    }
-                    .keyboardShortcut("p", modifiers: [.command, .shift])
-                    .disabled(!store.isDesktopPetEnabled)
-                    .help("Toggle Desktop Pet (⇧⌘P)")
-                    .accessibilityIdentifier("togglePetButton")
+                    HStack(spacing: 8) {
+                        Button {
+                            store.toggleDesktopPet()
+                        } label: {
+                            Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
+                        }
+                        .keyboardShortcut("p", modifiers: [.command, .shift])
+                        .disabled(!store.isDesktopPetEnabled)
+                        .help("Toggle Desktop Pet (⇧⌘P)")
+                        .accessibilityIdentifier("togglePetButton")
 
-                    Button {
-                        store.chooseInputImages()
-                    } label: {
-                        Label("Add Images", systemImage: "photo.badge.plus")
+                        Button {
+                            store.chooseInputImages()
+                        } label: {
+                            Label("Add Images", systemImage: "photo.badge.plus")
+                        }
+                        .keyboardShortcut("o", modifiers: [.command])
+                        .buttonStyle(.borderedProminent)
+                        .tint(SoftNativeStyle.accent)
+                        .help("Add Images (⌘O)")
+                        .accessibilityIdentifier("addImagesButton")
                     }
-                    .keyboardShortcut("o", modifiers: [.command])
-                    .buttonStyle(.borderedProminent)
-                    .tint(SoftNativeStyle.accent)
-                    .help("Add Images (⌘O)")
-                    .accessibilityIdentifier("addImagesButton")
+                }
+
+                HStack(alignment: .center, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text(title)
+                            .font(.system(size: 28, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
+                            .accessibilityIdentifier("petTitleLabel")
+                            .accessibilityLabel(title)
+
+                        Text(subtitle)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .accessibilityIdentifier("petSubtitleLabel")
+                            .accessibilityLabel(subtitle)
+
+                        if store.isProcessing {
+                            ProgressView(value: Double(store.completedCount), total: Double(max(store.jobs.count, 1)))
+                                .tint(SoftNativeStyle.secondary)
+                                .frame(maxWidth: 340)
+                        }
+                    }
+
+                    Spacer(minLength: 90)
                 }
             }
+            .padding(16)
 
-            HStack(alignment: .center, spacing: 18) {
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(title)
-                        .font(.system(size: 28, weight: .semibold, design: .rounded))
-                        .lineLimit(1)
-                        .accessibilityIdentifier("petTitleLabel")
-                        .accessibilityLabel(title)
-
-                    Text(subtitle)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                        .accessibilityIdentifier("petSubtitleLabel")
-                        .accessibilityLabel(subtitle)
-
-                    if store.isProcessing {
-                        ProgressView(value: Double(store.completedCount), total: Double(max(store.jobs.count, 1)))
-                            .tint(SoftNativeStyle.secondary)
-                            .frame(maxWidth: 340)
-                    }
+            Group {
+                if let cgImage = petImage {
+                    Image(decorative: cgImage, scale: 1.0)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 82, height: 82)
+                } else {
+                    Color.clear
+                        .frame(width: 82, height: 82)
                 }
-
-                Spacer(minLength: 18)
-
-                Group {
-                    if let cgImage = petImage {
-                        Image(decorative: cgImage, scale: 1.0)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 82, height: 82)
-                    } else {
-                        Color.clear
-                            .frame(width: 82, height: 82)
-                    }
-                }
-                .frame(width: 116, height: 104)
-                .background {
-                    ZStack {
-                        SoftNativeStyle.accentSoft
-                        Circle()
-                            .fill(SoftNativeStyle.secondary.opacity(0.16))
-                            .frame(width: 92, height: 92)
-                            .blur(radius: 16)
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(SoftNativeStyle.accent.opacity(0.20))
-                )
-                .accessibilityLabel("Desktop Pet \(store.petState == .idle ? "Idle" : store.petState == .eating ? "Eating" : store.petState == .happy ? "Happy" : "Error")")
-                .accessibilityIdentifier("petEmojiLabel")
             }
+            .accessibilityLabel("Desktop Pet \(store.petState == .idle ? "Idle" : store.petState == .eating ? "Eating" : store.petState == .happy ? "Happy" : "Error")")
+            .accessibilityIdentifier("petEmojiLabel")
         }
-        .padding(16)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .softNativeCard(radius: 14)
     }
 
@@ -609,13 +600,13 @@ private struct JobListView: View {
                 }
             }
         }
-        .clipShape(Rectangle())
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(
-            Rectangle()
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(SoftNativeStyle.border)
         )
         .frame(height: jobs.isEmpty ? 150 : 260)
-        .softNativeCard(radius: 0)
+        .softNativeCard(radius: 10)
     }
 }
 
