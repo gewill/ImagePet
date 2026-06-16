@@ -10,14 +10,16 @@ struct ContentView: View {
             ZStack {
                 SoftNativeStyle.workspaceBackground
 
-                VStack(spacing: 14) {
-                    HeaderView(store: store)
-                    ControlsView(store: store)
-                    DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
-                    JobListView(jobs: store.jobs)
-                    SummaryView(store: store)
+                ScrollView {
+                    VStack(spacing: 14) {
+                        HeaderView(store: store)
+                        ControlsView(store: store)
+                        DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                        JobListView(jobs: store.jobs)
+                        SummaryView(store: store)
+                    }
+                    .padding(20)
                 }
-                .padding(20)
             }
             .tabItem {
                 Label("Compress", systemImage: "doc.on.doc")
@@ -612,7 +614,7 @@ private struct JobListView: View {
             Rectangle()
                 .stroke(SoftNativeStyle.border)
         )
-        .frame(minHeight: jobs.isEmpty ? 150 : 140, maxHeight: .infinity)
+        .frame(height: jobs.isEmpty ? 150 : 260)
         .softNativeCard(radius: 0)
     }
 }
