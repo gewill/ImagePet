@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。当前所有自动化 Unit Tests / UI Tests 均已全量通过，可以进入发布前的手工验收、性能验收和分发签名准备。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入手工视觉验收、性能验收和分发签名准备。
 
 已完成：
 
@@ -49,6 +49,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.11 App 完整性、帮助中心与可自定义快捷键规划：[PRD_v0.11_app_completeness.md](PRD_v0.11_app_completeness.md)
 - V0.12 系统级集成与自动化工作流规划：[PRD_v0.12_system_integration.md](PRD_v0.12_system_integration.md)
 - V0.13 本地通知与发布完整性闭环规划：[PRD_v0.13_local_notifications_and_release_completeness.md](PRD_v0.13_local_notifications_and_release_completeness.md)
+- V0.14 Soft Native 主窗口重设计方案：[PRD_v0.14_soft_native_main_window_redesign.md](PRD_v0.14_soft_native_main_window_redesign.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -91,6 +92,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | Finder 快速操作 (Quick Actions) | 已实现 | Info.plist NSServices 声明与 AppDelegate 的 `handleServices` | 手工在 Finder 多选图片右键压缩验证 |
 | 快捷指令 (Shortcuts) 集成 | 已实现 | `AppIntents` 编写 `CompressImagesIntent` 并注册 `ImagePetShortcuts` | 真实 Shortcuts app 内搜索动作和传参验证 |
 | 本地通知与发布完整性闭环 | 已实现，本机验证通过 | 整合 `CompressionBatchSummary` 摘要模型、`LocalNotificationManager` 包含防抖合并、防骚扰限频与 Shortcuts/Folder Watching 静默成功策略、历史纪录持久化、设置页面通知控制项及 Debug UI、独立 `RELEASE_CHECKLIST.md` | 手工触发不同入口压缩检查通知展示与通知动作的 Finder 唤起 |
+| Soft Native 主窗口重设计 | DesignSpike 已实现 | `DESIGN.md` + `docs/SoftNative.html` + `docs/PRD_v0.14_soft_native_main_window_redesign.md`；主窗口使用 Soft Native token、紧凑 header、响应式控制项、列表和 summary 视觉重构；Desktop Pet 配色同步 | `swift test`、`git diff --check`、`./script/build_and_run.sh --verify` 已通过；仍需手工视觉验收 |
 
 ## 已验证
 

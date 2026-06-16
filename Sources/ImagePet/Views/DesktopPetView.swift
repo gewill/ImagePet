@@ -31,10 +31,10 @@ struct DesktopPetView: View {
             Group {
                 if currentMode == .mini {
                     Circle()
-                        .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : Color.clear)
+                        .fill(isDropTargeted ? SoftNativeStyle.accentSoft.opacity(0.86) : Color.clear)
                 } else {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(isDropTargeted ? Color.accentColor.opacity(0.14) : accentColor(for: snapshot.state).opacity(0.04))
+                        .fill(isDropTargeted ? SoftNativeStyle.accentSoft : stateSurfaceColor(for: snapshot.state))
                 }
             }
         )
@@ -43,6 +43,8 @@ struct DesktopPetView: View {
                 if currentMode != .mini {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(.regularMaterial)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(SoftNativeStyle.surface.opacity(0.62))
                 }
             }
         )
@@ -51,12 +53,12 @@ struct DesktopPetView: View {
                 if currentMode == .mini {
                     if isDropTargeted {
                         Circle()
-                            .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                            .strokeBorder(SoftNativeStyle.accent, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
                     }
                 } else {
                     RoundedRectangle(cornerRadius: 8)
                         .strokeBorder(
-                            isDropTargeted ? Color.accentColor : accentColor(for: snapshot.state).opacity(0.24),
+                            isDropTargeted ? SoftNativeStyle.accent : accentColor(for: snapshot.state).opacity(0.24),
                             style: StrokeStyle(lineWidth: isDropTargeted ? 2 : 1, dash: isDropTargeted ? [6, 4] : [])
                         )
                 }
@@ -204,7 +206,7 @@ struct DesktopPetView: View {
             Button {
                 store.handlePetAction(.collapse)
             } label: {
-                PetIconButton(systemImage: "arrow.down.right.and.arrow.up.left", accent: .secondary)
+                PetIconButton(systemImage: "arrow.down.right.and.arrow.up.left", accent: SoftNativeStyle.secondary)
             }
             .buttonStyle(.plain)
             .help("Collapse to Mini Pet")
@@ -214,7 +216,7 @@ struct DesktopPetView: View {
             Button {
                 store.handlePetAction(.hidePet)
             } label: {
-                PetIconButton(systemImage: "xmark", accent: .secondary)
+                PetIconButton(systemImage: "xmark", accent: SoftNativeStyle.secondary)
             }
             .buttonStyle(.plain)
             .help("Hide Desktop Pet")
@@ -227,7 +229,7 @@ struct DesktopPetView: View {
     private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(accentColor(for: snapshot.state).opacity(isDropTargeted ? 0.22 : 0.12))
+                .fill(faceSurfaceColor(for: snapshot.state).opacity(isDropTargeted ? 1.0 : 0.92))
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 1)
@@ -263,7 +265,8 @@ struct DesktopPetView: View {
                     .foregroundStyle(accentColor(for: snapshot.state))
                     .frame(width: 22, height: 22)
                     .background(.regularMaterial, in: Circle())
-                    .overlay(Circle().stroke(.secondary.opacity(0.18), lineWidth: 1))
+                    .background(SoftNativeStyle.surface.opacity(0.78), in: Circle())
+                    .overlay(Circle().stroke(SoftNativeStyle.border, lineWidth: 1))
                     .padding(2)
                     .accessibilityHidden(true)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
@@ -520,15 +523,37 @@ struct DesktopPetView: View {
     private func accentColor(for state: DesktopPetDisplayState) -> Color {
         switch state {
         case .idle:
-            return .accentColor
+            return SoftNativeStyle.accent
         case .needsSetup, .confirm:
-            return .orange
+            return SoftNativeStyle.secondary
         case .eating:
-            return .accentColor
+            return SoftNativeStyle.accent
         case .done:
-            return .green
+            return SoftNativeStyle.success
         case .issues, .permission:
-            return .red
+            return SoftNativeStyle.danger
+        }
+    }
+
+    private func stateSurfaceColor(for state: DesktopPetDisplayState) -> Color {
+        switch state {
+        case .idle, .eating, .done:
+            return SoftNativeStyle.accentSoft.opacity(0.48)
+        case .needsSetup, .confirm:
+            return SoftNativeStyle.secondarySoft.opacity(0.58)
+        case .issues, .permission:
+            return SoftNativeStyle.surface.opacity(0.66)
+        }
+    }
+
+    private func faceSurfaceColor(for state: DesktopPetDisplayState) -> Color {
+        switch state {
+        case .idle, .eating, .done:
+            return SoftNativeStyle.accentSoft
+        case .needsSetup, .confirm:
+            return SoftNativeStyle.secondarySoft
+        case .issues, .permission:
+            return SoftNativeStyle.elevated
         }
     }
 
@@ -583,10 +608,10 @@ private struct PetTopActionLabel: View {
             Text(title)
                 .font(.system(size: 11, weight: .medium))
         }
-        .foregroundStyle(isHovered ? Color.accentColor : Color.secondary)
+        .foregroundStyle(isHovered ? SoftNativeStyle.accent : Color.secondary)
         .padding(.horizontal, 6)
         .frame(height: 22)
-        .background(isHovered ? Color.accentColor.opacity(0.10) : Color.clear, in: Capsule())
+        .background(isHovered ? SoftNativeStyle.accentSoft : Color.clear, in: Capsule())
         .contentShape(Capsule())
         .onHover { isHovered = $0 }
     }

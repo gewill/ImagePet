@@ -39,6 +39,7 @@
 		6E1D8DF5CF4B366725F9F100 /* CompressionBatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7E1B8A4827313A572EA88 /* CompressionBatchSummary.swift */; };
 		762AFE210909358E8AEAC379 /* OutputFolderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23F4F1A21E8F4FC4C0E5D /* OutputFolderPanel.swift */; };
 		77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F9729CED642EBCF472BAC1 /* ContentView.swift */; };
+		7D20F29A3F1A40159F0DCA21 /* SoftNativeStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */; };
 		84DF67E7F26FB52ADF4008D2 /* OutputNameAllocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */; };
 		8562B9F7A06B8B4C41EAE8F7 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DB24BBAA65BB7DBA78A4FF /* ModelTests.swift */; };
 		85964FC9A85A3838F50BD640 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = F6B0246EDBD395211A9A2FCF /* ArgumentParser */; };
@@ -169,6 +170,7 @@
 		7226EBDFBBC3D3F690B4C295 /* SupportedImageFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedImageFormatTests.swift; sourceTree = "<group>"; };
 		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
 		7BE319DDF6542DE0C863105A /* CompressionPresetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPresetTests.swift; sourceTree = "<group>"; };
+		7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftNativeStyle.swift; sourceTree = "<group>"; };
 		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; includeInIndex = 0; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
@@ -391,6 +393,7 @@
 				2845AD061C173BB07CE9F82B /* DesktopPetView.swift */,
 				D63122AAD9F56829BED8AD2B /* FolderWatchingSection.swift */,
 				83FD78B2591A703F59ECE6F7 /* HelpView.swift */,
+				7D20F2993F1A40159F0DCA21 /* SoftNativeStyle.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -611,6 +614,7 @@
 				EE328D8FBFBD56372D470CEC /* DesktopPetView.swift in Sources */,
 				EDA254AC8E096DC665C92353 /* DesktopPetWindowController.swift in Sources */,
 				8B0AE1F2462AE4500A1820DC /* FileSizeFormatting.swift in Sources */,
+				7D20F29A3F1A40159F0DCA21 /* SoftNativeStyle.swift in Sources */,
 				2BDCAAEB14319197828116A8 /* FolderMonitor.swift in Sources */,
 				897CF058BBC73FBD1848DAB6 /* FolderWatchManager.swift in Sources */,
 				98E3A9EE00DCE60CAC8E9226 /* FolderWatchingSection.swift in Sources */,

@@ -502,21 +502,56 @@ final class ImagePetStore: ObservableObject {
     }
 
     @discardableResult
-    private func focusMainWindowIfPresent() -> Bool {
-        for window in NSApp.windows {
-            guard window.isVisible else {
-                continue
-            }
+    func waitForMainWindowActivation(timeoutNanoseconds: UInt64 = 800_000_000) async -> Bool {
+        if focusMainWindowIfPresent() {
+            return true
+        }
 
-            if window.title == "ImagePet" || window.identifier?.rawValue == "main" || window.frameAutosaveName == "ImagePet" {
-                if window.isMiniaturized {
-                    window.deminiaturize(nil)
-                }
-                window.makeKeyAndOrderFront(nil)
+        let deadline = ContinuousClock.now + .nanoseconds(Int(timeoutNanoseconds))
+        while ContinuousClock.now < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            if focusMainWindowIfPresent() {
                 return true
             }
         }
+
+        return focusMainWindowIfPresent()
+    }
+
+    @discardableResult
+    private func focusMainWindowIfPresent() -> Bool {
+        for window in NSApp.windows {
+            guard window.isVisible, isMainApplicationWindow(window) else {
+                continue
+            }
+
+            if window.isMiniaturized {
+                window.deminiaturize(nil)
+            }
+            window.makeKeyAndOrderFront(nil)
+            return true
+        }
         return false
+    }
+
+    private func isMainApplicationWindow(_ window: NSWindow) -> Bool {
+        if window.identifier?.rawValue == "main" || window.title == "ImagePet" || window.frameAutosaveName == "ImagePet" {
+            return true
+        }
+
+        guard window.contentView != nil else {
+            return false
+        }
+
+        if window.identifier?.rawValue == "DesktopPetWindow" || window.title == "ImagePet Help" {
+            return false
+        }
+
+        let generatedContentViewWindow = window.title.contains("ImagePet.ContentView")
+        let standardAppWindow = window.styleMask.contains(.titled)
+            && window.styleMask.contains(.closable)
+            && window.styleMask.contains(.resizable)
+        return generatedContentViewWindow || standardAppWindow
     }
 
     var succeededCount: Int {
@@ -816,7 +851,7 @@ final class ImagePetStore: ObservableObject {
         case .addImages:
             activateMainWindow()
             Task { @MainActor in
-                await Task.yield()
+                _ = await waitForMainWindowActivation()
                 chooseInputImages()
             }
         case .revealOutput:
