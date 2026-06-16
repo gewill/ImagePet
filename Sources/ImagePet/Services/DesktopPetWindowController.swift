@@ -67,6 +67,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
     private func updateWindowSize(for mode: DesktopPetViewMode) {
         guard let window = self.window else { return }
+        window.hasShadow = (mode == .full)
         let newSize = mode == .mini ? Self.miniSize : Self.fullSize
         let currentFrame = window.frame
         let newOrigin: NSPoint
@@ -104,7 +105,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window.contentView = NSHostingView(rootView: DesktopPetView(store: store))
         window.backgroundColor = .clear
         window.isOpaque = false
-        window.hasShadow = true
+        window.hasShadow = (store.petViewMode == .full)
         window.isReleasedWhenClosed = false
         window.level = .floating
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]

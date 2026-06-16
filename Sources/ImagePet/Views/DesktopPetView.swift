@@ -232,7 +232,7 @@ struct DesktopPetView: View {
                 .fill(faceSurfaceColor(for: snapshot.state).opacity(isDropTargeted ? 1.0 : 0.92))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(accentColor(for: snapshot.state).opacity(0.22), lineWidth: 0.5)
+                        .strokeBorder(accentColor(for: snapshot.state).opacity(currentMode == .mini ? 0.12 : 0.22), lineWidth: 0.5)
                 )
 
             ZStack {
@@ -273,7 +273,11 @@ struct DesktopPetView: View {
             }
         }
         .frame(width: 66, height: 58)
-        .shadow(color: accentColor(for: snapshot.state).opacity(0.18), radius: isDropTargeted ? 10 : 6, y: 3)
+        .shadow(
+            color: accentColor(for: snapshot.state).opacity(currentMode == .mini ? 0.08 : 0.18),
+            radius: currentMode == .mini ? 3 : (isDropTargeted ? 10 : 6),
+            y: currentMode == .mini ? 1.5 : 3
+        )
     }
 
     private func miniView(for snapshot: DesktopPetSnapshot) -> some View {
