@@ -45,8 +45,12 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
 
             XCTAssertEqual(files.count, spec.frames, "\(theme)/\(spec.name) should have the expected frame count")
 
+            var uniqueFrames = Set<Data>()
             for (index, fileURL) in files.enumerated() {
                 XCTAssertEqual(fileURL.lastPathComponent, String(format: "frame_%03d.png", index))
+
+                let frameData = try Data(contentsOf: fileURL)
+                uniqueFrames.insert(frameData)
 
                 let values = try fileURL.resourceValues(forKeys: [.fileSizeKey])
                 totalBytes += values.fileSize ?? 0
@@ -57,6 +61,12 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
                 XCTAssertEqual(cgImage.height, 256, "\(fileURL.path) should be 256 px tall")
                 XCTAssertTrue(hasVisiblePixels(cgImage), "\(theme)/\(spec.name)/\(fileURL.lastPathComponent) should not be blank")
             }
+
+            XCTAssertGreaterThan(
+                uniqueFrames.count,
+                1,
+                "\(theme)/\(spec.name) should contain animated frame variation, not duplicated placeholder frames"
+            )
         }
 
         XCTAssertLessThanOrEqual(totalBytes, 3 * 1024 * 1024, "\(theme) theme should stay under the PRD 3 MB budget")
