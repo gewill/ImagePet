@@ -219,3 +219,33 @@ xcodebuild -project ImagePet.xcodeproj -scheme ImagePet -configuration Debug -de
 ```
 
 如果本地存在 `TestImages/Apple`，`AppleFixtureCompressionTests` 会使用 Apple Newsroom 测试素材跑一遍真实压缩；如果素材不存在，该测试会自动 skip。
+
+## Open Source & Contributing (开源与贡献)
+
+ImagePet 已正式采用 **MIT License** 开源，我们非常欢迎来自社区的贡献与反馈！
+
+### 开源自查与准备工作 (Preparation Checklist)
+
+在将仓库公开发布 (Make Public) 或提交 Pull Request 之前，请确保完成以下自查工作：
+
+1. **证书与签名 (Signing & Sandbox)**:
+   - 本地开发建议使用 Xcode 自动管理签名 (Apple Development)。请勿提交带有硬编码或敏感私有证书的 `project.pbxproj` 文件。
+   - 必须保持 App Sandbox (`.entitlements`) 开启，确保所有的本地文件读写操作遵循沙盒机制，并正确使用安全书签 (Security-scoped bookmarks)。
+
+2. **忽略构建产物 (Git Cleanliness)**:
+   - 请检查并确保未提交 `DerivedData`、`.build`、`xcuserdata`、`.xcuserstate` 以及任何本地测试图片（如 `TestImages`）。
+
+3. **提交规范 (Conventional Commits)**:
+   - 项目使用约定式提交规范。请确保您的 Commit Message 格式为：`<type>(<scope>): <subject>`（例如 `feat(app): add batch compression UI`, `fix(core): preserve output filename uniqueness`）。
+
+### 贡献引导
+
+- **提交反馈**: 如果您在使用中遇到问题或有新功能想法，请通过 [GitHub Issues](https://github.com/gewill/ImagePet/issues) 提交，我们会根据提供的运行环境模板进行跟进。
+- **核心开发边界**:
+  - 任何**图片压缩/编码/解码行为**相关的修改应严格限制在 `Sources/ImagePetCore` 内部，不能引入任何 SwiftUI/AppKit UI 或 App 主运行时的依赖。
+  - 主 GUI 和交互逻辑依然在 `Sources/ImagePet` 下进行迭代。
+
+## License
+
+本项目基于 [MIT License](LICENSE) 协议开源。
+
