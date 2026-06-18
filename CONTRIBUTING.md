@@ -34,6 +34,14 @@ ImagePet has strict code boundaries. Please respect these when adding new featur
 
 You can build and run the application in two ways:
 
+### Code Signing & Developer Team ID
+The project is configured by default with the development team ID `RLK76T8Y89` in `project.yml` and `ImagePet.xcodeproj`. 
+If you encounter code signing errors while building:
+1. Open the project in Xcode.
+2. Select the `ImagePet` project in the project navigator, then go to the **Signing & Capabilities** tab of the `ImagePet` target.
+3. Change the **Team** setting to your own Apple Developer Team (or select a personal development team).
+4. (Optional) If you are using XcodeGen to regenerate the project, you can update the `DEVELOPMENT_TEAM` value in `project.yml` before running `xcodegen generate`.
+
 ### Using Xcode
 Open the committed [ImagePet.xcodeproj](file:///Users/rxwill/git/MyApps/ImagePet/ImagePet.xcodeproj) directly in Xcode, select the `ImagePet` scheme, and hit **Product -> Run** (⌘R).
 
