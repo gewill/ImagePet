@@ -8,13 +8,11 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "ImagePetApp", targets: ["ImagePetApp"]),
         .executable(name: "imagepet", targets: ["ImagePetCLI"])
     ],
     dependencies: [
         .package(url: "https://github.com/ainame/Swift-WebP.git", exact: "0.6.1"),
         .package(url: "https://github.com/awxkee/mozjpeg.swift.git", exact: "1.1.3"),
-        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts.git", exact: "2.4.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", exact: "1.3.1")
     ],
     targets: [
@@ -25,21 +23,6 @@ let package = Package(
                 .product(name: "mozjpeg", package: "mozjpeg.swift")
             ],
             path: "Sources/ImagePetCore"
-        ),
-        .executableTarget(
-            name: "ImagePetApp",
-            dependencies: [
-                "ImagePetCore",
-                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts")
-            ],
-            path: "Sources/ImagePet",
-            exclude: [
-                "AppIcon.icon"
-            ],
-            resources: [
-                .process("Assets.xcassets"),
-                .copy("Resources")
-            ]
         ),
         .executableTarget(
             name: "ImagePetCLI",
