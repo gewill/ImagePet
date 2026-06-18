@@ -21,7 +21,8 @@ struct ImagePetCLI: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "imagepet",
         abstract: "ImagePet: A fast local image compressor.",
-        discussion: "Specify one or more image files or directories. The tool will compress them locally."
+        discussion: "Specify one or more image files or directories. The tool will compress them locally.",
+        version: "1.0.0"
     )
 
     @Argument(help: "Input image files or directories.")
