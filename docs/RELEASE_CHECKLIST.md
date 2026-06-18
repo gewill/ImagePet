@@ -92,3 +92,31 @@ This document contains the manual acceptance criteria for validating a Release C
   3. Relaunch the app.
   4. Verify that the custom output directory bookmark restores successfully (no warnings).
   5. Drop images into the watched folder and verify they compress successfully, confirming security-scoped bookmark restoration works perfectly.
+
+---
+
+## 6. Mac App Store Submission Metadata
+
+- **Test Case 6.1: Xcode Cloud Build**
+  1. Push a branch whose name starts with `build`.
+  2. Verify Xcode Cloud starts the packaging workflow.
+  3. Verify the produced build appears in App Store Connect and can be selected for submission or TestFlight review.
+  4. Record branch, commit, version, build number, and Xcode Cloud result.
+
+- **Test Case 6.2: App Store Connect Metadata**
+  1. Open `docs/APP_STORE_METADATA.md`.
+  2. Verify App name, subtitle, description, promotional text, keywords, category, age rating, support URL, privacy policy URL, and review notes are complete in ASC.
+  3. Verify metadata does not mention unreleased features, cloud upload, AI compression, unsupported formats, or Developer ID distribution.
+  4. Verify App Review notes explain how to test the app without login or backend access.
+
+- **Test Case 6.3: Privacy and Compliance**
+  1. Verify ASC App Privacy answers match the actual binary and dependencies.
+  2. Verify privacy policy URL is live and states that image processing is local.
+  3. Verify export compliance / encryption questions are answered.
+  4. Verify age rating questionnaire is completed.
+
+- **Test Case 6.4: Screenshots**
+  1. Upload one to ten macOS screenshots in `.jpeg`, `.jpg`, or `.png` format.
+  2. Verify screenshots are captured from the submitted build.
+  3. Verify screenshots do not expose private filenames, local paths, user data, or unsupported feature claims.
+  4. Verify first screenshot clearly shows the main compression workflow.

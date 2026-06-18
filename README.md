@@ -9,7 +9,7 @@ ImagePet 是一个 macOS 本地图片压缩小工具。当前核心 workflow 是
 
 App 支持 `JPG / PNG / HEIC / WebP` 输入，输出可选择 `Original / JPEG / PNG / HEIC / WebP`。JPEG 输出可在能力可用时启用 Advanced JPEG。非覆盖模式永不覆盖已有文件；覆盖原图模式会二次确认并保持每个文件的原始格式。App 全程本地处理，不上传图片。
 
-当前开发重点已经从核心压缩扩展进入 app 完整性与发布前闭环。v0.13 开发聚焦完整本地通知、后台任务摘要、通知动作、通知节流聚合，以及 Finder / Shortcuts / Folder Watching 等后台入口的可理解反馈。
+当前开发重点已经从核心压缩扩展进入 Mac App Store 上线准备闭环。Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包；v0.15 聚焦 App Store Connect metadata、截图、隐私信息、App Review notes、RC 验收和发布说明，不继续扩大压缩格式或系统入口范围。
 
 ## Project Shape
 
@@ -183,6 +183,9 @@ ImagePet 已经规划并实现多种 macOS 系统入口：
 - [PRD v0.11: App 完整性、帮助中心与可自定义快捷键](docs/PRD_v0.11_app_completeness.md)
 - [PRD v0.12: 系统级集成与自动化工作流](docs/PRD_v0.12_system_integration.md)
 - [PRD v0.13: 本地通知与发布完整性闭环](docs/PRD_v0.13_local_notifications_and_release_completeness.md)
+- [PRD v0.14: Soft Native 主窗口重设计方案](docs/PRD_v0.14_soft_native_main_window_redesign.md)
+- [PRD v0.15: Release Candidate 与上线准备](docs/PRD_v0.15_release_candidate_and_distribution.md)
+- [App Store Connect Metadata](docs/APP_STORE_METADATA.md)
 - [Progress](docs/PROGRESS.md)
 
 ## Run
