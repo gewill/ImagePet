@@ -294,12 +294,12 @@ private enum HelpContent {
                 HelpSection(
                     "Install",
                     paragraphs: [
-                        "Build the CLI tool with SwiftPM and copy the binary to a directory in your PATH."
+                        "You can download the pre-compiled binary from GitHub Releases, install it via Homebrew, or compile it yourself using SwiftPM."
                     ],
                     bullets: [
-                        "swift build -c release",
-                        "cp .build/release/imagepet /usr/local/bin/",
-                        "Or run directly: swift run imagepet [options] <files...>"
+                        "Via Homebrew: brew install gewill/tap/imagepet",
+                        "Via GitHub: Download from github.com/gewill/ImagePet/releases",
+                        "Build from source: swift build -c release && cp .build/release/imagepet /usr/local/bin/"
                     ]
                 ),
                 HelpSection(
