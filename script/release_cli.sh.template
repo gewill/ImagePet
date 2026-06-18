@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# ImagePet CLI - Sign and Notarize Script Template (Option A)
+# Copy this file to "release_cli.sh" and fill in your actual credentials.
+# Note: "release_cli.sh" is ignored by git to protect your Apple credentials.
+
+set -euo pipefail
+
+# === 配置区 (Configuration) ===
+# 填入你的 Developer ID Application 证书全名，例如 "Developer ID Application: Wei Ge (G94UBFV868)"
+CERTIFICATE_NAME="Developer ID Application: Your Name (TEAM_ID)"
+
+# 填入你的 Apple ID 邮箱地址，例如 "developer@example.com"
+APPLE_ID="your-apple-id-email@example.com"
+
+# 填入生成的 App 专用密码（App-Specific Password），格式为 xxxx-xxxx-xxxx-xxxx
+APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+
+# 填入你的 Apple Developer Team ID，例如 "G94UBFV868"
+TEAM_ID="YOUR_TEAM_ID"
+# ==============================
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_DIR"
+
+# 检查占位符是否被替换
+if [[ "$CERTIFICATE_NAME" == *"Your Name"* ]] || [[ "$APPLE_ID" == *"your-apple-id"* ]] || [[ "$APP_SPECIFIC_PASSWORD" == *"xxxx-xxxx"* ]]; then
+  echo "❌ Error: 请在 release_cli.sh 中填入你真实的证书和 Apple 凭证信息。"
+  exit 1
+fi
+
+echo "=== 1. 正在编译 Release 版本 CLI ==="
+swift build -c release --product imagepet
+
+echo "=== 2. 正在进行 Hardened Runtime 签名 ==="
+codesign --force \
+  --options runtime \
+  --sign "$CERTIFICATE_NAME" \
+  .build/release/imagepet
+
+echo "=== 3. 正在打包 ZIP ==="
+cd .build/release
+rm -f imagepet-cli.zip
+zip -r imagepet-cli.zip imagepet
+
+echo "=== 4. 正在提交苹果服务器公证 (Notarization) ==="
+xcrun notarytool submit imagepet-cli.zip \
+  --apple-id "$APPLE_ID" \
+  --password "$APP_SPECIFIC_PASSWORD" \
+  --team-id "$TEAM_ID" \
+  --wait
+
+echo "=== 5. 正在附着公证凭证 (Stapling) ==="
+xcrun stapler staple imagepet
+
+echo "=== 🎉 CLI 发布准备完成！二进制文件已签名公证完毕 ==="
