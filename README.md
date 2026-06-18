@@ -189,6 +189,8 @@ ImagePet 已经规划并实现多种 macOS 系统入口：
 - [Static Website](website/README.md)
 - [App Store Connect Metadata Index](docs/APP_STORE_METADATA.md)
 - [Progress](docs/PROGRESS.md)
+- [Third-Party Notices](docs/THIRD_PARTY_NOTICES.md)
+
 
 ## Run
 
