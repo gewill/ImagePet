@@ -26,6 +26,6 @@ echo "Preparing static deploy bundle..."
 cp -R dist/. "$DEPLOY_DIR"/
 
 echo "Deploying to Cloudflare Pages project: $PROJECT_NAME"
-npx wrangler pages deploy "$DEPLOY_DIR" --project-name="$PROJECT_NAME"
+npx wrangler pages deploy "$DEPLOY_DIR" --project-name="$PROJECT_NAME" "$@"
 
 echo "Deployment complete."
