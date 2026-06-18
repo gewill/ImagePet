@@ -58,11 +58,17 @@ xcrun notarytool submit imagepet-cli.zip \
 ```
 *`--wait` 参数会阻塞终端，并实时输出公证进度（通常耗时 1 到 3 分钟），直到服务器返回 `Accepted`（成功）或 `Invalid`（失败）。*
 
-### 步骤 5：附着公证凭证 (Staple)
-当公证成功后，你需要将苹果的公证凭证（Ticket）附着在你的二进制文件上，这称为 Staple。这样用户即使在断网状态下首次双击运行，系统也能识别出已通过安全扫描：
+### 步骤 5：验证公证与签名结果
+由于 `stapler` 只能应用于 `.app`、`.dmg` 或 `.pkg` 等打包/包格式，对于单独的命令行工具裸可执行文件（如 `imagepet` CLI），在公证成功后**不需要（也无法）执行 staple**。当用户首次在终端运行时，macOS Gatekeeper 会自动向苹果公证服务器在线核对公证状态。
+
+你可以通过以下命令在本地验证签名与公证状态：
 ```bash
-# 注意：stapler 必须直接作用在 imagepet 二进制文件本身上，而不是 ZIP 上
-xcrun stapler staple imagepet
+# 验证打包后的 ZIP 压缩包的公证状态
+spctl -a -vvv -t install imagepet-cli.zip
+
+# 验证本地解压出的二进制文件的签名状态
+codesign --verify --strict --verbose=2 imagepet
+codesign -dv --verbose=4 imagepet
 ```
 
 ---
@@ -109,10 +115,14 @@ xcrun notarytool submit imagepet-cli.zip \
   --team-id "$TEAM_ID" \
   --wait
 
-echo "=== 5. 正在附着公证凭证 (Stapling) ==="
-xcrun stapler staple imagepet
+echo "=== 5. 正在验证公证结果 ==="
+spctl -a -vvv -t install imagepet-cli.zip
 
-echo "=== 🎉 CLI 发布准备完成！二进制文件已签名公证完毕 ==="
+echo "=== 6. 正在验证本地二进制签名 ==="
+codesign --verify --strict --verbose=2 imagepet
+codesign -dv --verbose=4 imagepet
+
+echo "=== 🎉 完成：CLI 已签名并通过 Notarization ==="
 ```
 运行脚本即可自动完成全套流程。
 

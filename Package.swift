@@ -37,6 +37,7 @@ let package = Package(
                 "AppIcon.icon"
             ],
             resources: [
+                .process("Assets.xcassets"),
                 .copy("Resources")
             ]
         ),

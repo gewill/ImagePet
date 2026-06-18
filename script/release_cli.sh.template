@@ -49,7 +49,12 @@ xcrun notarytool submit imagepet-cli.zip \
   --team-id "$TEAM_ID" \
   --wait
 
-echo "=== 5. 正在附着公证凭证 (Stapling) ==="
-xcrun stapler staple imagepet
+echo "=== 5. 正在验证公证结果 ==="
+spctl -a -vvv -t install imagepet-cli.zip
 
-echo "=== 🎉 CLI 发布准备完成！二进制文件已签名公证完毕 ==="
+echo "=== 6. 正在验证本地二进制签名 ==="
+codesign --verify --strict --verbose=2 imagepet
+codesign -dv --verbose=4 imagepet
+
+echo "=== 🎉 完成：CLI 已签名并通过 Notarization ==="
+
