@@ -54,10 +54,10 @@
     "processingLocation": "Local Mac"
   },
   "links": {
-    "support": null,
-    "privacyPolicy": null,
-    "marketing": null,
-    "macAppStore": null
+    "support": "mailto:531sunlight@gmail.com",
+    "privacyPolicy": "https://imagepet-website.pages.dev/en/privacy",
+    "marketing": "https://imagepet-website.pages.dev",
+    "macAppStore": "https://apps.apple.com/app/id6780180225"
   },
   "sourceReferences": {
     "thirdPartyNotices": "docs/THIRD_PARTY_NOTICES.md",
