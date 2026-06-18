@@ -351,8 +351,8 @@ function App() {
         <div className="support-panel" id="support">
           <h2>{locale.website.support.title}</h2>
           <p>{locale.website.support.summary}</p>
-          <a className="support-link" href={metadataLink(links.support, "mailto:")}>
-            Support URL will be added before App Store submission.
+          <a className="support-link" href={metadataLink(links.support, "mailto:")} target="_blank" rel="noreferrer">
+            Open Support Issues on GitHub
           </a>
         </div>
       </section>
@@ -385,7 +385,7 @@ function App() {
           <a href={appStoreHref} aria-disabled={!links.macAppStore}>
             App Store
           </a>
-          <a href="https://github.com/" rel="noreferrer">
+          <a href="https://github.com/gewill/ImagePet" target="_blank" rel="noreferrer">
             GitHub
           </a>
         </div>
