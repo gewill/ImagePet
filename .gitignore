@@ -9,5 +9,4 @@ xcuserdata/
 *.xcuserstate
 *.tsbuildinfo
 website/tmp-qa/
-script/release_cli.sh
 

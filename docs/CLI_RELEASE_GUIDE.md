@@ -16,6 +16,14 @@
 3. **App 专用密码 (App-Specific Password)**：
    - 登录你的 Apple ID 账户管理页面 ([appleid.apple.com](https://appleid.apple.com))。
    - 在“登录和安全”中，点击“App 专用密码”，生成一个专门用于公证的密码并保存。
+4. **存储公证凭证到 macOS 钥匙串中（强烈推荐）**：
+   - 运行以下命令，将凭证安全地存储到本地系统中（命名为 `imagepet-notary-profile`）：
+     ```bash
+     xcrun notarytool store-credentials "imagepet-notary-profile" \
+       --apple-id "your-apple-id-email@example.com" \
+       --team-id "YOUR_TEAM_ID"
+     ```
+   - 系统会提示您输入刚刚生成的 App 专用密码。完成后，此凭证将以加密形式保存在本地 Keychain 中，无需在任何脚本或环境变量中暴露明文密码。
 
 ---
 
@@ -48,8 +56,14 @@ zip -r imagepet-cli.zip imagepet
 ```
 
 ### 步骤 4：提交至苹果公证服务器
-使用 `notarytool` 命令行工具提交你的 ZIP 包：
+我们强烈推荐使用已配置的 Keychain profile 提交公证，以避免在命令行中暴露密码：
 ```bash
+# 推荐方式：使用 Keychain Profile
+xcrun notarytool submit imagepet-cli.zip \
+  --keychain-profile "imagepet-notary-profile" \
+  --wait
+
+# 备选方式：直接在命令中传入凭证
 xcrun notarytool submit imagepet-cli.zip \
   --apple-id "YOUR_APPLE_ID_EMAIL" \
   --password "YOUR_APP_SPECIFIC_PASSWORD" \
@@ -75,56 +89,27 @@ codesign -dv --verbose=4 imagepet
 
 ## 3. 一键自动化脚本 `script/release_cli.sh`
 
-为了免去每次手动输入命令，你可以创建并运行如下的自动化脚本。
+项目已包含一键签名与公证的自动化脚本 [release_cli.sh](file:///Users/rxwill/git/MyApps/ImagePet/script/release_cli.sh)。该脚本**完全不含任何硬编码密钥或证书**，可在开源环境中安全公开。
 
-在 `script/release_cli.sh` 中写入：
+### 运行方式
 
+#### 运行选项 1：使用 Keychain 凭证（推荐）
+在本地 Keychain 存好凭证后，只需要传入 Profile 名称运行：
 ```bash
-#!/usr/bin/env bash
-# ImagePet CLI - Sign and Notarize Script (Option A)
-set -euo pipefail
-
-# === 配置区 ===
-CERTIFICATE_NAME="Developer ID Application: Your Name (TEAM_ID)"
-APPLE_ID="your-email@example.com"
-APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
-TEAM_ID="YOUR_TEAM_ID"
-# ==============
-
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$PROJECT_DIR"
-
-echo "=== 1. 正在编译 Release 版本 CLI ==="
-swift build -c release --product imagepet
-
-echo "=== 2. 正在进行 Hardened Runtime 签名 ==="
-codesign --force \
-  --options runtime \
-  --sign "$CERTIFICATE_NAME" \
-  .build/release/imagepet
-
-echo "=== 3. 正在打包 ZIP ==="
-cd .build/release
-rm -f imagepet-cli.zip
-zip -r imagepet-cli.zip imagepet
-
-echo "=== 4. 正在提交苹果服务器公证 (Notarization) ==="
-xcrun notarytool submit imagepet-cli.zip \
-  --apple-id "$APPLE_ID" \
-  --password "$APP_SPECIFIC_PASSWORD" \
-  --team-id "$TEAM_ID" \
-  --wait
-
-echo "=== 5. 正在验证公证结果 ==="
-spctl -a -vvv -t install imagepet-cli.zip
-
-echo "=== 6. 正在验证本地二进制签名 ==="
-codesign --verify --strict --verbose=2 imagepet
-codesign -dv --verbose=4 imagepet
-
-echo "=== 🎉 完成：CLI 已签名并通过 Notarization ==="
+NOTARY_PROFILE="imagepet-notary-profile" ./script/release_cli.sh
 ```
-运行脚本即可自动完成全套流程。
+
+#### 运行选项 2：使用临时环境变量
+如果不使用 Keychain，可通过环境变量传入必要凭证：
+```bash
+CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
+NOTARY_APPLE_ID="your-email@example.com" \
+NOTARY_PASSWORD="xxxx-xxxx-xxxx-xxxx" \
+NOTARY_TEAM_ID="YOUR_TEAM_ID" \
+./script/release_cli.sh
+```
+*(注：如果本地 Keychain 只有一个 Developer ID 签名证书，可省略 `CODESIGN_IDENTITY` 环境变量，脚本会尝试自动检测)*
+
 
 ---
 
