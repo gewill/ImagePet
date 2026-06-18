@@ -185,7 +185,9 @@ ImagePet 已经规划并实现多种 macOS 系统入口：
 - [PRD v0.13: 本地通知与发布完整性闭环](docs/PRD_v0.13_local_notifications_and_release_completeness.md)
 - [PRD v0.14: Soft Native 主窗口重设计方案](docs/PRD_v0.14_soft_native_main_window_redesign.md)
 - [PRD v0.15: Release Candidate 与上线准备](docs/PRD_v0.15_release_candidate_and_distribution.md)
-- [App Store Connect Metadata](docs/APP_STORE_METADATA.md)
+- [Metadata Source](metadata/README.md)
+- [Static Website](website/README.md)
+- [App Store Connect Metadata Index](docs/APP_STORE_METADATA.md)
 - [Progress](docs/PROGRESS.md)
 
 ## Run

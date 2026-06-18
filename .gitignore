@@ -1,8 +1,11 @@
 .DS_Store
 .build/
 .swiftpm/
+node_modules/
 dist/
 TestImages/
 DerivedData/
 xcuserdata/
 *.xcuserstate
+*.tsbuildinfo
+website/tmp-qa/

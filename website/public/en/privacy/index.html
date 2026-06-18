@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - ImagePet</title>
+  <style>
+    :root {
+      --bg: #f7fbf6;
+      --paper: #ffffff;
+      --ink: #1d2420;
+      --muted: #66746d;
+      --muted-strong: #41524a;
+      --line: rgba(42, 64, 55, 0.12);
+      --accent: #1c7a61;
+      --accent-soft: #e0f6ec;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      font-family: var(--font);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .legal-container {
+      max-width: 760px;
+      margin: 40px auto;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(29, 36, 32, 0.04);
+      border: 1px solid rgba(29, 36, 32, 0.08);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(29, 36, 32, 0.08);
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    .legal-card {
+      margin-top: 24px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 16px 48px rgba(40, 72, 60, 0.05);
+    }
+
+    .legal-header {
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+    }
+
+    .legal-header h1 {
+      font-size: 36px;
+      font-weight: 820;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .last-updated {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .legal-section {
+      margin-bottom: 32px;
+    }
+
+    .legal-section h2 {
+      font-size: 20px;
+      font-weight: 780;
+      color: var(--ink);
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    .legal-section p {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .legal-section a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .legal-section a:hover {
+      text-decoration: underline;
+    }
+
+    .legal-footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--muted);
+      opacity: 0.8;
+    }
+
+    /* Floating Interactive Desktop Pet Mini */
+    .floating-desktop-pet {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .floating-desktop-pet:hover {
+      transform: translateY(-6px);
+    }
+
+    .floating-desktop-pet:active {
+      transform: scale(0.92) translateY(-2px);
+    }
+
+    .floating-pet-card {
+      width: 88px;
+      height: 88px;
+      border-radius: 16px;
+      background-color: var(--accent-soft);
+      border: 1.5px solid rgba(36, 122, 97, 0.16);
+      box-shadow: 
+        0 16px 36px rgba(29, 36, 32, 0.18), 
+        0 4px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .floating-pet-img {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .floating-pet-tooltip {
+      position: absolute;
+      bottom: 104px;
+      right: 0;
+      width: 200px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(29, 36, 32, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+      transform-origin: bottom right;
+      transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .floating-pet-tooltip::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      right: 36px;
+      width: 10px;
+      height: 10px;
+      background: #ffffff;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      transform: rotate(45deg);
+    }
+
+    .floating-desktop-pet:hover .floating-pet-tooltip {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .floating-pet-tooltip strong {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .floating-pet-tooltip span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+      margin-top: 3px;
+    }
+
+    .floating-pet-tooltip .tooltip-hint {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--muted-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes petPop {
+      0% {
+        transform: scale(0.75) translateY(5px);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 12px;
+      }
+      .legal-card {
+        padding: 24px;
+      }
+      .legal-header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="legal-container">
+    <a href="/" class="back-btn">← Back to Home</a>
+
+    <div class="legal-card">
+      <div class="legal-header">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: June 2026</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Introduction</h2>
+        <p>This Privacy Policy explains how ImagePet collects, uses, and protects your personal information. We are committed to ensuring that your privacy is protected.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Information Collection</h2>
+        <p><strong>ImagePet does not collect, store, or upload any private information.</strong> The app performs image compression locally on your device. All files and settings are processed exclusively on your device and are never transmitted to any external servers.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Data Storage</h2>
+        <p>All data generated by the app (including images and settings) is stored locally on your device.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Third-Party Services</h2>
+        <p>ImagePet does not integrate with any third-party analytics, advertising, or data collection services.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Children's Privacy</h2>
+        <p>Our app does not address anyone under the age of 4. We do not knowingly collect personal information from children.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Changes to This Policy</h2>
+        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the Last updated date.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Contact Us</h2>
+        <p>
+          If you have any questions about this Privacy Policy, please contact us at
+          <a href="mailto:531sunlight@gmail.com">531sunlight@gmail.com</a>.
+        </p>
+      </div>
+
+      <div class="legal-footer">
+        <p>&copy; 2026 ImagePet. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Interactive Desktop Pet Mini -->
+  <div class="floating-desktop-pet" onclick="cyclePet()">
+    <div class="floating-pet-tooltip">
+      <strong id="pet-name">Desktop Pet: Dog</strong>
+      <span id="pet-desc">Friendly all-round puppy</span>
+      <span class="tooltip-hint">Click to switch theme</span>
+    </div>
+    <div class="floating-pet-card">
+      <img id="pet-img" src="/pets/dog.png" alt="Desktop pet" class="floating-pet-img" />
+    </div>
+  </div>
+
+  <script>
+    const pets = [
+      { name: "Dog", desc: "Friendly all-round puppy", image: "/pets/dog.png" },
+      { name: "Pufferfish", desc: "Soft floating pacing", image: "/pets/pufferfish.png" },
+      { name: "Squirrel", desc: "Quick-tailed motion", image: "/pets/squirrel.png" },
+      { name: "Hamster", desc: "Cozy and compact", image: "/pets/hamster.png" },
+      { name: "Cat", desc: "Warm orange idle", image: "/pets/cat.png" },
+      { name: "Rabbit", desc: "Light springy movement", image: "/pets/rabbit.png" }
+    ];
+    let activeIndex = 0;
+    
+    function cyclePet() {
+      activeIndex = (activeIndex + 1) % pets.length;
+      const img = document.getElementById("pet-img");
+      img.src = pets[activeIndex].image;
+      document.getElementById("pet-name").innerText = "Desktop Pet: " + pets[activeIndex].name;
+      document.getElementById("pet-desc").innerText = pets[activeIndex].desc;
+      
+      // Re-trigger bounce animation
+      img.style.animation = 'none';
+      img.offsetHeight; // trigger reflow
+      img.style.animation = 'petPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    }
+  </script>
+</body>
+</html>

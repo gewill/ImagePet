@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "appStoreConnect": {
+    "name": "ImagePet",
+    "subtitle": "Local image compression",
+    "promotionalText": "Compress JPG, PNG, HEIC, and WebP images locally on your Mac with a playful desktop pet and no cloud upload.",
+    "description": [
+      "ImagePet is a local-first image compression app for macOS. Drop images into the window, choose a quality preset and output format, then let the pet shrink them on your Mac.",
+      "ImagePet supports JPG, PNG, HEIC, and WebP inputs. Outputs can keep the original format or be written as JPEG, PNG, HEIC, or WebP, depending on the selected workflow and available encoder support. For JPEG output, ImagePet can use its standard encoder or Advanced JPEG when available.",
+      "The app is designed for everyday cleanup work: batch image compression, optional max-edge resizing, metadata stripping, safe output naming, and clear per-file results. It can save to a chosen folder, save next to originals, or overwrite originals only after confirmation.",
+      "ImagePet also includes macOS-native workflow helpers: Finder Quick Action / Services support, Shortcuts integration, Folder Watching for authorized local folders, optional local notifications for background work, and a small desktop pet that reflects compression progress.",
+      "Privacy is simple: ImagePet processes images locally and does not upload your files. It does not require an account, cloud sync, or online service to compress images."
+    ],
+    "whatsNew": "Initial Mac App Store release.",
+    "keywords": [
+      "image compression",
+      "compress photos",
+      "HEIC",
+      "JPG",
+      "PNG",
+      "WebP",
+      "mac image optimizer",
+      "batch resize",
+      "local"
+    ],
+    "supportPageMinimumContent": [
+      "How to contact support or file an issue.",
+      "Supported formats and output behavior.",
+      "Explanation that image processing is local.",
+      "Troubleshooting for output folder permissions, Shortcuts, Finder Quick Action, Folder Watching, and notifications."
+    ],
+    "privacyPolicyMinimumStatements": [
+      "ImagePet processes selected images locally on the Mac.",
+      "ImagePet does not upload images to a server.",
+      "ImagePet does not require account login.",
+      "ImagePet does not include third-party analytics, ads, or tracking in the planned first Mac App Store release.",
+      "Folder Watching uses user-selected local folders and security-scoped access.",
+      "Notifications are local macOS notifications.",
+      "Support requests may include user-provided diagnostic details, but users should not send private images unless they intentionally choose to."
+    ],
+    "reviewNotes": {
+      "summary": "ImagePet is a local image compression utility for macOS. It does not require login, account setup, network access, or backend services.",
+      "basicReviewFlow": [
+        "Launch the app.",
+        "Drag JPG, PNG, HEIC, or WebP images into the main window, or use Add Images.",
+        "Choose a quality preset and output format.",
+        "Choose an output folder if prompted.",
+        "Confirm that compressed output files are created and per-file results are shown."
+      ],
+      "additionalIntegrations": [
+        "Finder Quick Action / Services: select supported images in Finder and invoke ImagePet.",
+        "Shortcuts: use the ImagePet compression action from the Shortcuts app.",
+        "Folder Watching: configure a watched input folder and output folder in Settings, then drop supported images into the watched folder.",
+        "Notifications: enable local notifications in Settings to review completion and attention-needed alerts."
+      ],
+      "sandboxNote": "The app uses sandboxed, user-selected file access. It only reads files and folders selected by the user. Overwrite Original mode requires explicit confirmation."
+    }
+  },
+  "website": {
+    "home": {
+      "metaTitle": "ImagePet - Local image compression for Mac",
+      "metaDescription": "Compress JPG, PNG, HEIC, and WebP images locally on your Mac with ImagePet.",
+      "heroTitle": "ImagePet",
+      "heroSubtitle": "Local image compression for Mac, with a small desktop pet that keeps progress visible.",
+      "primaryCtaLabel": "Download on the Mac App Store",
+      "secondaryCtaLabel": "Read privacy notes"
+    },
+    "sections": [
+      {
+        "id": "local-first",
+        "heading": "Local-first compression",
+        "body": "Drop supported images into ImagePet and compress them on your Mac without account setup, cloud upload, or an online service."
+      },
+      {
+        "id": "batch-workflow",
+        "heading": "Built for batch cleanup",
+        "body": "Use presets, output formats, max-edge resizing, metadata stripping, safe names, and per-file results for everyday image cleanup."
+      },
+      {
+        "id": "mac-workflows",
+        "heading": "Mac workflow helpers",
+        "body": "Use Finder Quick Action, Shortcuts, authorized folder watching, local notifications, and the desktop pet to fit compression into local workflows."
+      },
+      {
+        "id": "desktop-pet",
+        "heading": "A desktop pet that keeps progress visible",
+        "body": "ImagePet can keep a small companion on your desktop, reflect compression state, and make local batch work easier to notice without opening a cloud dashboard."
+      },
+      {
+        "id": "privacy",
+        "heading": "Simple privacy model",
+        "body": "ImagePet processes selected files locally, does not upload images, and does not require login."
+      }
+    ],
+    "support": {
+      "title": "ImagePet Support",
+      "summary": "For support, include your macOS version, ImagePet version, input format, selected output format, and a short description of what happened. Do not send private images unless you intentionally choose to."
+    },
+    "privacy": {
+      "title": "ImagePet Privacy",
+      "summary": "ImagePet is designed around local image processing. Selected images stay on the Mac unless you separately choose to share them through your own tools."
+    }
+  }
+}

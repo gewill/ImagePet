@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。下一步是补齐 App Store Connect metadata、截图、隐私信息、App Review notes 和 RC checklist。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入手工视觉验收、MAS build 验收和 ASC metadata 提交准备。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入手工视觉验收、MAS build 验收和 ASC metadata 提交准备。
 
 已完成：
 
@@ -22,7 +22,8 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.12 系统级集成 (Finder 快速操作、文件夹监听、Shortcuts 快捷指令集成)
 - V0.13 本地通知与发布完整性闭环 (Batch Summary 模型、Folder Watching 2秒防抖合并、Shortcuts/Folder Watching 智能静默与防骚扰策略、20条通知历史持久化与 Debug UI、独立发布 Checklists)
 - V0.15 Release Candidate 与 Mac App Store 上线准备 PRD
-- App Store Connect metadata 草稿
+- App Store Connect / website 共享 metadata 源
+- Cloudflare Pages 友好的静态官网
 - App Sandbox entitlements
 - committed `ImagePet.xcodeproj`
 - SwiftPM 和 Xcode build/test 路径
@@ -53,7 +54,9 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.13 本地通知与发布完整性闭环规划：[PRD_v0.13_local_notifications_and_release_completeness.md](PRD_v0.13_local_notifications_and_release_completeness.md)
 - V0.14 Soft Native 主窗口重设计方案：[PRD_v0.14_soft_native_main_window_redesign.md](PRD_v0.14_soft_native_main_window_redesign.md)
 - V0.15 Release Candidate 与上线准备：[PRD_v0.15_release_candidate_and_distribution.md](PRD_v0.15_release_candidate_and_distribution.md)
-- App Store Connect Metadata：[APP_STORE_METADATA.md](APP_STORE_METADATA.md)
+- Metadata 数据源：[../metadata/README.md](../metadata/README.md)
+- 静态官网：[../website/README.md](../website/README.md)
+- App Store Connect Metadata 索引：[APP_STORE_METADATA.md](APP_STORE_METADATA.md)
 - 项目说明与架构：[../README.md](../README.md)
 - Agent 协作规则：[../AGENTS.md](../AGENTS.md)
 
@@ -98,7 +101,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 快捷指令 (Shortcuts) 集成 | 已实现 | `AppIntents` 编写 `CompressImagesIntent` 并注册 `ImagePetShortcuts` | 真实 Shortcuts app 内搜索动作和传参验证 |
 | 本地通知与发布完整性闭环 | 已实现，本机验证通过 | 整合 `CompressionBatchSummary` 摘要模型、`LocalNotificationManager` 包含防抖合并、防骚扰限频与 Shortcuts/Folder Watching 静默成功策略、历史纪录持久化、设置页面通知控制项及 Debug UI、独立 `RELEASE_CHECKLIST.md` | 手工触发不同入口压缩检查通知展示与通知动作的 Finder 唤起 |
 | Soft Native 主窗口重设计 | DesignSpike 已实现 | `DESIGN.md` + `docs/SoftNative.html` + `docs/PRD_v0.14_soft_native_main_window_redesign.md`；主窗口使用 Soft Native token、紧凑 header、响应式控制项、列表和 summary 视觉重构；Desktop Pet 配色同步 | `swift test`、`git diff --check`、`./script/build_and_run.sh --verify` 已通过；仍需手工视觉验收 |
-| Release Candidate 与上线准备 | 已规划 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`docs/APP_STORE_METADATA.md` 已给出 ASC metadata 草稿 | 补齐 `docs/RELEASE_CHECKLIST.md` MAS 上线验收项，执行 ASC/TestFlight RC 验收 |
+| Release Candidate 与上线准备 | 已规划 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引 | 补齐 `docs/RELEASE_CHECKLIST.md` MAS 上线验收项，执行 ASC/TestFlight RC 验收 |
 
 ## 已验证
 
@@ -274,6 +277,7 @@ org.gewill.ImagePet
 ## 未开始
 
 - App Store Connect metadata 填写与提交
+- 支持页面 URL 与隐私页面 URL 上线后回填 `metadata/app.json`
 - MAS review build / TestFlight smoke
 - App icon
 - V0.4 桌面 Pet 产品化剩余验收

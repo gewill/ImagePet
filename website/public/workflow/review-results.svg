@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-labelledby="title desc">
+  <title id="title">Review results workflow illustration</title>
+  <desc id="desc">A simplified list panel showing successful image compression stats and space savings.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f2f7f4"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1a342b" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="560" rx="32" fill="url(#bg)"/>
+
+  <!-- Dashboard List Panel -->
+  <rect x="150" y="100" width="420" height="360" rx="24" fill="#ffffff" stroke="#1d2420" stroke-width="3" filter="url(#shadow)"/>
+  
+  <!-- Window Header -->
+  <line x1="150" y1="155" x2="570" y2="155" stroke="#1d2420" stroke-width="3"/>
+  <circle cx="180" cy="128" r="6" fill="#ef7f61" stroke="#1d2420" stroke-width="1.5"/>
+  <circle cx="200" cy="128" r="6" fill="#f3c45d" stroke="#1d2420" stroke-width="1.5"/>
+  <circle cx="220" cy="128" r="6" fill="#66c9a8" stroke="#1d2420" stroke-width="1.5"/>
+
+  <!-- ROW 1 -->
+  <g transform="translate(0, 160)">
+    <!-- Checkmark Circle -->
+    <circle cx="195" cy="30" r="14" fill="#dcefe5" stroke="#1c7a61" stroke-width="2"/>
+    <path d="M 190 30 L 194 34 L 201 25" fill="none" stroke="#1c7a61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- File Details Skeleton -->
+    <rect x="230" y="20" width="100" height="8" rx="4" fill="#1d2420"/>
+    <rect x="230" y="34" width="60" height="5" rx="2.5" fill="#66746d" opacity="0.5"/>
+    
+    <!-- Savings Badge -->
+    <rect x="360" y="15" width="70" height="30" rx="15" fill="#e8f8f2" stroke="#66c9a8" stroke-width="2"/>
+    <text x="395" y="34" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" fill="#1c7a61" text-anchor="middle">-75%</text>
+    
+    <!-- Size Line -->
+    <rect x="455" y="26" width="75" height="7" rx="3.5" fill="#66746d" opacity="0.4"/>
+  </g>
+
+  <line x1="175" y1="225" x2="545" y2="225" stroke="#dcefe5" stroke-width="1.5"/>
+
+  <!-- ROW 2 -->
+  <g transform="translate(0, 230)">
+    <!-- Checkmark Circle -->
+    <circle cx="195" cy="30" r="14" fill="#dcefe5" stroke="#1c7a61" stroke-width="2"/>
+    <path d="M 190 30 L 194 34 L 201 25" fill="none" stroke="#1c7a61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- File Details Skeleton -->
+    <rect x="230" y="20" width="80" height="8" rx="4" fill="#1d2420"/>
+    <rect x="230" y="34" width="45" height="5" rx="2.5" fill="#66746d" opacity="0.5"/>
+    
+    <!-- Savings Badge -->
+    <rect x="360" y="15" width="70" height="30" rx="15" fill="#e8f8f2" stroke="#66c9a8" stroke-width="2"/>
+    <text x="395" y="34" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" fill="#1c7a61" text-anchor="middle">-68%</text>
+    
+    <!-- Size Line -->
+    <rect x="455" y="26" width="75" height="7" rx="3.5" fill="#66746d" opacity="0.4"/>
+  </g>
+
+  <line x1="175" y1="295" x2="545" y2="295" stroke="#dcefe5" stroke-width="1.5"/>
+
+  <!-- ROW 3 -->
+  <g transform="translate(0, 300)">
+    <!-- Checkmark Circle -->
+    <circle cx="195" cy="30" r="14" fill="#dcefe5" stroke="#1c7a61" stroke-width="2"/>
+    <path d="M 190 30 L 194 34 L 201 25" fill="none" stroke="#1c7a61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- File Details Skeleton -->
+    <rect x="230" y="20" width="120" height="8" rx="4" fill="#1d2420"/>
+    <rect x="230" y="34" width="75" height="5" rx="2.5" fill="#66746d" opacity="0.5"/>
+    
+    <!-- Savings Badge -->
+    <rect x="360" y="15" width="70" height="30" rx="15" fill="#e8f8f2" stroke="#66c9a8" stroke-width="2"/>
+    <text x="395" y="34" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" fill="#1c7a61" text-anchor="middle">-82%</text>
+    
+    <!-- Size Line -->
+    <rect x="455" y="26" width="75" height="7" rx="3.5" fill="#66746d" opacity="0.4"/>
+  </g>
+
+  <!-- Total Savings Summary Card -->
+  <g transform="translate(175, 380)">
+    <rect x="0" y="0" width="370" height="52" rx="14" fill="#ffd1bf" fill-opacity="0.18" stroke="#ef7f61" stroke-width="2"/>
+    
+    <!-- Sparkle Icon -->
+    <path d="M 30 18 Q 30 26 38 26 Q 30 26 30 34 Q 30 26 22 26 Q 30 26 30 18 Z" fill="#ef7f61"/>
+    
+    <!-- Total Savings Text -->
+    <text x="52" y="32" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="13" fill="#1d2420">Saved 24.5 MB (74%)</text>
+  </g>
+</svg>

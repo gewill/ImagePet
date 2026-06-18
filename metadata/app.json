@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-06-18",
+  "product": {
+    "id": "imagepet",
+    "name": "ImagePet",
+    "bundleIdentifier": "org.gewill.ImagePet",
+    "platform": "macOS",
+    "minimumOS": "macOS 13",
+    "marketingVersion": "1.0.0",
+    "buildNumber": "1",
+    "primaryLocale": "en-US",
+    "supportedLocales": [
+      "en-US"
+    ],
+    "distributionTarget": "Mac App Store"
+  },
+  "capabilities": {
+    "inputFormats": [
+      "JPG",
+      "JPEG",
+      "PNG",
+      "HEIC",
+      "WebP"
+    ],
+    "outputFormats": [
+      "Original",
+      "JPEG",
+      "PNG",
+      "HEIC",
+      "WebP"
+    ],
+    "workflowHelpers": [
+      "Finder Quick Action / Services",
+      "Shortcuts integration",
+      "Folder Watching for authorized local folders",
+      "Local notifications for background work",
+      "Desktop pet progress companion"
+    ],
+    "safety": [
+      "Local processing only",
+      "Sandboxed user-selected file access",
+      "Explicit confirmation before overwriting originals",
+      "Safe output naming when not overwriting"
+    ]
+  },
+  "privacy": {
+    "dataCollected": "None",
+    "tracking": false,
+    "thirdPartyAdvertising": false,
+    "thirdPartyAnalytics": false,
+    "accountRequired": false,
+    "cloudUploadRequired": false,
+    "processingLocation": "Local Mac"
+  },
+  "links": {
+    "support": null,
+    "privacyPolicy": null,
+    "marketing": null,
+    "macAppStore": null
+  },
+  "sourceReferences": {
+    "thirdPartyNotices": "docs/THIRD_PARTY_NOTICES.md",
+    "releaseChecklist": "docs/RELEASE_CHECKLIST.md",
+    "progress": "docs/PROGRESS.md"
+  }
+}

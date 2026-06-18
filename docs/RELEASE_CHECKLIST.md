@@ -104,7 +104,7 @@ This document contains the manual acceptance criteria for validating a Release C
   4. Record branch, commit, version, build number, and Xcode Cloud result.
 
 - **Test Case 6.2: App Store Connect Metadata**
-  1. Open `docs/APP_STORE_METADATA.md`.
+  1. Open `metadata/README.md`, `metadata/app.json`, `metadata/locales/en-US.json`, and `metadata/channels/mac-app-store.json`.
   2. Verify App name, subtitle, description, promotional text, keywords, category, age rating, support URL, privacy policy URL, and review notes are complete in ASC.
   3. Verify metadata does not mention unreleased features, cloud upload, AI compression, unsupported formats, or Developer ID distribution.
   4. Verify App Review notes explain how to test the app without login or backend access.
