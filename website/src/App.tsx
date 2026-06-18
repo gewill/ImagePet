@@ -161,6 +161,22 @@ function App() {
 
   const appStoreHref = metadataLink(links.macAppStore, "#download");
   const privacyHref = metadataLink(links.privacyPolicy, "#privacy");
+  const supportHref = (() => {
+    if (!links.support) return "mailto:";
+    if (links.support.includes("github.com") && links.support.includes("/issues")) {
+      const base = links.support.endsWith("/new") ? links.support : `${links.support.replace(/\/+$/, "")}/new`;
+      const title = encodeURIComponent("[Support] ");
+      const body = encodeURIComponent(
+        "**macOS Version:** \n" +
+        "**ImagePet Version:** \n" +
+        "**Input Format:** \n" +
+        "**Output Format:** \n\n" +
+        "**Description of what happened:** \n"
+      );
+      return `${base}?title=${title}&body=${body}`;
+    }
+    return links.support;
+  })();
 
   if (path === "/en/terms" || path === "/en/terms/") {
     return (
@@ -351,7 +367,7 @@ function App() {
         <div className="support-panel" id="support">
           <h2>{locale.website.support.title}</h2>
           <p>{locale.website.support.summary}</p>
-          <a className="support-link" href={metadataLink(links.support, "mailto:")} target="_blank" rel="noreferrer">
+          <a className="support-link" href={supportHref} target="_blank" rel="noreferrer">
             Open Support Issues on GitHub
           </a>
         </div>
