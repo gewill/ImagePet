@@ -451,6 +451,49 @@ private struct HelpAboutSection: View {
                 .help("Open Third-party notices file in default editor")
                 .accessibilityIdentifier("openThirdPartyNoticesButton")
             }
+            
+            Divider()
+                .padding(.vertical, 4)
+            
+            HStack(alignment: .firstTextBaseline) {
+                Text("Website")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+                
+                Link("imagepet.gewill.org", destination: URL(string: "https://imagepet.gewill.org")!)
+                    .font(.callout)
+                    .accessibilityIdentifier("aboutWebsiteLink")
+            }
+            
+            HStack(alignment: .firstTextBaseline) {
+                Text("Support")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+                
+                Link("GitHub Issues", destination: URL(string: "https://github.com/gewill/ImagePet/issues")!)
+                    .font(.callout)
+                    .accessibilityIdentifier("aboutSupportLink")
+            }
+            
+            HStack(alignment: .firstTextBaseline) {
+                Text("Privacy Policy")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+                
+                Link("View Privacy Policy", destination: URL(string: "https://imagepet.gewill.org/en/privacy")!)
+                    .font(.callout)
+                    .accessibilityIdentifier("aboutPrivacyLink")
+            }
+            
+            HStack(alignment: .firstTextBaseline) {
+                Text("Terms of Use")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+                
+                Link("View Terms of Use", destination: URL(string: "https://imagepet.gewill.org/en/terms")!)
+                    .font(.callout)
+                    .accessibilityIdentifier("aboutTermsLink")
+            }
         }
         .accessibilityIdentifier("helpAboutSummary")
     }
