@@ -1,5 +1,11 @@
 # ImagePet
 
+> **TL;DR**: ImagePet is a local-first macOS batch image compressor with an interactive desktop pet progress companion. It supports JPG, PNG, HEIC, and WebP, featuring Finder extensions, Shortcuts actions, and background folder watching—all processed 100% locally on your Mac.
+>
+> ImagePet 是一个基于 macOS 的本地批处理图片压缩工具，带有一个有趣的桌面宠物进度伴侣。支持 JPG、PNG、HEIC 和 WebP 格式，并集成了 Finder 快捷动作、快捷指令（Shortcuts）以及后台文件夹监控——所有图片处理均 100% 在本地完成，无需上传。
+
+---
+
 ImagePet 是一个 macOS 本地图片压缩小工具。当前核心 workflow 是：
 
 1. Drop JPG, PNG, HEIC, or WebP images into the window, or choose them with Add Images.
