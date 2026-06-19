@@ -116,7 +116,7 @@ private struct HeaderView: View {
                         }
                         .keyboardShortcut("p", modifiers: [.command, .shift])
                         .disabled(!store.isDesktopPetEnabled)
-                        .help("Toggle Desktop Pet (⇧⌘P)")
+                        .help(store.isDesktopPetVisible ? "Hide Desktop Pet (⇧⌘P)" : "Show Desktop Pet (⇧⌘P)")
                         .accessibilityIdentifier("togglePetButton")
 
                         Button {

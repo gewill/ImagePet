@@ -16,7 +16,7 @@ struct DesktopPetView: View {
     @State private var resizeStartPetSize: CGFloat?
 
     private var sizeMetrics: DesktopPetSizeMetrics {
-        DesktopPetSizeMetrics(petSize: store.petSize)
+        DesktopPetSizeMetrics.metrics(for: currentMode, resizedPetSize: store.petSize)
     }
 
     private var currentWindowSize: CGSize {
@@ -247,7 +247,7 @@ struct DesktopPetView: View {
     }
 
     private var resizeButton: some View {
-        Image(systemName: "arrow.up.left.and.arrow.down.right")
+        Image(systemName: "ruler")
             .font(.system(size: 10, weight: .bold))
             .foregroundStyle(isHovering ? SoftNativeStyle.accent : Color.secondary)
             .frame(width: 24, height: 24)

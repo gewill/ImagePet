@@ -100,6 +100,15 @@ private struct DesktopPetSection: View {
 
                 Spacer()
 
+                Button {
+                    store.toggleDesktopPet()
+                } label: {
+                    Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
+                }
+                .disabled(!store.isDesktopPetEnabled)
+                .help(store.isDesktopPetVisible ? "Hide Desktop Pet" : "Show Desktop Pet")
+                .accessibilityIdentifier("showPetButton")
+
                 Toggle(isOn: $store.isDesktopPetEnabled) {
                     Text(store.isDesktopPetEnabled ? "Enabled" : "Disabled")
                         .font(.headline)

@@ -655,6 +655,9 @@ final class ImagePetUITests: XCTestCase {
         let enabledToggle = window.descendants(matching: .any)["petSettingsEnabledToggle"]
         XCTAssertTrue(enabledToggle.exists)
 
+        let showPetButton = window.buttons["showPetButton"]
+        XCTAssertTrue(showPetButton.exists)
+
         let dogCard = window.buttons["themeCard_Dog"]
         XCTAssertTrue(dogCard.exists)
         XCTAssertTrue(dogCard.isEnabled)

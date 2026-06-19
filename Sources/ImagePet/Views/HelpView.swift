@@ -196,7 +196,7 @@ private enum HelpContent {
                         "The desktop pet mirrors compression status while staying separate from advanced compression settings."
                     ],
                     bullets: [
-                        "Show or hide the pet from the main window or View menu.",
+                        "Show or hide the pet from the main window, Settings, or View menu.",
                         "Click the mini pet to expand controls.",
                         "The pet remembers its visibility across app restarts.",
                         "Launch at Login starts the pet quietly when enabled."

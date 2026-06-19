@@ -41,6 +41,8 @@ struct ThemeCache {
             }
         }
         
+        loadedFrames = trimmingTransparentPadding(in: loadedFrames)
+
         let endTime = DispatchTime.now()
         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
         let durationMs = Double(nanoTime) / 1_000_000.0
@@ -53,6 +55,89 @@ struct ThemeCache {
         #endif
         
         return ThemeCache(frames: loadedFrames)
+    }
+
+    private static func trimmingTransparentPadding(in frames: [PetAnimation: [CGImage]]) -> [PetAnimation: [CGImage]] {
+        let allFrames = frames.values.flatMap { $0 }
+        guard let cropRect = visibleUnionRect(for: allFrames) else { return frames }
+
+        return frames.mapValues { animationFrames in
+            animationFrames.map { frame in
+                frame.cropping(to: cropRect) ?? frame
+            }
+        }
+    }
+
+    private static func visibleUnionRect(for frames: [CGImage]) -> CGRect? {
+        var unionRect: CGRect?
+
+        for frame in frames {
+            guard let visibleRect = visibleRect(for: frame) else { continue }
+            unionRect = unionRect.map { $0.union(visibleRect) } ?? visibleRect
+        }
+
+        guard let unionRect,
+              let firstFrame = frames.first else {
+            return nil
+        }
+
+        let imageBounds = CGRect(x: 0, y: 0, width: firstFrame.width, height: firstFrame.height)
+        let integralRect = unionRect.integral.intersection(imageBounds)
+        guard integralRect.width > 0,
+              integralRect.height > 0,
+              integralRect != imageBounds else {
+            return nil
+        }
+
+        return integralRect
+    }
+
+    private static func visibleRect(for image: CGImage) -> CGRect? {
+        let width = image.width
+        let height = image.height
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        var pixels = [UInt8](repeating: 0, count: height * bytesPerRow)
+
+        guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                data: &pixels,
+                width: width,
+                height: height,
+                bitsPerComponent: 8,
+                bytesPerRow: bytesPerRow,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+              ) else {
+            return nil
+        }
+
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        var minX = width
+        var minY = height
+        var maxX = -1
+        var maxY = -1
+
+        for y in 0..<height {
+            let rowStart = y * bytesPerRow
+            for x in 0..<width {
+                let alpha = pixels[rowStart + x * bytesPerPixel + 3]
+                if alpha > 0 {
+                    minX = min(minX, x)
+                    minY = min(minY, y)
+                    maxX = max(maxX, x)
+                    maxY = max(maxY, y)
+                }
+            }
+        }
+
+        guard maxX >= minX,
+              maxY >= minY else {
+            return nil
+        }
+
+        return CGRect(x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1)
     }
     
     static func loadStaticImage(themeName: String, animation: PetAnimation = .idle) -> CGImage? {

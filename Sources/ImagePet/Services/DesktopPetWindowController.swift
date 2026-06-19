@@ -78,7 +78,8 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private func updateWindowSize(for mode: DesktopPetViewMode, anchor: ResizeAnchor, animated: Bool) {
         guard let window = self.window else { return }
         window.hasShadow = (mode == .full)
-        let newSize = nsSize(for: DesktopPetSizeMetrics(petSize: store.petSize).windowSize(for: mode))
+        let metrics = DesktopPetSizeMetrics.metrics(for: mode, resizedPetSize: store.petSize)
+        let newSize = nsSize(for: metrics.windowSize(for: mode))
         let currentFrame = window.frame
         let newOrigin: NSPoint
         if currentFrame.size == newSize {
@@ -112,7 +113,8 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
             UserDefaults.standard.removeObject(forKey: "NSWindow Frame \(Self.frameAutosaveName)")
         }
 
-        let size = nsSize(for: DesktopPetSizeMetrics(petSize: store.petSize).windowSize(for: store.petViewMode))
+        let metrics = DesktopPetSizeMetrics.metrics(for: store.petViewMode, resizedPetSize: store.petSize)
+        let size = nsSize(for: metrics.windowSize(for: store.petViewMode))
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),
             styleMask: [.borderless],
@@ -159,7 +161,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
     private func defaultOrigin(for size: NSSize) -> NSPoint {
         let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
-        let expandedWidth = max(size.width, DesktopPetSizeMetrics(petSize: store.petSize).fullWindow.width)
+        let expandedWidth = max(size.width, DesktopPetSizeMetrics(petSize: DesktopPetSizeMetrics.defaultPetSize).fullWindow.width)
         let horizontalInset = 28 + (expandedWidth - size.width) / 2
         return NSPoint(
             x: visibleFrame.maxX - size.width - horizontalInset,

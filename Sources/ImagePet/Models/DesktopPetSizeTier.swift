@@ -17,6 +17,10 @@ struct DesktopPetSizeMetrics: Equatable {
         min(max(value, minPetSize), maxPetSize)
     }
 
+    static func metrics(for mode: DesktopPetViewMode, resizedPetSize: CGFloat) -> DesktopPetSizeMetrics {
+        DesktopPetSizeMetrics(petSize: mode == .mini ? resizedPetSize : defaultPetSize)
+    }
+
     static func migratedPetSize(from legacyTier: String) -> CGFloat? {
         switch legacyTier {
         case "compact":

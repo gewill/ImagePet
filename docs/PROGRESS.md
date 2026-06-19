@@ -70,7 +70,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
 | WebP | 已实现，本机验证通过 | Swift-WebP `0.6.1` + libwebp-Xcode `1.5.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；MAS review build smoke |
 | Advanced JPEG / mozjpeg | 已实现，本机验证通过 | `awxkee/mozjpeg.swift` `1.1.3` 已接入；`EncoderCapabilities.jpegEncodingModes` 分离 standard/advanced；Advanced JPEG 只影响 JPEG 输出并由 smoke encode gate 控制；Third Party Notices 已扩展 | 补 benchmark fixture、Preview/Safari/Chrome 打开验证、MAS review build smoke |
-| App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `3.0.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口 | 发布前手工录制并触发 Show Main Window / Toggle Desktop Pet global shortcuts |
+| App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `3.0.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口 | 发布前手工录制并触发 Show Main Window / Show / Hide Desktop Pet global shortcuts |
 | AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
 | 最大边长限制 | 已实现 | `MaxDimensionLimit` + compressor 单测覆盖缩放 | 用真实大图做视觉验收 |
@@ -86,7 +86,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |
 | 桌面 Pet 内置主题扩展 | 已实现 | 内置主题已切换为 `Dog`、`Pufferfish`、`Squirrel`、`Hamster`、`Cat`、`Rabbit`；设置页主题卡、Help 文案、主题默认 fps 与资源规格测试已同步 | 继续把静态占位帧逐步替换为每个角色的正式动画序列 |
-| 桌面 Pet 自由缩放 | 已实现 | 参考 Codex pet 的小桌宠可读范围，限制 Pet 视觉尺寸在 `64-256 px`；设置页不再提供尺寸 segment，用户仅在 mini 状态 hover Pet 后可拖拽右下角缩放手柄自由调整尺寸，窗口和 Pet 渲染区随数值联动 | 手工验证不同屏幕与多 Space 下的尺寸切换和可见区域约束 |
+| 桌面 Pet 自由缩放 | 已实现 | 参考 Codex pet 的小桌宠可读范围，限制 mini Pet 视觉尺寸在 `64-256 px`；设置页不再提供尺寸 segment，用户仅在 mini 状态 hover Pet 后可拖拽右下角缩放手柄自由调整尺寸；full 面板保持固定尺寸 | 手工验证不同屏幕与多 Space 下的尺寸切换和可见区域约束 |
 | 静默桌面 Pet 常驻与内置主题扩展规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 与 `docs/PRD_v0.7_desktop_pet_expansion.md` 明确内置动画集、Launch at Login 静默启动、既有 Pet 直接拖拽验收、至少 1 套新增内置主题；自定义导入延后 | 进入 v0.7 技术设计评审 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
@@ -137,7 +137,7 @@ KeyboardShortcuts version: 3.0.0
 revision: f7d08ba4109d5ca025e1a64165be169cdf089206
 target boundary: ImagePet GUI target only; ImagePetCore remains dependency-free
 global shortcut defaults: unset
-settings UI: KeyboardShortcuts.Recorder renders for Show Main Window, Toggle Desktop Pet, Toggle Pet Mini / Full
+settings UI: KeyboardShortcuts.Recorder renders for Show Main Window, Show / Hide Desktop Pet, Toggle Pet Mini / Full
 handler smoke: UI-test registration disabled through IS_UI_TESTING to avoid global hotkey side effects
 manual trigger smoke: pending before release candidate
 license: MIT, archived in docs/THIRD_PARTY_NOTICES.md

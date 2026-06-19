@@ -16,7 +16,7 @@ struct ImagePetShortcutAction: Identifiable {
         ),
         ImagePetShortcutAction(
             id: "toggleDesktopPet",
-            title: "Toggle Desktop Pet",
+            title: "Show / Hide Desktop Pet",
             detail: "Show or hide the desktop pet from anywhere on your Mac.",
             name: .toggleDesktopPet
         ),
