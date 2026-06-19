@@ -1,88 +1,57 @@
 import CoreGraphics
 import Foundation
 
-enum DesktopPetSizeTier: String, CaseIterable, Codable, Identifiable {
-    case compact
-    case standard
-    case large
+struct DesktopPetSizeMetrics: Equatable {
+    static let minPetSize: CGFloat = 64
+    static let defaultPetSize: CGFloat = 80
+    static let maxPetSize: CGFloat = 256
+    static let accessibilityStep: CGFloat = 4
 
-    var id: String { rawValue }
+    let petSize: CGFloat
 
-    var title: String {
-        switch self {
-        case .compact:
-            return "Compact"
-        case .standard:
-            return "Standard"
-        case .large:
-            return "Large"
+    init(petSize: CGFloat) {
+        self.petSize = Self.clamped(petSize)
+    }
+
+    static func clamped(_ value: CGFloat) -> CGFloat {
+        min(max(value, minPetSize), maxPetSize)
+    }
+
+    static func migratedPetSize(from legacyTier: String) -> CGFloat? {
+        switch legacyTier {
+        case "compact":
+            return 64
+        case "standard":
+            return 80
+        case "large":
+            return 96
+        default:
+            return nil
         }
     }
 
-    var detail: String {
-        switch self {
-        case .compact:
-            return "64 px pet face"
-        case .standard:
-            return "80 px pet face"
-        case .large:
-            return "96 px pet face"
-        }
+    var accessibilityValue: String {
+        "\(Int(round(petSize))) px"
     }
 
     var miniWindow: CGSize {
-        switch self {
-        case .compact:
-            return CGSize(width: 80, height: 80)
-        case .standard:
-            return CGSize(width: 96, height: 96)
-        case .large:
-            return CGSize(width: 112, height: 112)
-        }
+        CGSize(width: petSize + 16, height: petSize + 16)
     }
 
     var fullWindow: CGSize {
-        switch self {
-        case .compact:
-            return CGSize(width: 192, height: 176)
-        case .standard:
-            return CGSize(width: 216, height: 196)
-        case .large:
-            return CGSize(width: 240, height: 216)
-        }
+        CGSize(width: petSize * 1.5 + 96, height: petSize * 1.25 + 96)
     }
 
     var petArtFrame: CGSize {
-        switch self {
-        case .compact:
-            return CGSize(width: 64, height: 56)
-        case .standard:
-            return CGSize(width: 80, height: 70)
-        case .large:
-            return CGSize(width: 96, height: 84)
-        }
+        CGSize(width: petSize, height: petSize * 0.875)
     }
 
     var petFaceFrame: CGSize {
-        switch self {
-        case .compact:
-            return CGSize(width: 66, height: 58)
-        case .standard:
-            return CGSize(width: 82, height: 72)
-        case .large:
-            return CGSize(width: 98, height: 86)
-        }
+        CGSize(width: petSize + 2, height: petSize * 0.875 + 2)
     }
 
     var miniPetFrame: CGSize {
-        switch self {
-        case .compact:
-            return CGSize(width: 72, height: 72)
-        case .standard:
-            return CGSize(width: 88, height: 88)
-        case .large:
-            return CGSize(width: 104, height: 104)
-        }
+        CGSize(width: petSize + 8, height: petSize + 8)
     }
 
     func windowSize(for mode: DesktopPetViewMode) -> CGSize {

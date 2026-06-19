@@ -679,12 +679,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(rabbitCard.exists)
         rabbitCard.click()
 
-        let sizePicker = window.descendants(matching: .any)["petSizeTierPicker"]
-        XCTAssertTrue(sizePicker.exists)
-        if sizePicker.buttons.count >= 3 {
-            sizePicker.buttons.element(boundBy: 2).click()
-            sizePicker.buttons.element(boundBy: 0).click()
-        }
+        XCTAssertFalse(window.descendants(matching: .any)["petSizeTierPicker"].exists)
 
         let launchToggle = window.descendants(matching: .any)["launchAtLoginToggle"]
         XCTAssertTrue(launchToggle.exists)

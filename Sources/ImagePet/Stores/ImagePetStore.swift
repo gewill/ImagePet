@@ -178,9 +178,14 @@ final class ImagePetStore: ObservableObject {
             defaults.set(resolved, forKey: selectedThemeNameKey)
         }
     }
-    @Published var petSizeTier: DesktopPetSizeTier = .standard {
+    @Published var petSize: CGFloat = DesktopPetSizeMetrics.defaultPetSize {
         didSet {
-            defaults.set(petSizeTier.rawValue, forKey: petSizeTierKey)
+            let clamped = DesktopPetSizeMetrics.clamped(petSize)
+            if petSize != clamped {
+                petSize = clamped
+                return
+            }
+            defaults.set(Double(clamped), forKey: petSizeKey)
         }
     }
     @Published var issuesVisuallyDegraded = false
@@ -240,7 +245,8 @@ final class ImagePetStore: ObservableObject {
     private let enableSuccessSoundKey = "ImagePet.enableSuccessSound"
     private let energySavingModeKey = "ImagePet.energySavingMode"
     private let selectedThemeNameKey = "ImagePet.selectedThemeName"
-    private let petSizeTierKey = "ImagePet.petSizeTier"
+    private let petSizeKey = "ImagePet.desktopPetSize"
+    private let legacyPetSizeTierKey = "ImagePet.petSizeTier"
 
     // PRD v0.7 Keys
     private let launchAtLoginKey = "ImagePet.launchAtLogin"
@@ -275,7 +281,7 @@ final class ImagePetStore: ObservableObject {
         self.enableSuccessSound = true
         self.energySavingMode = false
         self.selectedThemeName = BuiltInPetTheme.fallback.id
-        self.petSizeTier = .standard
+        self.petSize = DesktopPetSizeMetrics.defaultPetSize
 
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
@@ -386,9 +392,11 @@ final class ImagePetStore: ObservableObject {
             if let theme = defaults.string(forKey: selectedThemeNameKey) {
                 self.selectedThemeName = BuiltInPetTheme.resolvedTheme(named: theme).id
             }
-            if let rawTier = defaults.string(forKey: petSizeTierKey),
-               let tier = DesktopPetSizeTier(rawValue: rawTier) {
-                self.petSizeTier = tier
+            if defaults.object(forKey: petSizeKey) != nil {
+                self.petSize = DesktopPetSizeMetrics.clamped(defaults.double(forKey: petSizeKey))
+            } else if let rawTier = defaults.string(forKey: legacyPetSizeTierKey),
+                      let migratedSize = DesktopPetSizeMetrics.migratedPetSize(from: rawTier) {
+                self.petSize = migratedSize
             }
 
             if defaults.object(forKey: launchAtLoginKey) != nil {
@@ -928,6 +936,13 @@ final class ImagePetStore: ObservableObject {
         } else {
             petViewMode = .full
         }
+    }
+
+    func setDesktopPetSize(_ value: CGFloat) {
+        let clamped = DesktopPetSizeMetrics.clamped(value)
+        guard petSize != clamped else { return }
+        petSize = clamped
+        resetPetIdleTimer()
     }
 
     func attachDesktopPetControllerIfNeeded() {

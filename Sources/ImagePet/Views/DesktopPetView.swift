@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct DesktopPetView: View {
@@ -12,12 +13,14 @@ struct DesktopPetView: View {
     @State private var controlsOpacity: CGFloat = 0.0
     @State private var controlsOffset: CGFloat = 8.0
 
-    private var sizeTier: DesktopPetSizeTier {
-        store.petSizeTier
+    @State private var resizeStartPetSize: CGFloat?
+
+    private var sizeMetrics: DesktopPetSizeMetrics {
+        DesktopPetSizeMetrics(petSize: store.petSize)
     }
 
     private var currentWindowSize: CGSize {
-        sizeTier.windowSize(for: currentMode)
+        sizeMetrics.windowSize(for: currentMode)
     }
 
     init(store: ImagePetStore) {
@@ -74,6 +77,12 @@ struct DesktopPetView: View {
         )
         .scaleEffect(isDropTargeted && !reduceMotion ? 1.02 : 1)
         .contentShape(RoundedRectangle(cornerRadius: currentMode == .mini ? currentWindowSize.width / 2 : 8))
+        .overlay(alignment: .bottomTrailing) {
+            if currentMode == .mini {
+                resizeButton
+                    .padding(3)
+            }
+        }
     }
 
     var body: some View {
@@ -144,7 +153,7 @@ struct DesktopPetView: View {
                 animator.updateTheme(themeName: newTheme)
                 updateAnimator()
             }
-            .onChange(of: store.petSizeTier) { _ in
+            .onChange(of: store.petSize) { _ in
                 currentMode = store.petViewMode
             }
             .onChange(of: store.enableIdleVariants) { val in
@@ -237,13 +246,57 @@ struct DesktopPetView: View {
         .frame(height: 22)
     }
 
+    private var resizeButton: some View {
+        Image(systemName: "arrow.up.left.and.arrow.down.right")
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(isHovering ? SoftNativeStyle.accent : Color.secondary)
+            .frame(width: 24, height: 24)
+            .background(.regularMaterial, in: Circle())
+            .background(SoftNativeStyle.surface.opacity(0.78), in: Circle())
+            .overlay(Circle().stroke(SoftNativeStyle.border.opacity(0.9), lineWidth: 1))
+            .shadow(color: Color.black.opacity(0.12), radius: 4, y: 2)
+            .contentShape(Circle())
+            .overlay {
+                DesktopPetResizeEventCatcher(
+                    onChanged: { diagonalDelta in
+                        let startSize = resizeStartPetSize ?? store.petSize
+                        resizeStartPetSize = startSize
+                        store.setDesktopPetSize(startSize + diagonalDelta)
+                    },
+                    onEnded: {
+                        resizeStartPetSize = nil
+                    }
+                )
+                .frame(width: 32, height: 32)
+            }
+            .help("Drag to resize pet")
+            .accessibilityElement()
+            .accessibilityLabel("Resize Desktop Pet")
+            .accessibilityValue(sizeMetrics.accessibilityValue)
+            .accessibilityIdentifier("desktopPetResizeButton")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment:
+                    store.setDesktopPetSize(store.petSize + DesktopPetSizeMetrics.accessibilityStep)
+                case .decrement:
+                    store.setDesktopPetSize(store.petSize - DesktopPetSizeMetrics.accessibilityStep)
+                @unknown default:
+                    break
+                }
+            }
+            .opacity(isHovering ? 1 : 0)
+            .scaleEffect(isHovering && !reduceMotion ? 1 : 0.92)
+            .allowsHitTesting(isHovering)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: isHovering)
+    }
+
     private func petFace(for snapshot: DesktopPetSnapshot) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(faceSurfaceColor(for: snapshot.state).opacity(isDropTargeted ? 1.0 : 0.92))
+                .fill(faceBackgroundColor(for: snapshot.state))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(accentColor(for: snapshot.state).opacity(currentMode == .mini ? 0.12 : 0.22), lineWidth: 0.5)
+                        .strokeBorder(faceBorderColor(for: snapshot.state), lineWidth: 0.5)
                 )
 
             ZStack {
@@ -255,7 +308,7 @@ struct DesktopPetView: View {
                     Color.clear
                 }
             }
-            .frame(width: sizeTier.petArtFrame.width, height: sizeTier.petArtFrame.height)
+            .frame(width: sizeMetrics.petArtFrame.width, height: sizeMetrics.petArtFrame.height)
             .scaleEffect(faceScale(for: snapshot.state))
             .animation(reduceMotion ? nil : faceAnimation(for: snapshot.state), value: snapshot.state)
             .accessibilityElement(children: .ignore)
@@ -283,7 +336,7 @@ struct DesktopPetView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
         }
-        .frame(width: sizeTier.petFaceFrame.width, height: sizeTier.petFaceFrame.height)
+        .frame(width: sizeMetrics.petFaceFrame.width, height: sizeMetrics.petFaceFrame.height)
         .shadow(
             color: accentColor(for: snapshot.state).opacity(currentMode == .mini ? 0.08 : 0.18),
             radius: currentMode == .mini ? 3 : (isDropTargeted ? 10 : 6),
@@ -293,7 +346,7 @@ struct DesktopPetView: View {
 
     private func miniView(for snapshot: DesktopPetSnapshot) -> some View {
         petFace(for: snapshot)
-            .frame(width: sizeTier.miniPetFrame.width, height: sizeTier.miniPetFrame.height)
+            .frame(width: sizeMetrics.miniPetFrame.width, height: sizeMetrics.miniPetFrame.height)
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture {
                 store.handlePetAction(.expand)
@@ -572,6 +625,16 @@ struct DesktopPetView: View {
         }
     }
 
+    private func faceBackgroundColor(for state: DesktopPetDisplayState) -> Color {
+        guard currentMode != .mini else { return .clear }
+        return faceSurfaceColor(for: state).opacity(isDropTargeted ? 1.0 : 0.92)
+    }
+
+    private func faceBorderColor(for state: DesktopPetDisplayState) -> Color {
+        guard currentMode != .mini else { return .clear }
+        return accentColor(for: state).opacity(0.22)
+    }
+
     private func badgeSymbol(for state: DesktopPetDisplayState) -> String {
         switch state {
         case .idle:
@@ -645,6 +708,59 @@ private struct PetIconButton: View {
             .background(isHovered ? accent.opacity(0.12) : Color.clear, in: Circle())
             .contentShape(Circle())
             .onHover { isHovered = $0 }
+    }
+}
+
+private struct DesktopPetResizeEventCatcher: NSViewRepresentable {
+    var onChanged: (CGFloat) -> Void
+    var onEnded: () -> Void
+
+    func makeNSView(context: Context) -> ResizeEventView {
+        ResizeEventView(onChanged: onChanged, onEnded: onEnded)
+    }
+
+    func updateNSView(_ nsView: ResizeEventView, context: Context) {
+        nsView.onChanged = onChanged
+        nsView.onEnded = onEnded
+    }
+
+    final class ResizeEventView: NSView {
+        var onChanged: (CGFloat) -> Void
+        var onEnded: () -> Void
+        private var dragStartLocation: NSPoint?
+
+        override var mouseDownCanMoveWindow: Bool { false }
+
+        init(onChanged: @escaping (CGFloat) -> Void, onEnded: @escaping () -> Void) {
+            self.onChanged = onChanged
+            self.onEnded = onEnded
+            super.init(frame: .zero)
+        }
+
+        @available(*, unavailable)
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+            true
+        }
+
+        override func mouseDown(with event: NSEvent) {
+            dragStartLocation = event.locationInWindow
+        }
+
+        override func mouseDragged(with event: NSEvent) {
+            guard let dragStartLocation else { return }
+            let translationX = event.locationInWindow.x - dragStartLocation.x
+            let translationY = event.locationInWindow.y - dragStartLocation.y
+            onChanged((translationX - translationY) / 2)
+        }
+
+        override func mouseUp(with event: NSEvent) {
+            dragStartLocation = nil
+            onEnded()
+        }
     }
 }
 

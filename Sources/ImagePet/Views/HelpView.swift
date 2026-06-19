@@ -209,7 +209,7 @@ private enum HelpContent {
                     ],
                     bullets: [
                         "Dog, Pufferfish, Squirrel, Hamster, Cat, and Rabbit themes are available.",
-                        "Pet Size offers Compact, Standard, and Large display tiers.",
+                        "Hover the mini pet and drag the bottom-right resize handle to adjust size within the supported range.",
                         "Each theme uses its own default animation pacing.",
                         "Enable Idle Variants lets the pet yawn or stretch during inactivity.",
                         "Enable Hover Feedback animates the pet when the pointer hovers over it.",

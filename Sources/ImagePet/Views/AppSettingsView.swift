@@ -128,28 +128,6 @@ private struct DesktopPetSection: View {
                     }
                 }
 
-                Divider()
-
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Pet Size")
-                        .font(.headline)
-
-                    Picker("Pet Size", selection: $store.petSizeTier) {
-                        ForEach(DesktopPetSizeTier.allCases) { tier in
-                            Text(tier.title).tag(tier)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("petSizeTierPicker")
-
-                    Text("\(store.petSizeTier.title) keeps the pet around \(store.petSizeTier.detail.lowercased()) in mini mode.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .accessibilityIdentifier("petSizeTierDescription")
-                }
-
-                Divider()
-
                 VStack(alignment: .leading, spacing: 14) {
                     Toggle(isOn: $store.launchAtLoginEnabled) {
                         VStack(alignment: .leading, spacing: 2) {
