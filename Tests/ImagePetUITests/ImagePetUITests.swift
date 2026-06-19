@@ -14,6 +14,7 @@ final class ImagePetUITests: XCTestCase {
             app.launchArguments += ["-ImagePetResetWindowFrame", "YES"]
         }
         app.launch()
+        app.activate()
     }
 
     override func tearDownWithError() throws {
@@ -678,7 +679,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(rabbitCard.exists)
         rabbitCard.click()
 
-        let sizePicker = window.segmentedControls["petSizeTierPicker"]
+        let sizePicker = window.descendants(matching: .any)["petSizeTierPicker"]
         XCTAssertTrue(sizePicker.exists)
         if sizePicker.buttons.count >= 3 {
             sizePicker.buttons.element(boundBy: 2).click()

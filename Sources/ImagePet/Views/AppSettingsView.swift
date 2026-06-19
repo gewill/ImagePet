@@ -113,15 +113,17 @@ private struct DesktopPetSection: View {
                     Text("Theme")
                         .font(.headline)
 
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(store.builtInThemes) { theme in
-                                SettingsThemeCard(
-                                    theme: theme,
-                                    selectedTheme: $store.selectedThemeName
-                                )
-                                .accessibilityIdentifier("themeCard_\(theme.id)")
-                            }
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 150, maximum: 160), spacing: 16, alignment: .top)],
+                        alignment: .leading,
+                        spacing: 16
+                    ) {
+                        ForEach(store.builtInThemes) { theme in
+                            SettingsThemeCard(
+                                theme: theme,
+                                selectedTheme: $store.selectedThemeName
+                            )
+                            .accessibilityIdentifier("themeCard_\(theme.id)")
                         }
                     }
                 }

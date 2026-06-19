@@ -2,6 +2,27 @@ import AppKit
 import XCTest
 
 final class BuiltInPetThemeAssetTests: XCTestCase {
+    private struct ThemeManifest: Decodable {
+        struct CellSize: Decodable {
+            let width: Int
+            let height: Int
+        }
+
+        struct State: Decodable {
+            let mode: String
+            let recommendedFrames: Int
+        }
+
+        let schemaVersion: Int
+        let themeId: String
+        let displayName: String
+        let description: String
+        let defaultFPS: Int
+        let cellSize: CellSize
+        let assetFormat: String
+        let states: [String: State]
+    }
+
     private let builtInThemes = [
         "Dog",
         "Pufferfish",
@@ -11,16 +32,16 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
         "Rabbit"
     ]
 
-    private let animationSpecs: [(name: String, frames: Int)] = [
-        ("idle", 8),
-        ("dragHover", 4),
-        ("eating", 6),
-        ("done", 12),
-        ("issues", 8),
-        ("stretch", 12),
-        ("yawn", 10),
-        ("petting", 8),
-        ("sleep", 8)
+    private let animationSpecs: [(name: String, frames: Int, mode: String)] = [
+        ("idle", 8, "loop"),
+        ("dragHover", 4, "loop"),
+        ("eating", 6, "loop"),
+        ("done", 12, "once"),
+        ("issues", 8, "loop"),
+        ("stretch", 12, "once"),
+        ("yawn", 10, "once"),
+        ("petting", 8, "loop"),
+        ("sleep", 8, "loop")
     ]
 
     func testBuiltInPetThemesMatchAnimationBudget() throws {
@@ -34,8 +55,22 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: resourcesURL.path), "\(theme) theme folder should exist")
         var totalBytes = 0
 
+        let manifest = try loadManifest(for: theme, resourcesURL: resourcesURL)
+        XCTAssertEqual(manifest.schemaVersion, 1)
+        XCTAssertEqual(manifest.themeId, theme)
+        XCTAssertFalse(manifest.displayName.isEmpty)
+        XCTAssertFalse(manifest.description.isEmpty)
+        XCTAssertEqual(manifest.assetFormat, "png-sequence")
+        XCTAssertEqual(manifest.cellSize.width, 256)
+        XCTAssertEqual(manifest.cellSize.height, 256)
+        XCTAssertTrue((8...12).contains(manifest.defaultFPS))
+        XCTAssertEqual(Set(manifest.states.keys), Set(animationSpecs.map { $0.name }))
+
         for spec in animationSpecs {
             XCTAssertLessThanOrEqual(spec.frames, 24)
+            let manifestState = try XCTUnwrap(manifest.states[spec.name], "\(theme) theme.json should include \(spec.name)")
+            XCTAssertEqual(manifestState.mode, spec.mode, "\(theme)/\(spec.name) should declare the expected playback mode")
+            XCTAssertEqual(manifestState.recommendedFrames, spec.frames, "\(theme)/\(spec.name) should declare the expected frame count")
 
             let folderURL = resourcesURL.appendingPathComponent(spec.name)
             let files = try FileManager.default
@@ -70,6 +105,12 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
         }
 
         XCTAssertLessThanOrEqual(totalBytes, 3 * 1024 * 1024, "\(theme) theme should stay under the PRD 3 MB budget")
+    }
+
+    private func loadManifest(for theme: String, resourcesURL: URL) throws -> ThemeManifest {
+        let manifestURL = resourcesURL.appendingPathComponent("theme.json")
+        let data = try Data(contentsOf: manifestURL)
+        return try JSONDecoder().decode(ThemeManifest.self, from: data)
     }
 
     private func themeResourcesURL(_ theme: String) -> URL {

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "themeId": "Pufferfish",
+  "displayName": "Pufferfish",
+  "description": "A soft floating puffer with gentler pacing.",
+  "defaultFPS": 8,
+  "cellSize": {
+    "width": 256,
+    "height": 256
+  },
+  "assetFormat": "png-sequence",
+  "states": {
+    "idle": { "mode": "loop", "recommendedFrames": 8 },
+    "eating": { "mode": "loop", "recommendedFrames": 6 },
+    "done": { "mode": "once", "recommendedFrames": 12 },
+    "issues": { "mode": "loop", "recommendedFrames": 8 },
+    "dragHover": { "mode": "loop", "recommendedFrames": 4 },
+    "petting": { "mode": "loop", "recommendedFrames": 8 },
+    "stretch": { "mode": "once", "recommendedFrames": 12 },
+    "yawn": { "mode": "once", "recommendedFrames": 10 },
+    "sleep": { "mode": "loop", "recommendedFrames": 8 }
+  }
+}

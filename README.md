@@ -191,6 +191,7 @@ ImagePet 已经规划并实现多种 macOS 系统入口：
 - [PRD v0.13: 本地通知与发布完整性闭环](docs/PRD_v0.13_local_notifications_and_release_completeness.md)
 - [PRD v0.14: Soft Native 主窗口重设计方案](docs/PRD_v0.14_soft_native_main_window_redesign.md)
 - [PRD v0.15: Release Candidate 与上线准备](docs/PRD_v0.15_release_candidate_and_distribution.md)
+- [PRD v0.16: 桌面 Pet 主题生产与验证管线](docs/PRD_v0.16_desktop_pet_theme_authoring_pipeline.md)
 - [Metadata Source](metadata/README.md)
 - [Static Website](website/README.md)
 - [App Store Connect Metadata Index](docs/APP_STORE_METADATA.md)
@@ -256,4 +257,3 @@ ImagePet 已正式采用 **MIT License** 开源，我们非常欢迎来自社区
 ## License
 
 本项目基于 [MIT License](LICENSE) 协议开源。
-
