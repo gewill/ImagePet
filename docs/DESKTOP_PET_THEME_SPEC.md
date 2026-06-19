@@ -188,6 +188,12 @@ P0 manifest 示例：
 ### petting（鼠标悬停抚摸）
 柔和的闭眼、腮红、更快的尾巴摇摆。享受被抚摸的快乐反馈。
 
+> [!TIP]
+> **尊重生理与运动本能：** 互动动作（如 petting）不应一律套用哺乳动物的“摸头、摇尾”。对于不同身体构造的角色：
+> - **鱼类（如 Pufferfish）**：以欢快吐泡泡、原地轻快浮动、张合鱼鳍来代替“摸头摇尾”。
+> - **软体/史莱姆（如 Slime）**：进行有弹性的波纹震荡、形变或分裂合并反馈。
+> - **鸟类/昆虫**：抖动羽毛、扇动翅膀或原地轻快跳跃。
+
 ![petting 参考](../Sources/ImagePet/Resources/Dog/petting/frame_003.png)
 
 ### stretch（伸懒腰）和 yawn（打哈欠）
@@ -357,7 +363,7 @@ eating:    [角色] chewing with mouth open, cheek motion, small image crumbs, c
 done:      [角色] anticipation → jump → settle, sparkles/confetti support not cover, stop on last frame, 12 frames
 issues:    [角色] confused tilt, sweat drops, small warning cue, avoid only dead/X eyes, 8 frames
 dragHover: [角色] leaning forward, excited, mouth ready to catch, waiting to be fed, 4 frames
-petting:   [角色] soft closed eyes, blush, faster tail wag, enjoying being petted, 8 frames
+petting:   [角色] soft closed eyes, blush, enjoying interaction (e.g. wagging tail for dogs, blowing bubbles/floating for fish, shape wobbling for slime), 8 frames
 stretch:   [角色] full body stretch, silhouette must change visibly at small size, 12 frames
 yawn:      [角色] big yawn, mouth opens wide then closes, sleepy expression, 10 frames
 sleep:     [角色] dozing off, eyes closed, subtle breathing, small Z marks if readable, 8 frames
