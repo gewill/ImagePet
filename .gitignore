@@ -1,6 +1,7 @@
 .DS_Store
 .build/
 .swiftpm/
+.codex/
 node_modules/
 dist/
 TestImages/
