@@ -511,16 +511,29 @@ private struct SettingsThemeCard: View {
     let theme: BuiltInPetTheme
     @Binding var selectedTheme: String
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isHovered = false
-    @State private var previewImage: CGImage?
+    @State private var previewFrames: [CGImage] = []
+    @State private var frameIndex = 0
 
     private var isSelected: Bool {
         selectedTheme == theme.id
     }
 
+    private var previewImage: CGImage? {
+        guard !previewFrames.isEmpty else { return nil }
+        return previewFrames[min(frameIndex, previewFrames.count - 1)]
+    }
+
+    private var shouldAnimatePreview: Bool {
+        !reduceMotion && previewFrames.count > 1 && (isSelected || isHovered)
+    }
+
     var body: some View {
         Button {
-            selectedTheme = theme.id
+            withAnimation(.easeOut(duration: 0.18)) {
+                selectedTheme = theme.id
+            }
         } label: {
             VStack(alignment: .leading, spacing: 10) {
                 ZStack {
@@ -531,14 +544,26 @@ private struct SettingsThemeCard: View {
                         Image(decorative: image, scale: 1.0)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
+                            .frame(width: 58, height: 58)
+                            .scaleEffect(isHovered ? 1.06 : 1.0)
+                            .animation(.easeOut(duration: 0.16), value: isHovered)
                     } else {
                         Image(systemName: "pawprint.fill")
                             .font(.system(size: 28))
                             .foregroundStyle(.secondary)
                     }
+
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(Color.accentColor)
+                            .font(.system(size: 18, weight: .semibold))
+                            .padding(8)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                            .transition(.scale.combined(with: .opacity))
+                    }
                 }
-                .frame(height: 72)
+                .frame(height: 82)
 
                 Text(theme.displayName)
                     .font(.headline)
@@ -549,9 +574,6 @@ private struct SettingsThemeCard: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
 
-                Text("Default \(theme.defaultFPS) fps")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
             }
             .padding(12)
             .frame(width: 150, alignment: .leading)
@@ -561,11 +583,27 @@ private struct SettingsThemeCard: View {
                     .strokeBorder(isSelected ? Color.accentColor : Color.secondary.opacity(0.35), lineWidth: isSelected ? 2 : 1)
             )
             .shadow(color: .black.opacity(isHovered ? 0.12 : 0.04), radius: isHovered ? 8 : 2, y: 2)
+            .scaleEffect(isHovered ? 1.015 : 1.0)
         }
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
         .task(id: theme.id) {
-            previewImage = await ThemePreviewLoader.load(themeName: theme.id)
+            previewFrames = await ThemePreviewLoader.loadFrames(themeName: theme.id)
+            frameIndex = 0
+        }
+        .task(id: shouldAnimatePreview) {
+            guard shouldAnimatePreview else {
+                frameIndex = 0
+                return
+            }
+
+            let framesPerSecond = max(1, min(theme.defaultFPS, 8))
+            let interval = 1_000_000_000 / UInt64(framesPerSecond)
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: interval)
+                guard !Task.isCancelled else { return }
+                frameIndex = (frameIndex + 1) % previewFrames.count
+            }
         }
         .accessibilityLabel("Theme: \(theme.displayName)")
         .accessibilityValue(isSelected ? "Selected" : "Not selected")
@@ -573,9 +611,9 @@ private struct SettingsThemeCard: View {
 }
 
 private enum ThemePreviewLoader {
-    static func load(themeName: String) async -> CGImage? {
+    static func loadFrames(themeName: String) async -> [CGImage] {
         await Task.detached(priority: .utility) {
-            ThemeCache.loadStaticImage(themeName: themeName, animation: .idle)
+            ThemeCache.loadPreviewFrames(themeName: themeName, animation: .idle)
         }.value
     }
 }

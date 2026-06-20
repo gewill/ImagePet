@@ -171,6 +171,39 @@ struct ThemeCache {
         return nil
     }
 
+    static func loadPreviewFrames(themeName: String, animation: PetAnimation = .idle, maxFrames: Int = 12) -> [CGImage] {
+        let resolvedThemeName = BuiltInPetTheme.resolvedTheme(named: themeName).id
+        if let cachedFrames = staticImageCache.frames(themeName: resolvedThemeName, animation: animation, maxFrames: maxFrames) {
+            return cachedFrames
+        }
+
+        guard let themeURL = findResourcesURL(themeName: resolvedThemeName) else { return [] }
+        let cropRect = staticImageCache.cropRect(themeName: resolvedThemeName) {
+            loadVisibleUnionRect(themeURL: themeURL)
+        }
+        let folderURL = themeURL.appendingPathComponent(animation.rawValue)
+        let fileManager = FileManager.default
+        guard let files = try? fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else {
+            return []
+        }
+
+        let sortedFiles = files
+            .filter { $0.pathExtension.lowercased() == "png" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            .prefix(maxFrames)
+
+        let loadedFrames = sortedFiles.compactMap { fileURL -> CGImage? in
+            guard let image = NSImage(contentsOf: fileURL),
+                  let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                return nil
+            }
+            return cropRect.flatMap { cgImage.cropping(to: $0) } ?? cgImage
+        }
+
+        staticImageCache.setFrames(loadedFrames, themeName: resolvedThemeName, animation: animation, maxFrames: maxFrames)
+        return loadedFrames
+    }
+
     private static func loadVisibleUnionRect(themeURL: URL) -> CGRect? {
         var loadedFrames: [CGImage] = []
         let fileManager = FileManager.default
@@ -239,6 +272,7 @@ struct ThemeCache {
 private final class ThemeStaticImageCache: @unchecked Sendable {
     private let lock = NSLock()
     private var images: [String: CGImage] = [:]
+    private var frames: [String: [CGImage]] = [:]
     private var cropRects: [String: CachedCropRect] = [:]
 
     func image(themeName: String, animation: PetAnimation) -> CGImage? {
@@ -253,6 +287,18 @@ private final class ThemeStaticImageCache: @unchecked Sendable {
         }
     }
 
+    func frames(themeName: String, animation: PetAnimation, maxFrames: Int) -> [CGImage]? {
+        lock.withLock {
+            frames[framesKey(themeName: themeName, animation: animation, maxFrames: maxFrames)]
+        }
+    }
+
+    func setFrames(_ loadedFrames: [CGImage], themeName: String, animation: PetAnimation, maxFrames: Int) {
+        lock.withLock {
+            frames[framesKey(themeName: themeName, animation: animation, maxFrames: maxFrames)] = loadedFrames
+        }
+    }
+
     func cropRect(themeName: String, loader: () -> CGRect?) -> CGRect? {
         lock.lock()
         if let cached = cropRects[themeName] {
@@ -264,7 +310,7 @@ private final class ThemeStaticImageCache: @unchecked Sendable {
         let cropRect = loader()
 
         lock.withLock {
-            cropRects[themeName] = cropRect.map(CachedCropRect.rect) ?? .none
+            cropRects[themeName] = cropRect.map(CachedCropRect.rect) ?? CachedCropRect.none
         }
 
         return cropRect
@@ -272,6 +318,10 @@ private final class ThemeStaticImageCache: @unchecked Sendable {
 
     private func imageKey(themeName: String, animation: PetAnimation) -> String {
         "\(themeName)::\(animation.rawValue)"
+    }
+
+    private func framesKey(themeName: String, animation: PetAnimation, maxFrames: Int) -> String {
+        "\(themeName)::\(animation.rawValue)::\(maxFrames)"
     }
 
     private enum CachedCropRect {
