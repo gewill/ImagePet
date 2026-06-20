@@ -1,12 +1,14 @@
 {
   "ok": true,
-  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Rabbit",
+  "created_date": "2026-06-20",
+  "updated_date": "2026-06-20",
+  "theme_dir": "Sources/ImagePet/Resources/Rabbit",
   "theme_id": "Rabbit",
-  "total_bytes": 442765,
+  "total_bytes": 779384,
   "errors": [],
   "warnings": [],
   "outputs": {
-    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Rabbit/contact-sheet.png",
-    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Rabbit/previews"
+    "contact_sheet": "docs/theme-qa/v0.16/Rabbit/contact-sheet.png",
+    "preview_dir": "docs/theme-qa/v0.16/Rabbit/previews"
   }
 }

@@ -311,7 +311,7 @@ validator 至少检查：
 
 QA 输出：
 
-- `qa/review.json`：机器可读 error / warning。
+- `qa/review.json`：机器可读 `created_date`、`updated_date`、相对路径、error 和 warning。
 - `qa/contact-sheet.png`：所有状态的静态总览。
 - `qa/previews/*.gif`：逐状态 motion preview。
 

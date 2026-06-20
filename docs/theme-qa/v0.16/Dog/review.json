@@ -1,12 +1,14 @@
 {
   "ok": true,
-  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Dog",
+  "created_date": "2026-06-20",
+  "updated_date": "2026-06-20",
+  "theme_dir": "Sources/ImagePet/Resources/Dog",
   "theme_id": "Dog",
-  "total_bytes": 571774,
+  "total_bytes": 1006572,
   "errors": [],
   "warnings": [],
   "outputs": {
-    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Dog/contact-sheet.png",
-    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Dog/previews"
+    "contact_sheet": "docs/theme-qa/v0.16/Dog/contact-sheet.png",
+    "preview_dir": "docs/theme-qa/v0.16/Dog/previews"
   }
 }

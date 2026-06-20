@@ -1,12 +1,14 @@
 {
   "ok": true,
-  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Pufferfish",
+  "created_date": "2026-06-20",
+  "updated_date": "2026-06-20",
+  "theme_dir": "Sources/ImagePet/Resources/Pufferfish",
   "theme_id": "Pufferfish",
-  "total_bytes": 514339,
+  "total_bytes": 654170,
   "errors": [],
   "warnings": [],
   "outputs": {
-    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Pufferfish/contact-sheet.png",
-    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Pufferfish/previews"
+    "contact_sheet": "docs/theme-qa/v0.16/Pufferfish/contact-sheet.png",
+    "preview_dir": "docs/theme-qa/v0.16/Pufferfish/previews"
   }
 }

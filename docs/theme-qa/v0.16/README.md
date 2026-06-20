@@ -31,7 +31,7 @@
 
 - `review.json`：validator 机器校验结果
 - `contact-sheet.png`：逐状态逐帧 contact sheet
-- `previews/*.gif`：逐状态 motion preview，本地生成用于验收，不默认提交到 Git
+- `previews/*.gif`：逐状态 motion preview，作为轻量 QA 产物提交到 Git
 
 全局辅助检查图：
 
@@ -50,12 +50,12 @@
 
 | 主题 | Validator | Errors | Warnings | 主题大小 |
 | --- | --- | ---: | ---: | ---: |
-| Dog | Pass | 0 | 0 | 571774 bytes |
-| Pufferfish | Pass | 0 | 0 | 514339 bytes |
-| Squirrel | Pass | 0 | 0 | 581543 bytes |
-| Hamster | Pass | 0 | 0 | 524397 bytes |
-| Cat | Pass | 0 | 0 | 559271 bytes |
-| Rabbit | Pass | 0 | 0 | 442765 bytes |
+| Dog | Pass | 0 | 0 | 1006572 bytes |
+| Pufferfish | Pass | 0 | 0 | 654170 bytes |
+| Squirrel | Pass | 0 | 0 | 1053030 bytes |
+| Hamster | Pass | 0 | 0 | 1007595 bytes |
+| Cat | Pass | 0 | 0 | 998256 bytes |
+| Rabbit | Pass | 0 | 0 | 779384 bytes |
 
 ## 模型视觉验收记录
 

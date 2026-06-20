@@ -11,6 +11,7 @@ import argparse
 import json
 import re
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,31 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--contact-sheet", type=Path, help="Write a PNG contact sheet.")
     parser.add_argument("--preview-dir", type=Path, help="Write per-state GIF previews into this folder.")
     return parser.parse_args()
+
+
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def repo_relative_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(repo_root()).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
+def existing_created_date(json_out: Path | None, fallback: str) -> str:
+    if not json_out or not json_out.exists():
+        return fallback
+
+    try:
+        existing = json.loads(json_out.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return fallback
+
+    created = existing.get("created_date")
+    return created if isinstance(created, str) and created else fallback
 
 
 def add_error(errors: list[str], message: str) -> None:
@@ -237,6 +263,7 @@ def make_previews(states: list[StateFrames], output_dir: Path) -> None:
 def main() -> int:
     args = parse_args()
     theme_dir = args.theme_dir.resolve()
+    run_date = date.today().isoformat()
     errors: list[str] = []
     warnings: list[str] = []
 
@@ -266,14 +293,16 @@ def main() -> int:
 
     result = {
         "ok": not errors,
-        "theme_dir": str(theme_dir),
+        "created_date": existing_created_date(args.json_out, run_date),
+        "updated_date": run_date,
+        "theme_dir": repo_relative_path(theme_dir),
         "theme_id": manifest.get("themeId"),
         "total_bytes": total_bytes,
         "errors": errors,
         "warnings": warnings,
         "outputs": {
-            "contact_sheet": str(args.contact_sheet.resolve()) if args.contact_sheet and not errors else None,
-            "preview_dir": str(args.preview_dir.resolve()) if args.preview_dir and not errors else None,
+            "contact_sheet": repo_relative_path(args.contact_sheet) if args.contact_sheet and not errors else None,
+            "preview_dir": repo_relative_path(args.preview_dir) if args.preview_dir and not errors else None,
         },
     }
 
