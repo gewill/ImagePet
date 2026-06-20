@@ -512,6 +512,7 @@ private struct SettingsThemeCard: View {
     @Binding var selectedTheme: String
 
     @State private var isHovered = false
+    @State private var previewImage: CGImage?
 
     private var isSelected: Bool {
         selectedTheme == theme.id
@@ -526,7 +527,7 @@ private struct SettingsThemeCard: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06))
 
-                    if let image = ThemeCache.loadStaticImage(themeName: theme.id, animation: .idle) {
+                    if let image = previewImage {
                         Image(decorative: image, scale: 1.0)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -563,8 +564,19 @@ private struct SettingsThemeCard: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
+        .task(id: theme.id) {
+            previewImage = await ThemePreviewLoader.load(themeName: theme.id)
+        }
         .accessibilityLabel("Theme: \(theme.displayName)")
         .accessibilityValue(isSelected ? "Selected" : "Not selected")
+    }
+}
+
+private enum ThemePreviewLoader {
+    static func load(themeName: String) async -> CGImage? {
+        await Task.detached(priority: .utility) {
+            ThemeCache.loadStaticImage(themeName: themeName, animation: .idle)
+        }.value
     }
 }
 
