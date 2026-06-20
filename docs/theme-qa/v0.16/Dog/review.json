@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Dog",
+  "theme_id": "Dog",
+  "total_bytes": 571774,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Dog/contact-sheet.png",
+    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Dog/previews"
+  }
+}

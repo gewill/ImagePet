@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Pufferfish",
+  "theme_id": "Pufferfish",
+  "total_bytes": 514339,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Pufferfish/contact-sheet.png",
+    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Pufferfish/previews"
+  }
+}

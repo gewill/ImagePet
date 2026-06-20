@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Hamster",
+  "theme_id": "Hamster",
+  "total_bytes": 524397,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Hamster/contact-sheet.png",
+    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Hamster/previews"
+  }
+}

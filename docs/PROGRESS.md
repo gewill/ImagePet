@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已进入实现阶段，已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新，以及 manifest-backed runtime metadata 加载；仍不在 app 内引入 AI 生成。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist，并继续评估后续是否加入自定义主题导入。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入手工视觉验收、MAS build 验收和 ASC metadata 提交准备。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已进入实现阶段，已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist，并继续评估后续是否加入自定义主题导入。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入 MAS build 验收和 ASC metadata 提交准备。
 
 已完成：
 
@@ -14,7 +14,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - `Add Images` 菜单/按钮输入入口
 - 桌面宠物小窗第一版
 - 桌面 Pet UI、动效和轻量交互优化
-- 桌面 Pet 内置主题切换为 Dog / Pufferfish / Squirrel / Hamster / Cat / Rabbit，并新增尺寸档位与主题默认 fps
+- 桌面 Pet 内置主题切换为 Dog / Pufferfish / Squirrel / Hamster / Cat / Rabbit，并新增 mini 自由缩放与主题默认 fps
 - V0.3 输出格式、保存位置、覆盖确认、尺寸限制和元数据剥离选项
 - V0.9 WebP 与自定义压缩质量
 - V0.10 Advanced JPEG (mozjpeg) 并行双引擎
@@ -86,7 +86,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |
 | 桌面 Pet 内置主题扩展 | 已实现 | 内置主题已切换为 `Dog`、`Pufferfish`、`Squirrel`、`Hamster`、`Cat`、`Rabbit`；设置页主题卡、Help 文案、主题默认 fps 与资源规格测试已同步 | 继续把静态占位帧逐步替换为每个角色的正式动画序列 |
-| 桌面 Pet 自由缩放 | 已实现 | 参考 Codex pet 的小桌宠可读范围，限制 mini Pet 视觉尺寸在 `64-256 px`；设置页不再提供尺寸 segment，用户仅在 mini 状态 hover Pet 后可拖拽右下角缩放手柄自由调整尺寸；full 面板保持固定尺寸 | 手工验证不同屏幕与多 Space 下的尺寸切换和可见区域约束 |
+| 桌面 Pet 自由缩放 | 已实现 | 参考 Codex pet 的小桌宠可读范围，限制 mini Pet 视觉尺寸在 `64-256 px`；设置页不再提供尺寸 segment，用户仅在 mini 状态 hover Pet 后可拖拽右下角缩放手柄自由调整尺寸；full 面板保持固定尺寸；运行时和静态主题预览共用透明 padding 裁剪 | 手工验证不同屏幕与多 Space 下的尺寸切换、可见区域约束和主题预览观感 |
 | 静默桌面 Pet 常驻与内置主题扩展规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 与 `docs/PRD_v0.7_desktop_pet_expansion.md` 明确内置动画集、Launch at Login 静默启动、既有 Pet 直接拖拽验收、至少 1 套新增内置主题；自定义导入延后 | 进入 v0.7 技术设计评审 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
@@ -104,7 +104,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 本地通知与发布完整性闭环 | 已实现，本机验证通过 | 整合 `CompressionBatchSummary` 摘要模型、`LocalNotificationManager` 包含防抖合并、防骚扰限频与 Shortcuts/Folder Watching 静默成功策略、历史纪录持久化、设置页面通知控制项及 Debug UI、独立 `RELEASE_CHECKLIST.md` | 手工触发不同入口压缩检查通知展示与通知动作的 Finder 唤起 |
 | Soft Native 主窗口重设计 | DesignSpike 已实现 | `DESIGN.md` + `docs/SoftNative.html` + `docs/PRD_v0.14_soft_native_main_window_redesign.md`；主窗口使用 Soft Native token、紧凑 header、响应式控制项、列表和 summary 视觉重构；Desktop Pet 配色同步 | `swift test`、`git diff --check`、`./script/build_and_run.sh --verify` 已通过；仍需手工视觉验收 |
 | Release Candidate 与上线准备 | 已规划 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引 | 补齐 `docs/RELEASE_CHECKLIST.md` MAS 上线验收项，执行 ASC/TestFlight RC 验收 |
-| 桌面 Pet 主题生产与验证管线 | 基础能力已实现 | `docs/PRD_v0.16_desktop_pet_theme_authoring_pipeline.md` 已定义 `theme.json` 包契约、离线 authoring run、validator、contact sheet / preview QA、visual QA 与 manifest-backed runtime 方向；当前可选内置主题已补齐 `theme.json`，`script/validate_pet_theme.py` 可离线生成 review JSON、contact sheet 与 GIF preview，运行时主题 metadata 由 manifest 优先加载并保留 fallback | 跑完完整验证后进入手工 visual QA；后续 PRD 再决定是否加入自定义主题导入 |
+| 桌面 Pet 主题生产与验证管线 | 基础能力已实现，本机验证通过 | `docs/PRD_v0.16_desktop_pet_theme_authoring_pipeline.md` 已定义 `theme.json` 包契约、离线 authoring run、validator、contact sheet / preview QA、visual QA 与 manifest-backed runtime 方向；当前可选内置主题已补齐 `theme.json`，`script/validate_pet_theme.py` 可离线生成 review JSON、contact sheet 与 GIF preview，运行时主题 metadata 由 manifest 优先加载并保留 fallback；`docs/theme-qa/v0.16/` 已记录 bundled themes 的 contact sheet、preview 和模型视觉验收 | 后续 PRD 再决定是否加入自定义主题导入；未来新增或替换主题时重新生成 visual QA |
 
 ## 已验证
 

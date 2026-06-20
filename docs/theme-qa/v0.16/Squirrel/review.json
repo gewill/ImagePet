@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Squirrel",
+  "theme_id": "Squirrel",
+  "total_bytes": 581543,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Squirrel/contact-sheet.png",
+    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Squirrel/previews"
+  }
+}

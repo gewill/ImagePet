@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "theme_dir": "/Users/rxwill/git/MyApps/ImagePet/Sources/ImagePet/Resources/Rabbit",
+  "theme_id": "Rabbit",
+  "total_bytes": 442765,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Rabbit/contact-sheet.png",
+    "preview_dir": "/Users/rxwill/git/MyApps/ImagePet/docs/theme-qa/v0.16/Rabbit/previews"
+  }
+}

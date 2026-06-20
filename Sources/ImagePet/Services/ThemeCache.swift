@@ -4,6 +4,7 @@ import AppKit
 
 struct ThemeCache {
     let frames: [PetAnimation: [CGImage]]
+    private static let staticImageCache = ThemeStaticImageCache()
     
     static func load(themeName: String) -> ThemeCache {
         let resolvedThemeName = BuiltInPetTheme.resolvedTheme(named: themeName).id
@@ -142,7 +143,15 @@ struct ThemeCache {
     
     static func loadStaticImage(themeName: String, animation: PetAnimation = .idle) -> CGImage? {
         let resolvedThemeName = BuiltInPetTheme.resolvedTheme(named: themeName).id
+
+        if let cachedImage = staticImageCache.image(themeName: resolvedThemeName, animation: animation) {
+            return cachedImage
+        }
+
         guard let themeURL = findResourcesURL(themeName: resolvedThemeName) else { return nil }
+        let cropRect = staticImageCache.cropRect(themeName: resolvedThemeName) {
+            loadVisibleUnionRect(themeURL: themeURL)
+        }
         let folderURL = themeURL.appendingPathComponent(animation.rawValue)
         let fileManager = FileManager.default
         guard let files = try? fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else {
@@ -153,11 +162,35 @@ struct ThemeCache {
             if fileURL.pathExtension.lowercased() == "png" {
                 if let image = NSImage(contentsOf: fileURL),
                    let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-                    return cgImage
+                    let trimmedImage = cropRect.flatMap { cgImage.cropping(to: $0) } ?? cgImage
+                    staticImageCache.setImage(trimmedImage, themeName: resolvedThemeName, animation: animation)
+                    return trimmedImage
                 }
             }
         }
         return nil
+    }
+
+    private static func loadVisibleUnionRect(themeURL: URL) -> CGRect? {
+        var loadedFrames: [CGImage] = []
+        let fileManager = FileManager.default
+
+        for animation in PetAnimation.allCases {
+            let folderURL = themeURL.appendingPathComponent(animation.rawValue)
+            guard let files = try? fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else {
+                continue
+            }
+
+            let sortedFiles = files.sorted { $0.lastPathComponent < $1.lastPathComponent }
+            for fileURL in sortedFiles where fileURL.pathExtension.lowercased() == "png" {
+                if let image = NSImage(contentsOf: fileURL),
+                   let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                    loadedFrames.append(cgImage)
+                }
+            }
+        }
+
+        return visibleUnionRect(for: loadedFrames)
     }
     
     private static func findResourcesURL(themeName: String) -> URL? {
@@ -200,5 +233,58 @@ struct ThemeCache {
         }
         
         return nil
+    }
+}
+
+private final class ThemeStaticImageCache: @unchecked Sendable {
+    private let lock = NSLock()
+    private var images: [String: CGImage] = [:]
+    private var cropRects: [String: CachedCropRect] = [:]
+
+    func image(themeName: String, animation: PetAnimation) -> CGImage? {
+        lock.withLock {
+            images[imageKey(themeName: themeName, animation: animation)]
+        }
+    }
+
+    func setImage(_ image: CGImage, themeName: String, animation: PetAnimation) {
+        lock.withLock {
+            images[imageKey(themeName: themeName, animation: animation)] = image
+        }
+    }
+
+    func cropRect(themeName: String, loader: () -> CGRect?) -> CGRect? {
+        lock.lock()
+        if let cached = cropRects[themeName] {
+            lock.unlock()
+            return cached.value
+        }
+        lock.unlock()
+
+        let cropRect = loader()
+
+        lock.withLock {
+            cropRects[themeName] = cropRect.map(CachedCropRect.rect) ?? .none
+        }
+
+        return cropRect
+    }
+
+    private func imageKey(themeName: String, animation: PetAnimation) -> String {
+        "\(themeName)::\(animation.rawValue)"
+    }
+
+    private enum CachedCropRect {
+        case none
+        case rect(CGRect)
+
+        var value: CGRect? {
+            switch self {
+            case .none:
+                return nil
+            case .rect(let rect):
+                return rect
+            }
+        }
     }
 }
