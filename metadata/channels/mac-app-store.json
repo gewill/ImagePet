@@ -34,6 +34,11 @@
   "screenshotPlan": {
     "minimum": 1,
     "maximum": 10,
+    "workflowDoc": "docs/ASC_SCREENSHOT_WORKFLOW.md",
+    "deck": "metadata/asc-screenshot-deck.en-US.json",
+    "sourceDirectory": "screenshots/asc/source/en-US",
+    "outputDirectory": "screenshots/asc/mac/en-US",
+    "renderCommand": "./script/prepare_asc_screenshots.py",
     "formats": [
       ".jpeg",
       ".jpg",

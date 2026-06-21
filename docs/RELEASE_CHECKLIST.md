@@ -116,7 +116,11 @@ This document contains the manual acceptance criteria for validating a Release C
   4. Verify age rating questionnaire is completed.
 
 - **Test Case 6.4: Screenshots**
-  1. Upload one to ten macOS screenshots in `.jpeg`, `.jpg`, or `.png` format.
-  2. Verify screenshots are captured from the submitted build.
-  3. Verify screenshots do not expose private filenames, local paths, user data, or unsupported feature claims.
-  4. Verify first screenshot clearly shows the main compression workflow.
+  1. Place manual captures in `screenshots/asc/source/en-US/`.
+  2. Edit copy/layout in `metadata/asc-screenshot-deck.en-US.json`.
+  3. Run `./script/prepare_asc_screenshots.py`.
+  4. Upload generated PNGs from `screenshots/asc/mac/en-US/`.
+  5. Verify screenshots are captured from the submitted build.
+  6. Verify screenshots do not expose private filenames, local paths, user data, or unsupported feature claims.
+  7. Verify first screenshot clearly shows the main compression workflow.
+  8. Verify desktop pet visibility where it is part of the screenshot message.

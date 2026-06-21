@@ -16,6 +16,7 @@ Do not use it for secrets, API tokens, unreleased roadmap promises, downloaded s
 - `locales/en-US.json`: localized public copy for App Store Connect and the website.
 - `channels/mac-app-store.json`: App Store Connect field mapping, review metadata, screenshot plan, and submission checklist.
 - `channels/website.json`: website route and section mapping that consumes the shared localized copy.
+- `asc-screenshot-deck.en-US.json`: manually captured screenshot deck configuration for ASC-ready PNG generation.
 
 ## Source Rules
 
@@ -31,3 +32,4 @@ Do not use it for secrets, API tokens, unreleased roadmap promises, downloaded s
 2. Validate JSON syntax.
 3. Copy ASC fields from `channels/mac-app-store.json` plus the referenced locale fields, or generate them with a future script.
 4. Build website pages from `channels/website.json` plus the referenced locale fields.
+5. For screenshots, follow `docs/ASC_SCREENSHOT_WORKFLOW.md`.

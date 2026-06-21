@@ -9,6 +9,7 @@ This document is a human-readable index for App Store Connect submission work. D
 - Product identity, version, capabilities, privacy baseline, and public URLs: `../metadata/app.json`
 - English public copy: `../metadata/locales/en-US.json`
 - App Store Connect field mapping, app information, screenshot plan, and checklist: `../metadata/channels/mac-app-store.json`
+- ASC screenshot deck: `../metadata/asc-screenshot-deck.en-US.json`
 - Future website route mapping from the same source: `../metadata/channels/website.json`
 
 ## App Store Connect Field Map
@@ -31,6 +32,7 @@ This document is a human-readable index for App Store Connect submission work. D
 | App Privacy declaration | `metadata/app.json#/privacy` and `metadata/channels/mac-app-store.json#/appPrivacy` |
 | App Review notes | `metadata/locales/en-US.json#/appStoreConnect/reviewNotes` |
 | Screenshot plan | `metadata/channels/mac-app-store.json#/screenshotPlan` |
+| Screenshot deck | `metadata/asc-screenshot-deck.en-US.json` |
 | Submission checklist | `metadata/channels/mac-app-store.json#/submissionChecklist` |
 
 ## Submission State
@@ -46,6 +48,14 @@ This document is a human-readable index for App Store Connect submission work. D
 - Do not mention unreleased features, benchmark claims that have not been verified, cloud upload, AI compression, or unsupported formats.
 - Keep unknown public URLs as `null` in `metadata/app.json` until the real support, privacy, marketing, or Mac App Store page is live.
 - Re-check privacy fields before submission against the actual linked SDKs and any support/contact flow.
+
+## Screenshot Workflow
+
+- Manual source captures live in `screenshots/asc/source/en-US/`.
+- Edit screenshot copy, output names, accents, and layout in `metadata/asc-screenshot-deck.en-US.json`.
+- Generate ASC-ready PNGs with `./script/prepare_asc_screenshots.py`.
+- Upload generated PNGs from `screenshots/asc/mac/en-US/`.
+- Full workflow: `docs/ASC_SCREENSHOT_WORKFLOW.md`.
 
 ## Apple References
 
