@@ -124,7 +124,7 @@ NOTARY_TEAM_ID="YOUR_TEAM_ID" \
      class Imagepet < Formula
        desc "Local-first macOS batch image compressor"
        homepage "https://imagepet.gewill.org/"
-       url "https://github.com/gewill/ImagePet/releases/download/v1.0.0/imagepet-cli.zip"
+       url "https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli.zip"
        sha256 "ZIP文件的SHA256哈希值"
        license "MIT"
 

@@ -7,7 +7,8 @@
     "bundleIdentifier": "org.gewill.ImagePet",
     "platform": "macOS",
     "minimumOS": "macOS 13",
-    "marketingVersion": "1.0.0",
+    "marketingVersion": "1.0",
+    "appStoreVersion": "1.0",
     "buildNumber": "1",
     "primaryLocale": "en-US",
     "supportedLocales": [

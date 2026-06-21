@@ -17,10 +17,10 @@ Examples: `feat(app): add batch compression UI`, `fix(core): preserve output fil
 ImagePet is a macOS 13+ SwiftUI app for local image compression:
 
 ```text
-drop JPG/PNG/HEIC -> compress locally to JPG -> show savings
+drop JPG/PNG/HEIC/WebP -> compress locally to Original/JPEG/PNG/HEIC/WebP -> show savings
 ```
 
-MVP excludes WebP/AVIF, cloud, login/sync, folder watching, extensions, PDF, watermarking, and AI format decisions.
+MVP excludes AVIF, cloud, login/sync, PDF, watermarking, and AI format decisions.
 
 ## Code Boundaries
 
@@ -36,11 +36,12 @@ Keep app sandbox and user-selected read/write entitlements enabled. Read inputs 
 
 Preserve unless explicitly scoped otherwise:
 
-- Input `JPG/JPEG/PNG/HEIC`; output `JPG` only.
+- Input `JPG/JPEG/PNG/HEIC/WebP`; output `Original/JPEG/PNG/HEIC/WebP` when encoder capabilities allow it.
 - `maxConcurrentJobs = 2`.
 - Wrap decode/encode work in `autoreleasepool`.
-- Output standard sRGB JPG and preserve basic orientation.
-- Never overwrite existing output files.
+- Output standard sRGB where applicable and preserve basic orientation.
+- Never overwrite existing output files in non-overwrite modes.
+- Overwrite Original mode must require explicit confirmation and preserve the original format.
 - One file failure must not abort the batch.
 - User-facing compression errors stay short.
 

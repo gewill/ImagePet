@@ -1,4 +1,4 @@
-# ImagePet MVP PRD v0.2
+# ImagePet 当前产品 PRD
 
 ## 定位
 
@@ -7,10 +7,10 @@ ImagePet 是一个 macOS 本地图片压缩小工具。
 核心 workflow：
 
 ```text
-拖图片进去 -> 小宠物吃掉 -> 本地压缩 -> 输出更小 JPG -> 显示节省体积
+拖图片进去 -> 小宠物吃掉 -> 本地压缩 -> 输出更小图片 -> 显示节省体积
 ```
 
-第一版只解决一个问题：批量把图片压缩成更小的 JPG。
+当前版本解决一个问题：批量把本地图片压缩成更小、更适合分享或归档的文件。
 
 ## 目标系统
 
@@ -26,14 +26,19 @@ ImagePet 是一个 macOS 本地图片压缩小工具。
 - JPG / JPEG
 - PNG
 - HEIC
+- WebP
 
 ### 输出格式
 
-第一版只输出：
+当前支持：
 
-- JPG
+- Original
+- JPEG
+- PNG
+- HEIC
+- WebP
 
-暂不支持 WebP / AVIF，避免 ImageIO 写入兼容性和色彩问题。
+WebP 支持静态图片输入/输出；动画 WebP、WebP Lossless、AVIF 仍不在当前范围内。
 
 ## 核心功能
 
@@ -60,12 +65,8 @@ ImagePet 是一个 macOS 本地图片压缩小工具。
 
 ## 暂不做
 
-- WebP
 - AVIF
-- Finder Extension
 - Raycast Extension
-- Shortcuts
-- 文件夹监听
 - AI 格式判断
 - 裁剪
 - 水印
@@ -366,9 +367,9 @@ UI 必须显示失败文件名和简短原因。
 作者自己可以完成：
 
 ```text
-拖入或通过 Add Images 选择 20 张 iPhone HEIC / PNG / JPG
+拖入或通过 Add Images 选择 20 张 iPhone HEIC / PNG / JPG / WebP
 -> 选择 Balanced
--> 输出 JPG 到授权目录
+-> 输出到授权目录
 -> 看到每张图压缩结果
 -> 看到总共节省多少空间
 -> Reveal in Finder 查看结果
@@ -379,11 +380,11 @@ UI 必须显示失败文件名和简短原因。
 目标只有一个：
 
 ```text
-做一个可爱、稳定、顺手的本地 JPG 压缩 workflow。
+做一个可爱、稳定、顺手的本地图片压缩 workflow。
 ```
 
 关键边界：
 
-- 第一版别碰 WebP
+- WebP 只承诺静态图片输入/输出
 - 第一版别碰默认写 Pictures
 - 第一版别无限并发

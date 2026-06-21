@@ -73,7 +73,7 @@ enum ShortcutMaxDimension: String, AppEnum {
 @available(macOS 13.0, *)
 struct CompressImagesIntent: AppIntent {
     static let title: LocalizedStringResource = "Compress Images with ImagePet"
-    static let description: IntentDescription = .init("Compresses image files (JPG, PNG, HEIC) to a specific output format using ImagePet.")
+    static let description: IntentDescription = .init("Compresses image files (JPG, PNG, HEIC, WebP) to a specific output format using ImagePet.")
 
     @Parameter(title: "Images")
     var images: [IntentFile]
