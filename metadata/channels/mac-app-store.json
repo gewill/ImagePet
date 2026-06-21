@@ -17,7 +17,7 @@
     "secondaryCategory": "Utilities",
     "contentRights": "ImagePet uses original app UI/assets and third-party open source libraries listed in docs/THIRD_PARTY_NOTICES.md.",
     "ageRating": "Complete the ASC questionnaire; expected low-age rating because the app has no user-generated content, networking, accounts, ads, purchases, gambling, or unrestricted web access.",
-    "price": "To decide in ASC. Default planning assumption: free first release unless business model changes."
+    "price": "Recommended 1.0 launch pricing: paid app, USA base price USD 7.99; introductory sale option USD 4.99 for the first 7-14 days; raise to USD 9.99 only after review volume and release confidence improve. Use Apple's automatic comparable prices for other storefronts unless a territory-specific strategy is intentionally defined."
   },
   "urls": {
     "support": "metadata/app.json#/links/support",
