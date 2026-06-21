@@ -36,7 +36,7 @@ struct ContentView: View {
                 .tag(AppMainTab.settings)
         }
         .tint(SoftNativeStyle.accent)
-        .frame(minWidth: 860, minHeight: 660)
+        .frame(minWidth: 680, minHeight: 660)
         .dropDestination(for: URL.self) { urls, _ in
             store.addDroppedURLs(urls)
             return true
@@ -86,7 +86,7 @@ private struct SoftNativeCard: ViewModifier {
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
                     .stroke(SoftNativeStyle.border)
             )
-            .shadow(color: Color.black.opacity(0.055), radius: 18, y: 8)
+            .shadow(color: SoftNativeStyle.cardShadow, radius: 18, y: 8)
     }
 }
 
@@ -102,33 +102,15 @@ private struct HeaderView: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 16) {
-                HStack(spacing: 12) {
-                    Text("ImagePet")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundStyle(SoftNativeStyle.accent)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        appTitle
+                        headerActions
+                    }
 
-                    HStack(spacing: 8) {
-                        Button {
-                            store.toggleDesktopPet()
-                        } label: {
-                            Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
-                        }
-                        .keyboardShortcut("p", modifiers: [.command, .shift])
-                        .disabled(!store.isDesktopPetEnabled)
-                        .help(store.isDesktopPetVisible ? "Hide Desktop Pet (⇧⌘P)" : "Show Desktop Pet (⇧⌘P)")
-                        .accessibilityIdentifier("togglePetButton")
-
-                        Button {
-                            store.chooseInputImages()
-                        } label: {
-                            Label("Add Images", systemImage: "photo.badge.plus")
-                        }
-                        .keyboardShortcut("o", modifiers: [.command])
-                        .buttonStyle(.borderedProminent)
-                        .tint(SoftNativeStyle.accent)
-                        .help("Add Images (⌘O)")
-                        .accessibilityIdentifier("addImagesButton")
+                    VStack(alignment: .leading, spacing: 10) {
+                        appTitle
+                        headerActions
                     }
                 }
 
@@ -175,6 +157,38 @@ private struct HeaderView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .softNativeCard(radius: 14)
+    }
+
+    private var appTitle: some View {
+        Text("ImagePet")
+            .font(.system(size: 22, weight: .bold, design: .rounded))
+            .foregroundStyle(SoftNativeStyle.accent)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var headerActions: some View {
+        HStack(spacing: 8) {
+            Button {
+                store.toggleDesktopPet()
+            } label: {
+                Label(store.isDesktopPetVisible ? "Hide Pet" : "Show Pet", systemImage: "pawprint")
+            }
+            .keyboardShortcut("p", modifiers: [.command, .shift])
+            .disabled(!store.isDesktopPetEnabled)
+            .help(store.isDesktopPetVisible ? "Hide Desktop Pet (⇧⌘P)" : "Show Desktop Pet (⇧⌘P)")
+            .accessibilityIdentifier("togglePetButton")
+
+            Button {
+                store.chooseInputImages()
+            } label: {
+                Label("Add Images", systemImage: "photo.badge.plus")
+            }
+            .keyboardShortcut("o", modifiers: [.command])
+            .buttonStyle(.borderedProminent)
+            .tint(SoftNativeStyle.accent)
+            .help("Add Images (⌘O)")
+            .accessibilityIdentifier("addImagesButton")
+        }
     }
 
     private var petImage: CGImage? {
@@ -262,6 +276,7 @@ private struct ControlsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.82)
                         .transition(.opacity.combined(with: .move(edge: .leading)))
                     }
 
@@ -282,21 +297,15 @@ private struct ControlsView: View {
                     controlOptions
 
                     if store.qualityMode == .custom && store.outputFormat != .png {
-                        HStack(spacing: 10) {
-                            Text("Quality \(store.customQuality)")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .frame(width: 70, alignment: .leading)
-                            Slider(
-                                value: Binding(
-                                    get: { Double(store.customQuality) },
-                                    set: { store.customQuality = Int($0.rounded()) }
-                                ),
-                                in: 30...95,
-                                step: 1
-                            )
-                            .disabled(store.isProcessing)
-                            .accessibilityIdentifier("customQualitySlider")
+                        ViewThatFits(in: .horizontal) {
+                            customQualitySlider
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Quality \(store.customQuality)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                qualitySlider
+                            }
                         }
                         .padding(.horizontal, 4)
                     }
@@ -315,50 +324,23 @@ private struct ControlsView: View {
                             .padding(8)
                             .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
                         } else {
-                            HStack(alignment: .center, spacing: 16) {
-                                // Suffix configurations
-                                HStack(spacing: 8) {
-                                    Text("Filename Suffix:")
-                                        .font(.callout)
-                                    TextField("Suffix", text: $store.filenameSuffix)
-                                        .textFieldStyle(.roundedBorder)
-                                        .frame(width: 130)
-                                        .disabled(store.isProcessing)
-                                        .accessibilityIdentifier("filenameSuffixField")
-                                        .onChange(of: store.filenameSuffix) { _ in
-                                            store.sanitizeFilenameSuffix()
-                                        }
+                            ViewThatFits(in: .horizontal) {
+                                suffixRow
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    suffixEditor
+                                    filenamePreview
                                 }
-
-                                Text(store.filenamePreview)
-                                    .font(.system(.caption, design: .monospaced))
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                    .accessibilityIdentifier("filenamePreviewLabel")
-
-                                Spacer(minLength: 8)
                             }
 
                             if store.saveLocationMode == .designated {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "folder.badge.gearshape")
-                                        .foregroundStyle(.secondary)
+                                ViewThatFits(in: .horizontal) {
+                                    outputFolderRow
 
-                                    Text(outputFolderText)
-                                        .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
-                                        .lineLimit(1)
-                                        .truncationMode(.middle)
-                                        .accessibilityIdentifier("outputFolderLabel")
-
-                                    Button("Choose Folder") {
-                                        store.chooseOutputDirectory()
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        outputFolderLabel
+                                        chooseOutputFolderButton
                                     }
-                                    .keyboardShortcut("o", modifiers: [.command, .shift])
-                                    .disabled(store.isProcessing)
-                                    .help("Choose Output Folder (⇧⌘O)")
-                                    .accessibilityIdentifier("chooseFolderButton")
-
-                                    Spacer()
                                 }
                                 .font(.callout)
                             }
@@ -366,40 +348,17 @@ private struct ControlsView: View {
                     }
 
                     // Option Toggles (Metadata and PNG Lossless notice)
-                    HStack(spacing: 18) {
-                        Toggle("Strip Metadata (GPS/EXIF/Camera Info)", isOn: $store.stripMetadata)
-                            .disabled(store.isProcessing)
-                            .accessibilityIdentifier("stripMetadataToggle")
-
-                        if store.canUseAdvancedJPEG {
-                            Toggle("Advanced JPEG", isOn: Binding(
-                                get: { store.jpegEncodingMode == .advanced },
-                                set: { store.jpegEncodingMode = $0 ? .advanced : .standard }
-                            ))
-                            .disabled(store.isProcessing)
-                            .help("Smaller JPEG output for web sharing.")
-                            .accessibilityIdentifier("advancedJPEGToggle")
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 18) {
+                            metadataToggle
+                            advancedJPEGToggle
+                            compressionHint
                         }
 
-                        if store.outputFormat == .png {
-                            Label("PNG uses lossless compression. Quality does not apply.", systemImage: "info.circle")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        } else if store.canUseAdvancedJPEG && store.jpegEncodingMode == .advanced {
-                            Label("Smaller JPEG output for web sharing.", systemImage: "info.circle")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        } else if store.outputFormat == .webp {
-                            Label("Best for web sharing. Static images only.", systemImage: "info.circle")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            Label(
-                                "HDR or wide-gamut images will be exported as standard sRGB.",
-                                systemImage: "info.circle"
-                            )
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            metadataToggle
+                            advancedJPEGToggle
+                            compressionHint
                         }
                     }
 
@@ -449,6 +408,138 @@ private struct ControlsView: View {
                     saveToCard
                 }
             }
+
+            VStack(spacing: 8) {
+                qualityCard
+                formatCard
+                maxEdgeCard
+                saveToCard
+            }
+        }
+    }
+
+    private var customQualitySlider: some View {
+        HStack(spacing: 10) {
+            Text("Quality \(store.customQuality)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 70, alignment: .leading)
+            qualitySlider
+        }
+    }
+
+    private var qualitySlider: some View {
+        Slider(
+            value: Binding(
+                get: { Double(store.customQuality) },
+                set: { store.customQuality = Int($0.rounded()) }
+            ),
+            in: 30...95,
+            step: 1
+        )
+        .disabled(store.isProcessing)
+        .accessibilityIdentifier("customQualitySlider")
+    }
+
+    private var suffixRow: some View {
+        HStack(alignment: .center, spacing: 16) {
+            suffixEditor
+            filenamePreview
+            Spacer(minLength: 8)
+        }
+    }
+
+    private var suffixEditor: some View {
+        HStack(spacing: 8) {
+            Text("Filename Suffix:")
+                .font(.callout)
+            TextField("Suffix", text: $store.filenameSuffix)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 130)
+                .disabled(store.isProcessing)
+                .accessibilityIdentifier("filenameSuffixField")
+                .onChange(of: store.filenameSuffix) { _ in
+                    store.sanitizeFilenameSuffix()
+                }
+        }
+    }
+
+    private var filenamePreview: some View {
+        Text(store.filenamePreview)
+            .font(.system(.caption, design: .monospaced))
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            .accessibilityIdentifier("filenamePreviewLabel")
+    }
+
+    private var outputFolderRow: some View {
+        HStack(spacing: 8) {
+            outputFolderLabel
+            chooseOutputFolderButton
+            Spacer()
+        }
+    }
+
+    private var outputFolderLabel: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "folder.badge.gearshape")
+                .foregroundStyle(.secondary)
+
+            Text(outputFolderText)
+                .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+                .accessibilityIdentifier("outputFolderLabel")
+        }
+    }
+
+    private var chooseOutputFolderButton: some View {
+        Button("Choose Folder") {
+            store.chooseOutputDirectory()
+        }
+        .keyboardShortcut("o", modifiers: [.command, .shift])
+        .disabled(store.isProcessing)
+        .help("Choose Output Folder (⇧⌘O)")
+        .accessibilityIdentifier("chooseFolderButton")
+    }
+
+    private var metadataToggle: some View {
+        Toggle("Strip Metadata (GPS/EXIF/Camera Info)", isOn: $store.stripMetadata)
+            .disabled(store.isProcessing)
+            .accessibilityIdentifier("stripMetadataToggle")
+    }
+
+    @ViewBuilder
+    private var advancedJPEGToggle: some View {
+        if store.canUseAdvancedJPEG {
+            Toggle("Advanced JPEG", isOn: Binding(
+                get: { store.jpegEncodingMode == .advanced },
+                set: { store.jpegEncodingMode = $0 ? .advanced : .standard }
+            ))
+            .disabled(store.isProcessing)
+            .help("Smaller JPEG output for web sharing.")
+            .accessibilityIdentifier("advancedJPEGToggle")
+        }
+    }
+
+    private var compressionHint: some View {
+        Label(compressionHintText, systemImage: "info.circle")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var compressionHintText: String {
+        if store.outputFormat == .png {
+            return "PNG uses lossless compression. Quality does not apply."
+        } else if store.canUseAdvancedJPEG && store.jpegEncodingMode == .advanced {
+            return "Smaller JPEG output for web sharing."
+        } else if store.outputFormat == .webp {
+            return "Best for web sharing. Static images only."
+        } else {
+            return "HDR or wide-gamut images will be exported as standard sRGB."
         }
     }
 
@@ -572,15 +663,9 @@ private struct JobListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                Spacer()
-                    .frame(width: 18)
-                Text("File")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Status")
-                    .frame(width: 200, alignment: .leading)
-                Text("Size / Saved")
-                    .frame(width: 220, alignment: .trailing)
+            ViewThatFits(in: .horizontal) {
+                tableHeader
+                compactHeader
             }
             .padding(.horizontal, 12)
             .frame(height: 34)
@@ -609,6 +694,27 @@ private struct JobListView: View {
         )
         .frame(height: jobs.isEmpty ? 150 : 260)
         .softNativeCard(radius: 10)
+    }
+
+    private var tableHeader: some View {
+        HStack(spacing: 12) {
+            Spacer()
+                .frame(width: 18)
+            Text("File")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("Status")
+                .frame(width: 200, alignment: .leading)
+            Text("Size / Saved")
+                .frame(width: 220, alignment: .trailing)
+        }
+    }
+
+    private var compactHeader: some View {
+        HStack {
+            Text("Queue")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("\(jobs.count) \(jobs.count == 1 ? "image" : "images")")
+        }
     }
 }
 
@@ -644,6 +750,21 @@ private struct JobRowView: View {
     let job: ImageJob
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            regularRow
+            compactRow
+        }
+        .padding(.horizontal, 12)
+        .frame(minHeight: 38)
+        .background(SoftNativeStyle.surface.opacity(0.70))
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(SoftNativeStyle.border)
+                .frame(height: 1)
+        }
+    }
+
+    private var regularRow: some View {
         HStack(spacing: 12) {
             Image(systemName: iconName)
                 .foregroundStyle(iconColor)
@@ -675,14 +796,45 @@ private struct JobRowView: View {
                 .accessibilityIdentifier("jobSizeText_\(job.fileName)")
                 .accessibilityLabel(sizeText)
         }
-        .padding(.horizontal, 12)
-        .frame(minHeight: 38)
-        .background(SoftNativeStyle.surface.opacity(0.70))
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(SoftNativeStyle.border)
-                .frame(height: 1)
+    }
+
+    private var compactRow: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: iconName)
+                    .foregroundStyle(iconColor)
+                    .frame(width: 18)
+                    .accessibilityIdentifier("jobIcon_\(job.fileName)")
+
+                Text(job.fileName)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("jobFileName_\(job.fileName)")
+                    .accessibilityLabel(job.fileName)
+            }
+
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(statusText)
+                    .foregroundStyle(statusColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                    .help(statusText)
+                    .accessibilityIdentifier("jobStatusText_\(job.fileName)")
+                    .accessibilityLabel(statusText)
+
+                Spacer(minLength: 8)
+
+                Text(sizeText)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                    .accessibilityIdentifier("jobSizeText_\(job.fileName)")
+                    .accessibilityLabel(sizeText)
+            }
         }
+        .padding(.vertical, 8)
     }
 
     private var iconName: String {
@@ -763,47 +915,22 @@ private struct SummaryView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            horizontalContent
+            verticalContent
+        }
+        .padding(12)
+        .softNativeCard(radius: 10, tint: SoftNativeStyle.elevated)
+    }
+
+    private var horizontalContent: some View {
         HStack(spacing: 10) {
             if store.isCompleted {
-                SummaryMetric(title: "Ate", value: FileSizeFormatting.string(from: store.successfulOriginalTotal))
-                SummaryMetric(title: "Pooped", value: FileSizeFormatting.string(from: store.compressedTotal))
-                SummaryMetric(
-                    title: "Saved",
-                    value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
-                )
+                completedMetrics
 
                 Spacer()
 
-                Button {
-                    store.revealOutputDirectory()
-                } label: {
-                    Label("Reveal in Finder", systemImage: "folder")
-                }
-                .buttonStyle(.bordered)
-                .help("Reveal in Finder")
-                .accessibilityIdentifier("revealInFinderButton")
-
-                if store.hasFailedJobs {
-                    Button {
-                        store.retryFailed()
-                    } label: {
-                        Label("Retry Failed", systemImage: "arrow.clockwise")
-                    }
-                    .buttonStyle(.bordered)
-                    .keyboardShortcut("r", modifiers: [.command])
-                    .help("Retry Failed (⌘R)")
-                    .accessibilityIdentifier("retryFailedButton")
-                }
-
-                Button {
-                    store.clearList()
-                } label: {
-                    Label("Clear List", systemImage: "xmark.circle")
-                }
-                .buttonStyle(.bordered)
-                .keyboardShortcut("n", modifiers: [.command])
-                .help("Clear List (⌘N)")
-                .accessibilityIdentifier("clearListButton")
+                completedActions
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
                 Spacer()
@@ -813,8 +940,79 @@ private struct SummaryView: View {
                 Spacer()
             }
         }
-        .padding(12)
-        .softNativeCard(radius: 10, tint: SoftNativeStyle.elevated)
+    }
+
+    private var verticalContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if store.isCompleted {
+                ViewThatFits(in: .horizontal) {
+                    completedMetrics
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        SummaryMetric(title: "Ate", value: FileSizeFormatting.string(from: store.successfulOriginalTotal))
+                        SummaryMetric(title: "Pooped", value: FileSizeFormatting.string(from: store.compressedTotal))
+                        SummaryMetric(
+                            title: "Saved",
+                            value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
+                        )
+                    }
+                }
+                completedActions
+            } else if store.isProcessing {
+                SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
+            } else {
+                HStack(spacing: 10) {
+                    SummaryMetric(title: "Quality", value: store.qualitySummary)
+                    SummaryMetric(title: "Output", value: store.outputFormat.displayName)
+                }
+            }
+        }
+    }
+
+    private var completedMetrics: some View {
+        HStack(spacing: 10) {
+            SummaryMetric(title: "Ate", value: FileSizeFormatting.string(from: store.successfulOriginalTotal))
+            SummaryMetric(title: "Pooped", value: FileSizeFormatting.string(from: store.compressedTotal))
+            SummaryMetric(
+                title: "Saved",
+                value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
+            )
+        }
+    }
+
+    private var completedActions: some View {
+        HStack(spacing: 8) {
+            Button {
+                store.revealOutputDirectory()
+            } label: {
+                Label("Reveal in Finder", systemImage: "folder")
+            }
+            .buttonStyle(.bordered)
+            .help("Reveal in Finder")
+            .accessibilityIdentifier("revealInFinderButton")
+
+            if store.hasFailedJobs {
+                Button {
+                    store.retryFailed()
+                } label: {
+                    Label("Retry Failed", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+                .keyboardShortcut("r", modifiers: [.command])
+                .help("Retry Failed (⌘R)")
+                .accessibilityIdentifier("retryFailedButton")
+            }
+
+            Button {
+                store.clearList()
+            } label: {
+                Label("Clear List", systemImage: "xmark.circle")
+            }
+            .buttonStyle(.bordered)
+            .keyboardShortcut("n", modifiers: [.command])
+            .help("Clear List (⌘N)")
+            .accessibilityIdentifier("clearListButton")
+        }
     }
 }
 
@@ -838,7 +1036,7 @@ private struct SummaryMetric: View {
                 .accessibilityLabel(value)
         }
         .padding(10)
-        .frame(minWidth: 116, alignment: .leading)
+        .frame(minWidth: 112, maxWidth: .infinity, alignment: .leading)
         .background(SoftNativeStyle.surface.opacity(0.70), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
