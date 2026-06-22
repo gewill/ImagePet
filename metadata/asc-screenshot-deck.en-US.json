@@ -1,0 +1,53 @@
+{
+  "background": {
+    "tint": "#F7F4EF",
+    "tintAlpha": 164,
+    "blurRadius": 30
+  },
+  "slides": [
+    {
+      "sources": [
+        "01-empty-state.webp"
+      ],
+      "output": "01-local-first-compression.png",
+      "eyebrow": "ImagePet",
+      "headline": "Compress images locally",
+      "subhead": "Keep image compression on your Mac, with clear controls before work starts.",
+      "accent": "#267A69",
+      "layout": "single"
+    },
+    {
+      "sources": [
+        "02-drop-to-compress.webp"
+      ],
+      "output": "02-drop-to-compress.png",
+      "eyebrow": "ImagePet",
+      "headline": "Drop files and go",
+      "subhead": "Add JPG, PNG, HEIC, or WebP images from Finder and start a local batch.",
+      "accent": "#CD603C",
+      "layout": "single"
+    },
+    {
+      "sources": [
+        "03-compression.webp"
+      ],
+      "output": "03-watch-progress.png",
+      "eyebrow": "ImagePet",
+      "headline": "Watch every result",
+      "subhead": "Track each file, see saved space, and keep one failed image from stopping the batch.",
+      "accent": "#7560AD",
+      "layout": "single"
+    },
+    {
+      "sources": [
+        "04-settings.webp"
+      ],
+      "output": "04-desktop-pet-settings.png",
+      "eyebrow": "ImagePet",
+      "headline": "Pick your desktop pet",
+      "subhead": "Choose a small Mac companion for status, focus, and a little compression feedback.",
+      "accent": "#E08E36",
+      "layout": "single"
+    }
+  ]
+}

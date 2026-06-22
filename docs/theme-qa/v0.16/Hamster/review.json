@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "created_date": "2026-06-20",
+  "updated_date": "2026-06-20",
+  "theme_dir": "Sources/ImagePet/Resources/Hamster",
+  "theme_id": "Hamster",
+  "total_bytes": 1007595,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "docs/theme-qa/v0.16/Hamster/contact-sheet.png",
+    "preview_dir": "docs/theme-qa/v0.16/Hamster/previews"
+  }
+}

@@ -10,12 +10,30 @@ settings:
     SWIFT_VERSION: "5.9"
     MACOSX_DEPLOYMENT_TARGET: "13.0"
     CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+packages:
+  Swift-WebP:
+    url: https://github.com/ainame/Swift-WebP.git
+    exactVersion: 0.6.1
+  mozjpeg.swift:
+    url: https://github.com/awxkee/mozjpeg.swift.git
+    exactVersion: 1.1.3
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts.git
+    exactVersion: 2.4.0
+  swift-argument-parser:
+    url: https://github.com/apple/swift-argument-parser.git
+    exactVersion: 1.3.1
 targets:
   ImagePetCore:
     type: framework
     platform: macOS
     sources:
       - path: Sources/ImagePetCore
+    dependencies:
+      - package: Swift-WebP
+        product: WebP
+      - package: mozjpeg.swift
+        product: mozjpeg
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetCore
@@ -31,6 +49,8 @@ targets:
         type: folder
     dependencies:
       - target: ImagePetCore
+      - package: KeyboardShortcuts
+        product: KeyboardShortcuts
     info:
       path: Generated/Info.plist
       properties:
@@ -45,15 +65,24 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSServices:
+          - NSMenuItem:
+              default: Compress with ImagePet
+            NSMessage: handleServices
+            NSPortName: ImagePet
+            NSRequiredContext: {}
+            NSSendTypes:
+              - public.image
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePet
         CODE_SIGN_ENTITLEMENTS: Entitlements/ImagePet.entitlements
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: RLK76T8Y89
         ENABLE_APP_SANDBOX: YES
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        MARKETING_VERSION: 1.0.0
+        MARKETING_VERSION: 1.0
         CURRENT_PROJECT_VERSION: 1
   ImagePetTests:
     type: bundle.unit-test
@@ -78,6 +107,27 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetUITests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: ImagePet
+  ImagePetCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources/ImagePetCLI
+    dependencies:
+      - target: ImagePetCore
+      - package: swift-argument-parser
+        product: ArgumentParser
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetCLI
+        CODE_SIGN_IDENTITY: Apple Development
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: RLK76T8Y89
+        GENERATE_INFOPLIST_FILE: YES
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        LD_RUNPATH_SEARCH_PATHS:
+          - $(inherited)
+          - "@executable_path"
+          - "@executable_path/../Frameworks"
 schemes:
   ImagePet:
     build:
@@ -85,6 +135,7 @@ schemes:
         ImagePet: all
         ImagePetTests: [test]
         ImagePetUITests: [test]
+        ImagePetCLI: [test]
     run:
       config: Debug
     test:
@@ -92,3 +143,9 @@ schemes:
       targets:
         - ImagePetTests
         - ImagePetUITests
+  ImagePetCLI:
+    build:
+      targets:
+        ImagePetCLI: all
+    run:
+      config: Debug

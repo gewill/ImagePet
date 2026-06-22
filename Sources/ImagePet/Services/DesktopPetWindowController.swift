@@ -5,23 +5,44 @@ import Combine
 @MainActor
 final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     private static let frameAutosaveName = "ImagePetDesktopPetWindow"
-    private static let miniSize = NSSize(width: 80, height: 80)
-    private static let fullSize = NSSize(width: 192, height: 176)
+
+    private enum ResizeAnchor {
+        case center
+        case topLeading
+    }
 
     private let store: ImagePetStore
     private var window: NSWindow?
     private var cancellables = Set<AnyCancellable>()
+    private var isAppTerminating = false
 
     init(store: ImagePetStore) {
         self.store = store
         super.init()
 
         store.$petViewMode
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] mode in
-                self?.updateWindowSize(for: mode)
+                self?.updateWindowSize(for: mode, anchor: .center, animated: true)
             }
             .store(in: &cancellables)
+
+        store.$petSize
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.updateWindowSize(for: self.store.petViewMode, anchor: .topLeading, animated: false)
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillTerminate),
+            name: NSApplication.willTerminateNotification,
+            object: nil
+        )
+    }
+
+    @objc private func appWillTerminate(_ notification: Notification) {
+        isAppTerminating = true
     }
 
     func setVisible(_ isVisible: Bool) {
@@ -39,12 +60,14 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        guard !isAppTerminating else { return }
         store.hideDesktopPet()
     }
 
     private func show() {
         let window = window ?? makeWindow()
         self.window = window
+        updateWindowSize(for: store.petViewMode, anchor: .center, animated: false)
         window.orderFrontRegardless()
     }
 
@@ -52,31 +75,46 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window?.orderOut(nil)
     }
 
-    private func updateWindowSize(for mode: DesktopPetViewMode) {
+    private func updateWindowSize(for mode: DesktopPetViewMode, anchor: ResizeAnchor, animated: Bool) {
         guard let window = self.window else { return }
-        let newSize = mode == .mini ? Self.miniSize : Self.fullSize
+        window.hasShadow = (mode == .full)
+        let metrics = DesktopPetSizeMetrics.metrics(for: mode, resizedPetSize: store.petSize)
+        let newSize = nsSize(for: metrics.windowSize(for: mode))
         let currentFrame = window.frame
         let newOrigin: NSPoint
         if currentFrame.size == newSize {
             newOrigin = currentFrame.origin
         } else {
-            let currentCenter = NSPoint(x: currentFrame.midX, y: currentFrame.midY)
-            newOrigin = NSPoint(
-                x: currentCenter.x - newSize.width / 2,
-                y: currentCenter.y - newSize.height / 2
-            )
+            switch anchor {
+            case .center:
+                let currentCenter = NSPoint(x: currentFrame.midX, y: currentFrame.midY)
+                newOrigin = NSPoint(
+                    x: currentCenter.x - newSize.width / 2,
+                    y: currentCenter.y - newSize.height / 2
+                )
+            case .topLeading:
+                newOrigin = NSPoint(
+                    x: currentFrame.minX,
+                    y: currentFrame.maxY - newSize.height
+                )
+            }
         }
 
         let newFrame = constrainedFrame(NSRect(origin: newOrigin, size: newSize))
         guard window.frame != newFrame else { return }
 
-        let shouldAnimate = !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        let shouldAnimate = animated && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 
         window.setFrame(newFrame, display: true, animate: shouldAnimate)
     }
 
     private func makeWindow() -> NSWindow {
-        let size = store.petViewMode == .mini ? Self.miniSize : Self.fullSize
+        if ProcessInfo.processInfo.arguments.contains("-ImagePetResetWindowFrame") {
+            UserDefaults.standard.removeObject(forKey: "NSWindow Frame \(Self.frameAutosaveName)")
+        }
+
+        let metrics = DesktopPetSizeMetrics.metrics(for: store.petViewMode, resizedPetSize: store.petSize)
+        let size = nsSize(for: metrics.windowSize(for: store.petViewMode))
         let window = DesktopPetWindow(
             contentRect: NSRect(origin: defaultOrigin(for: size), size: size),
             styleMask: [.borderless],
@@ -87,7 +125,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
         window.contentView = NSHostingView(rootView: DesktopPetView(store: store))
         window.backgroundColor = .clear
         window.isOpaque = false
-        window.hasShadow = true
+        window.hasShadow = (store.petViewMode == .full)
         window.isReleasedWhenClosed = false
         window.level = .floating
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -123,7 +161,7 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
 
     private func defaultOrigin(for size: NSSize) -> NSPoint {
         let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
-        let expandedWidth = max(size.width, Self.fullSize.width)
+        let expandedWidth = max(size.width, DesktopPetSizeMetrics(petSize: DesktopPetSizeMetrics.defaultPetSize).fullWindow.width)
         let horizontalInset = 28 + (expandedWidth - size.width) / 2
         return NSPoint(
             x: visibleFrame.maxX - size.width - horizontalInset,
@@ -159,6 +197,10 @@ final class DesktopPetWindowController: NSObject, NSWindowDelegate {
             .map { screen in (screen, frame.intersection(screen.visibleFrame).width * frame.intersection(screen.visibleFrame).height) }
             .max { $0.1 < $1.1 }?
             .0 ?? NSScreen.main
+    }
+
+    private func nsSize(for size: CGSize) -> NSSize {
+        NSSize(width: size.width, height: size.height)
     }
 }
 

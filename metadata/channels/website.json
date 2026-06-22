@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "channel": "website",
+  "status": "implemented",
+  "sourceLocale": "en-US",
+  "site": {
+    "domain": null,
+    "basePath": "/",
+    "primaryLocale": "en-US"
+  },
+  "sharedSources": {
+    "product": "metadata/app.json#/product",
+    "capabilities": "metadata/app.json#/capabilities",
+    "privacy": "metadata/app.json#/privacy",
+    "links": "metadata/app.json#/links"
+  },
+  "routes": [
+    {
+      "id": "home",
+      "path": "/",
+      "title": "metadata/locales/en-US.json#/website/home/metaTitle",
+      "description": "metadata/locales/en-US.json#/website/home/metaDescription",
+      "copy": "metadata/locales/en-US.json#/website/home",
+      "sections": "metadata/locales/en-US.json#/website/sections"
+    },
+    {
+      "id": "support",
+      "path": "/support",
+      "title": "metadata/locales/en-US.json#/website/support/title",
+      "copy": "metadata/locales/en-US.json#/website/support",
+      "minimumContent": "metadata/locales/en-US.json#/appStoreConnect/supportPageMinimumContent"
+    },
+    {
+      "id": "privacy",
+      "path": "/privacy",
+      "title": "metadata/locales/en-US.json#/website/privacy/title",
+      "copy": "metadata/locales/en-US.json#/website/privacy",
+      "minimumStatements": "metadata/locales/en-US.json#/appStoreConnect/privacyPolicyMinimumStatements"
+    }
+  ],
+  "buildNotes": [
+    "The static Vite site lives in website/ and imports the shared metadata files directly.",
+    "Do not publish docs/ PRDs or internal progress pages as the public website.",
+    "Keep support and privacy URLs in metadata/app.json once the site is live."
+  ]
+}

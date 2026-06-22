@@ -1,6 +1,14 @@
 import AppKit
 import Foundation
 import ImagePetCore
+import ServiceManagement
+
+enum LaunchMode: String, Codable {
+    case normal
+    case loginItem
+    case fileOpen
+    case reopen
+}
 
 @MainActor
 final class ImagePetStore: ObservableObject {
@@ -11,7 +19,32 @@ final class ImagePetStore: ObservableObject {
             checkDoneTimeout()
         }
     }
-    @Published var preset: CompressionPreset = .balanced
+    @Published var preset: CompressionPreset = .balanced {
+        didSet {
+            defaults.set(preset.rawValue, forKey: presetKey)
+            if qualityMode.preset != preset {
+                qualityMode = CompressionQualityMode(preset: preset)
+            }
+        }
+    }
+    @Published var qualityMode: CompressionQualityMode = .balanced {
+        didSet {
+            defaults.set(qualityMode.rawValue, forKey: qualityModeKey)
+            if let preset = qualityMode.preset, self.preset != preset {
+                self.preset = preset
+            }
+        }
+    }
+    @Published var customQuality: Int = 80 {
+        didSet {
+            let clamped = min(95, max(30, customQuality))
+            if customQuality != clamped {
+                customQuality = clamped
+                return
+            }
+            defaults.set(customQuality, forKey: customQualityKey)
+        }
+    }
     @Published var outputDirectory: URL? {
         didSet {
             checkAndApplyAutoExpand()
@@ -30,10 +63,22 @@ final class ImagePetStore: ObservableObject {
             checkAndApplyAutoExpand()
         }
     }
+    @Published var selectedMainTab: AppMainTab = .compress
+    @Published var selectedSettingsSection: SettingsSection = .desktopPet
+    @Published var isDesktopPetEnabled = true {
+        didSet {
+            defaults.set(isDesktopPetEnabled, forKey: desktopPetEnabledKey)
+            guard !isInitializing else { return }
+            if !isDesktopPetEnabled {
+                isDesktopPetVisible = false
+            }
+        }
+    }
     @Published var isDesktopPetVisible = false {
         didSet {
             defaults.set(isDesktopPetVisible, forKey: desktopPetVisibilityKey)
-            if isDesktopPetVisible {
+            guard !isInitializing else { return }
+            if isDesktopPetVisible && isDesktopPetEnabled {
                 if desktopPetWindowController == nil {
                     desktopPetWindowController = DesktopPetWindowController(store: self)
                 }
@@ -41,12 +86,21 @@ final class ImagePetStore: ObservableObject {
                 let isBlocking = snapshot.state == .needsSetup || snapshot.state == .confirm || snapshot.state == .permission
                 self.petViewMode = isBlocking ? .full : .mini
             }
-            desktopPetWindowController?.setVisible(isDesktopPetVisible)
+            if !isDesktopPetVisible {
+                desktopPetWindowController?.setVisible(false)
+            } else if isDesktopPetEnabled {
+                desktopPetWindowController?.setVisible(true)
+            }
         }
     }
     @Published var outputFormat: OutputFormat = .original {
         didSet {
             defaults.set(outputFormat.rawValue, forKey: outputFormatKey)
+        }
+    }
+    @Published var jpegEncodingMode: JPEGEncodingMode = .standard {
+        didSet {
+            defaults.set(jpegEncodingMode.rawValue, forKey: jpegEncodingModeKey)
         }
     }
     @Published var saveLocationMode: SaveLocationMode = .designated {
@@ -82,6 +136,7 @@ final class ImagePetStore: ObservableObject {
 
     @Published var petViewMode: DesktopPetViewMode = .mini {
         didSet {
+            defaults.set(petViewMode.rawValue, forKey: petViewModeKey)
             if petViewMode == .full {
                 resetPetIdleTimer()
                 issuesVisuallyDegraded = false
@@ -103,19 +158,57 @@ final class ImagePetStore: ObservableObject {
             defaults.set(enableHoverFeedback, forKey: enableHoverFeedbackKey)
         }
     }
+    @Published var enableSuccessSound = true {
+        didSet {
+            defaults.set(enableSuccessSound, forKey: enableSuccessSoundKey)
+        }
+    }
     @Published var energySavingMode = false {
         didSet {
             defaults.set(energySavingMode, forKey: energySavingModeKey)
         }
     }
-    @Published var selectedThemeName = "CuteCat" {
+    @Published var selectedThemeName = BuiltInPetTheme.fallback.id {
         didSet {
-            defaults.set(selectedThemeName, forKey: selectedThemeNameKey)
+            let resolved = BuiltInPetTheme.resolvedTheme(named: selectedThemeName).id
+            if selectedThemeName != resolved {
+                selectedThemeName = resolved
+                return
+            }
+            defaults.set(resolved, forKey: selectedThemeNameKey)
+        }
+    }
+    @Published var petSize: CGFloat = DesktopPetSizeMetrics.defaultPetSize {
+        didSet {
+            let clamped = DesktopPetSizeMetrics.clamped(petSize)
+            if petSize != clamped {
+                petSize = clamped
+                return
+            }
+            defaults.set(Double(clamped), forKey: petSizeKey)
         }
     }
     @Published var issuesVisuallyDegraded = false
     @Published var doneVisuallyDismissed = false
 
+    // PRD v0.7 Properties
+    @Published var launchMode: LaunchMode = .normal
+    @Published var launchAtLoginEnabled = false {
+        didSet {
+            defaults.set(launchAtLoginEnabled, forKey: launchAtLoginKey)
+            updateLaunchAtLogin()
+        }
+    }
+    @Published var launchAtLoginError: String? = nil
+    @Published var hasReopened = false
+    @Published var isParametersExpanded = true {
+        didSet {
+            defaults.set(isParametersExpanded, forKey: isParametersExpandedKey)
+        }
+    }
+    static var shared: ImagePetStore?
+
+    private var isInitializing = true
     private var idleTimerTask: Task<Void, Never>?
     private var issuesTimer: Timer?
     private var doneTimer: Timer?
@@ -123,61 +216,156 @@ final class ImagePetStore: ObservableObject {
     let maxConcurrentJobs = 2
 
     private let compressor: ImageCompressor
+    private let encoderCapabilities: EncoderCapabilities
     private let bookmarkStore: OutputDirectoryBookmarkStore
     private let defaults: UserDefaults
     private var processingTask: Task<Void, Never>?
     private var openMainWindow: (() -> Void)?
+    private var openHelpWindow: (() -> Void)?
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
+    private var jobSources: [ImageJob.ID: CompressionSource] = [:]
+
+    @Published public var folderWatchManager: FolderWatchManager!
+    @Published var notificationManager: LocalNotificationManager
+
     private let desktopPetVisibilityKey = "ImagePet.desktopPetVisible"
     private let outputFormatKey = "ImagePet.outputFormat"
+    private let jpegEncodingModeKey = "ImagePet.jpegEncodingMode"
+    private let presetKey = "ImagePet.preset"
+    private let qualityModeKey = "ImagePet.qualityMode"
+    private let customQualityKey = "ImagePet.customQuality"
     private let saveLocationModeKey = "ImagePet.saveLocationMode"
     private let filenameSuffixKey = "ImagePet.filenameSuffix"
     private let maxDimensionKey = "ImagePet.maxDimension"
     private let stripMetadataKey = "ImagePet.stripMetadata"
     private let enableIdleVariantsKey = "ImagePet.enableIdleVariants"
     private let enableHoverFeedbackKey = "ImagePet.enableHoverFeedback"
+    private let enableSuccessSoundKey = "ImagePet.enableSuccessSound"
     private let energySavingModeKey = "ImagePet.energySavingMode"
     private let selectedThemeNameKey = "ImagePet.selectedThemeName"
+    private let petSizeKey = "ImagePet.desktopPetSize"
+    private let legacyPetSizeTierKey = "ImagePet.petSizeTier"
+
+    // PRD v0.7 Keys
+    private let launchAtLoginKey = "ImagePet.launchAtLogin"
+    private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
+    private let petViewModeKey = "ImagePet.petViewMode"
+    private let isParametersExpandedKey = "ImagePet.isParametersExpanded"
 
     init(
-        compressor: ImageCompressor = ImageCompressor(),
+        compressor: ImageCompressor? = nil,
+        encoderCapabilities: EncoderCapabilities = .current,
         bookmarkStore: OutputDirectoryBookmarkStore? = nil,
         defaults: UserDefaults = .standard
     ) {
-        self.compressor = compressor
+        self.encoderCapabilities = encoderCapabilities
+        self.compressor = compressor ?? ImageCompressor(capabilities: encoderCapabilities)
         self.defaults = defaults
         self.bookmarkStore = bookmarkStore ?? OutputDirectoryBookmarkStore(defaults: defaults)
+        self.notificationManager = LocalNotificationManager(defaults: defaults)
 
         self.outputFormat = .original
+        self.jpegEncodingMode = .standard
         self.saveLocationMode = .designated
         self.filenameSuffix = "_compressed"
         self.maxDimension = .none
         self.stripMetadata = true
+        self.qualityMode = .balanced
+        self.customQuality = 80
         self.petViewMode = .mini
-        
+
         self.enableIdleVariants = true
         self.enableHoverFeedback = true
+        self.enableSuccessSound = true
         self.energySavingMode = false
-        self.selectedThemeName = "CuteCat"
+        self.selectedThemeName = BuiltInPetTheme.fallback.id
+        self.petSize = DesktopPetSizeMetrics.defaultPetSize
 
-        if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
-            self.isDesktopPetVisible = false
-            self.outputDirectory = nil
+        self.isDesktopPetEnabled = true
+        self.launchAtLoginEnabled = false
+        self.isParametersExpanded = true
+        ImagePetStore.shared = self
+
+        self.folderWatchManager = FolderWatchManager(defaults: defaults)
+        self.folderWatchManager.store = self
+        bindNotificationActions()
+
+        let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
+        let isRestorationTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING_RESTORATION"] == "1"
+
+        // 1. 推断或注入 LaunchMode
+        if let envModeString = ProcessInfo.processInfo.environment["IMAGEPET_LAUNCH_MODE"],
+           let envMode = LaunchMode(rawValue: envModeString) {
+            self.launchMode = envMode
+        } else {
+            let isBackgroundLaunch = !NSApplication.shared.isActive
+            let launchAtLogin = defaults.bool(forKey: launchAtLoginKey)
+            if isBackgroundLaunch && launchAtLogin && !isRestorationTesting && !isUITesting {
+                self.launchMode = .loginItem
+            } else {
+                self.launchMode = .normal
+            }
+        }
+
+        if isUITesting && !isRestorationTesting {
+            if let mockEnabled = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_ENABLED"] {
+                self.isDesktopPetEnabled = (mockEnabled != "0")
+            } else {
+                self.isDesktopPetEnabled = true
+            }
+            if let mockVisible = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_VISIBLE"] {
+                self.isDesktopPetVisible = (mockVisible == "1")
+            } else {
+                self.isDesktopPetVisible = false
+            }
+            if self.launchMode == .loginItem {
+                self.outputDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
+            } else {
+                self.outputDirectory = nil
+            }
             self.petViewMode = .mini
+            self.enableSuccessSound = true
+            self.preset = .balanced
+            self.qualityMode = .balanced
+            self.customQuality = 80
+            self.jpegEncodingMode = .standard
             if ProcessInfo.processInfo.environment["UI_TEST_OVERWRITE"] == "1" {
                 self.saveLocationMode = .overwrite
             }
+            self.launchAtLoginEnabled = false
         } else {
+            if defaults.object(forKey: desktopPetEnabledKey) == nil {
+                self.isDesktopPetEnabled = true
+            } else {
+                self.isDesktopPetEnabled = defaults.bool(forKey: desktopPetEnabledKey)
+            }
             self.isDesktopPetVisible = defaults.bool(forKey: desktopPetVisibilityKey)
             restoreOutputDirectory()
 
             if let savedFormat = defaults.string(forKey: outputFormatKey), let format = OutputFormat(rawValue: savedFormat) {
-                self.outputFormat = format
+                self.outputFormat = encoderCapabilities.writableFormats.contains(format) ? format : .original
+            }
+            if let savedJPEGMode = defaults.string(forKey: jpegEncodingModeKey),
+               let mode = JPEGEncodingMode(rawValue: savedJPEGMode) {
+                self.jpegEncodingMode = encoderCapabilities.jpegEncodingModes.contains(mode) ? mode : .standard
+            }
+            if let savedPreset = defaults.string(forKey: presetKey), let preset = CompressionPreset(rawValue: savedPreset) {
+                self.preset = preset
+                self.qualityMode = CompressionQualityMode(preset: preset)
+            }
+            if let savedQualityMode = defaults.string(forKey: qualityModeKey), let mode = CompressionQualityMode(rawValue: savedQualityMode) {
+                self.qualityMode = mode
+            }
+            if defaults.object(forKey: customQualityKey) != nil {
+                self.customQuality = min(95, max(30, defaults.integer(forKey: customQualityKey)))
             }
             if let savedMode = defaults.string(forKey: saveLocationModeKey), let mode = SaveLocationMode(rawValue: savedMode) {
                 self.saveLocationMode = mode
+            }
+            if self.saveLocationMode == .overwrite {
+                self.outputFormat = .original
             }
             if let savedSuffix = defaults.string(forKey: filenameSuffixKey) {
                 self.filenameSuffix = OutputNameAllocator.sanitizedSuffix(savedSuffix)
@@ -188,34 +376,114 @@ final class ImagePetStore: ObservableObject {
             if defaults.object(forKey: stripMetadataKey) != nil {
                 self.stripMetadata = defaults.bool(forKey: stripMetadataKey)
             }
-            
+
             if defaults.object(forKey: enableIdleVariantsKey) != nil {
                 self.enableIdleVariants = defaults.bool(forKey: enableIdleVariantsKey)
             }
             if defaults.object(forKey: enableHoverFeedbackKey) != nil {
                 self.enableHoverFeedback = defaults.bool(forKey: enableHoverFeedbackKey)
             }
+            if defaults.object(forKey: enableSuccessSoundKey) != nil {
+                self.enableSuccessSound = defaults.bool(forKey: enableSuccessSoundKey)
+            }
             if defaults.object(forKey: energySavingModeKey) != nil {
                 self.energySavingMode = defaults.bool(forKey: energySavingModeKey)
             }
             if let theme = defaults.string(forKey: selectedThemeNameKey) {
-                self.selectedThemeName = theme
+                self.selectedThemeName = BuiltInPetTheme.resolvedTheme(named: theme).id
             }
-            
-            self.petViewMode = .mini
+            if defaults.object(forKey: petSizeKey) != nil {
+                self.petSize = DesktopPetSizeMetrics.clamped(defaults.double(forKey: petSizeKey))
+            } else if let rawTier = defaults.string(forKey: legacyPetSizeTierKey),
+                      let migratedSize = DesktopPetSizeMetrics.migratedPetSize(from: rawTier) {
+                self.petSize = migratedSize
+            }
+
+            if defaults.object(forKey: launchAtLoginKey) != nil {
+                self.launchAtLoginEnabled = defaults.bool(forKey: launchAtLoginKey)
+            } else {
+                if #available(macOS 13.0, *) {
+                    self.launchAtLoginEnabled = (SMAppService.mainApp.status == .enabled)
+                }
+            }
+
+            if let savedMode = defaults.string(forKey: petViewModeKey), let mode = DesktopPetViewMode(rawValue: savedMode) {
+                self.petViewMode = mode
+            } else {
+                self.petViewMode = .mini
+            }
+            if defaults.object(forKey: isParametersExpandedKey) != nil {
+                self.isParametersExpanded = defaults.bool(forKey: isParametersExpandedKey)
+            } else {
+                self.isParametersExpanded = true
+            }
         }
+
+        if isUITesting && isRestorationTesting {
+            if let mockEnabled = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_ENABLED"] {
+                self.isDesktopPetEnabled = (mockEnabled != "0")
+            }
+            if let mockVisible = ProcessInfo.processInfo.environment["IMAGEPET_MOCK_PET_VISIBLE"] {
+                self.isDesktopPetVisible = (mockVisible == "1")
+            }
+        }
+
         checkAndApplyAutoExpand()
+        self.isInitializing = false
     }
 
     var completedCount: Int {
         jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
     }
 
+    var builtInThemes: [BuiltInPetTheme] {
+        BuiltInPetTheme.all
+    }
+
+    var selectedTheme: BuiltInPetTheme {
+        BuiltInPetTheme.resolvedTheme(named: selectedThemeName)
+    }
+
+    var availableOutputFormats: [OutputFormat] {
+        OutputFormat.allCases.filter { encoderCapabilities.writableFormats.contains($0) }
+    }
+
+    var qualitySummary: String {
+        guard outputFormat != .png else {
+            return "Lossless"
+        }
+        return qualityMode.compressionQuality(customQuality: customQuality).displayName
+    }
+
+    var effectiveLossyQuality: CompressionQuality? {
+        outputFormat == .png ? nil : qualityMode.compressionQuality(customQuality: customQuality)
+    }
+
+    var canUseAdvancedJPEG: Bool {
+        guard encoderCapabilities.jpegEncodingModes.contains(.advanced),
+              saveLocationMode != .overwrite else {
+            return false
+        }
+
+        if outputFormat == .jpeg {
+            return true
+        }
+
+        if outputFormat == .original {
+            return jobs.contains { SupportedImageFormat.format(for: $0.inputURL) == .jpeg }
+        }
+
+        return false
+    }
+
+    var effectiveJPEGEncodingMode: JPEGEncodingMode {
+        canUseAdvancedJPEG ? jpegEncodingMode : .standard
+    }
+
     var filenamePreview: String {
         let dummyInput = URL(fileURLWithPath: "/tmp/photo.png")
-        let targetFormat = outputFormat
-        let targetUTType = targetFormat.targetUTType(for: dummyInput)
-        let targetExtension = targetUTType.preferredFilenameExtension ?? "png"
+        let targetFormat = encoderCapabilities.writableFormats.contains(outputFormat) ? outputFormat : .original
+        let targetExtension = targetFormat.targetExtension(for: dummyInput)
 
         let outputName = OutputNameAllocator.outputFileName(
             for: dummyInput,
@@ -237,32 +505,97 @@ final class ImagePetStore: ObservableObject {
         openMainWindow = opener
     }
 
+    func setHelpWindowOpener(_ opener: @escaping () -> Void) {
+        openHelpWindow = opener
+    }
+
+    func openHelp() {
+        openHelpWindow?()
+    }
+
+    func showSettings(_ section: SettingsSection) {
+        selectedSettingsSection = section
+        selectedMainTab = .settings
+        activateMainWindow()
+    }
+
     func activateMainWindow() {
+        self.hasReopened = true
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.setActivationPolicy(.regular)
+        }
         NSApp.activate(ignoringOtherApps: true)
+
         if focusMainWindowIfPresent() {
             return
         }
 
         openMainWindow?()
 
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
             await Task.yield()
+            guard let self else { return }
+            if self.focusMainWindowIfPresent() {
+                return
+            }
+
+            self.openMainWindow?()
+            try? await Task.sleep(nanoseconds: 150_000_000)
             self.focusMainWindowIfPresent()
         }
     }
 
     @discardableResult
-    private func focusMainWindowIfPresent() -> Bool {
-        for window in NSApp.windows {
-            if window.title == "ImagePet" || window.identifier?.rawValue == "main" || window.frameAutosaveName == "ImagePet" {
-                if window.isMiniaturized {
-                    window.deminiaturize(nil)
-                }
-                window.makeKeyAndOrderFront(nil)
+    func waitForMainWindowActivation(timeoutNanoseconds: UInt64 = 800_000_000) async -> Bool {
+        if focusMainWindowIfPresent() {
+            return true
+        }
+
+        let deadline = ContinuousClock.now + .nanoseconds(Int(timeoutNanoseconds))
+        while ContinuousClock.now < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            if focusMainWindowIfPresent() {
                 return true
             }
         }
+
+        return focusMainWindowIfPresent()
+    }
+
+    @discardableResult
+    private func focusMainWindowIfPresent() -> Bool {
+        for window in NSApp.windows {
+            guard window.isVisible, isMainApplicationWindow(window) else {
+                continue
+            }
+
+            if window.isMiniaturized {
+                window.deminiaturize(nil)
+            }
+            window.makeKeyAndOrderFront(nil)
+            return true
+        }
         return false
+    }
+
+    private func isMainApplicationWindow(_ window: NSWindow) -> Bool {
+        if window.identifier?.rawValue == "main" || window.title == "ImagePet" || window.frameAutosaveName == "ImagePet" {
+            return true
+        }
+
+        guard window.contentView != nil else {
+            return false
+        }
+
+        if window.identifier?.rawValue == "DesktopPetWindow" || window.title == "ImagePet Help" {
+            return false
+        }
+
+        let generatedContentViewWindow = window.title.contains("ImagePet.ContentView")
+        let standardAppWindow = window.styleMask.contains(.titled)
+            && window.styleMask.contains(.closable)
+            && window.styleMask.contains(.resizable)
+        return generatedContentViewWindow || standardAppWindow
     }
 
     var succeededCount: Int {
@@ -308,6 +641,7 @@ final class ImagePetStore: ObservableObject {
 
     func promptForOutputFolderOnFirstLaunch() {
         guard !didPromptForInitialFolder else { return }
+        guard saveLocationMode == .designated else { return }
         didPromptForInitialFolder = true
 
         if outputDirectory == nil {
@@ -332,14 +666,18 @@ final class ImagePetStore: ObservableObject {
 
     func chooseInputImages() {
         let urls = InputFilePanel.chooseImages()
-        addInputURLs(urls)
+        addInputURLs(urls, source: .manual)
     }
 
     func addDroppedURLs(_ urls: [URL]) {
-        addInputURLs(urls)
+        addInputURLs(urls, source: .manual)
     }
 
-    private func addInputURLs(_ urls: [URL]) {
+    func addServiceURLs(_ urls: [URL]) {
+        addInputURLs(urls, source: .finderService)
+    }
+
+    private func addInputURLs(_ urls: [URL], source: CompressionSource) {
         guard !urls.isEmpty else {
             return
         }
@@ -347,7 +685,7 @@ final class ImagePetStore: ObservableObject {
         let newJobs = urls.map { url in
             let size = Self.fileSize(for: url)
 
-            guard SupportedImageFormat.isSupported(url) else {
+            guard SupportedImageFormat.isSupported(url, capabilities: encoderCapabilities) else {
                 return ImageJob(
                     inputURL: url,
                     originalSize: size,
@@ -360,6 +698,44 @@ final class ImagePetStore: ObservableObject {
         }
 
         jobs.append(contentsOf: newJobs)
+        for job in newJobs {
+            jobSources[job.id] = source
+        }
+
+        if jobs.contains(where: { $0.status == .pending }) {
+            startProcessingIfPossible()
+        } else if hasFailedJobs {
+            petState = .error
+        }
+    }
+
+    func processWatchedFiles(_ urls: [URL], outputDirectory: URL) {
+        guard !urls.isEmpty else { return }
+
+        let newJobs = urls.map { url in
+            let size = Self.fileSize(for: url)
+
+            guard SupportedImageFormat.isSupported(url, capabilities: encoderCapabilities) else {
+                return ImageJob(
+                    inputURL: url,
+                    originalSize: size,
+                    status: .failed,
+                    errorMessage: CompressionError.unsupportedImageFormat.localizedDescription,
+                    designatedOutputDirectory: outputDirectory
+                )
+            }
+
+            return ImageJob(
+                inputURL: url,
+                originalSize: size,
+                designatedOutputDirectory: outputDirectory
+            )
+        }
+
+        jobs.append(contentsOf: newJobs)
+        for job in newJobs {
+            jobSources[job.id] = .folderWatching
+        }
 
         if jobs.contains(where: { $0.status == .pending }) {
             startProcessingIfPossible()
@@ -381,7 +757,7 @@ final class ImagePetStore: ObservableObject {
         startProcessingIfPossible()
     }
 
-    func compressMore() {
+    func clearList() {
         guard !isProcessing else { return }
 
         clearDoneTimeout()
@@ -393,6 +769,7 @@ final class ImagePetStore: ObservableObject {
         Task {
             await compressor.resetReservations()
         }
+        jobSources.removeAll()
 
         if outputDirectory == nil && saveLocationMode == .designated {
             chooseOutputDirectory()
@@ -469,9 +846,9 @@ final class ImagePetStore: ObservableObject {
                 let hasSuccess = jobs.contains { $0.status == .done }
                 let secondary: [DesktopPetAction]
                 if hasSuccess {
-                    secondary = [.addImages, .revealOutput, .compressMore, .hidePet]
+                    secondary = [.addImages, .revealOutput, .clearList, .hidePet]
                 } else {
-                    secondary = [.addImages, .compressMore, .hidePet]
+                    secondary = [.addImages, .clearList, .hidePet]
                 }
                 return DesktopPetSnapshot(
                     state: doneVisuallyDismissed ? .idle : .done,
@@ -493,7 +870,7 @@ final class ImagePetStore: ObservableObject {
                     title: "Issues",
                     detail: detailText,
                     primaryAction: .retryFailed,
-                    secondaryActions: [.addImages, .retryFailed, .compressMore, .hidePet],
+                    secondaryActions: [.addImages, .retryFailed, .clearList, .hidePet],
                     canAcceptDrop: true
                 )
             }
@@ -516,23 +893,56 @@ final class ImagePetStore: ObservableObject {
         case .hidePet:
             hideDesktopPet()
         case .addImages:
-            chooseInputImages()
+            activateMainWindow()
+            Task { @MainActor in
+                _ = await waitForMainWindowActivation()
+                chooseInputImages()
+            }
         case .revealOutput:
             revealOutputDirectory()
         case .retryFailed:
             retryFailed()
-        case .compressMore:
-            compressMore()
+        case .clearList:
+            clearList()
         case .expand:
             petViewMode = .full
         case .collapse:
-            petViewMode = .mini
+            NotificationCenter.default.post(name: .desktopPetWillCollapse, object: nil)
         }
         resetPetIdleTimer()
     }
 
+    func performCollapse() {
+        self.petViewMode = .mini
+    }
+
     func toggleDesktopPet() {
         isDesktopPetVisible.toggle()
+    }
+
+    func toggleDesktopPetMode() {
+        guard isDesktopPetEnabled else {
+            return
+        }
+
+        guard isDesktopPetVisible else {
+            isDesktopPetVisible = true
+            petViewMode = .mini
+            return
+        }
+
+        if petViewMode == .full {
+            handlePetAction(.collapse)
+        } else {
+            petViewMode = .full
+        }
+    }
+
+    func setDesktopPetSize(_ value: CGFloat) {
+        let clamped = DesktopPetSizeMetrics.clamped(value)
+        guard petSize != clamped else { return }
+        petSize = clamped
+        resetPetIdleTimer()
     }
 
     func attachDesktopPetControllerIfNeeded() {
@@ -706,6 +1116,8 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func runQueue(outputDirectory: URL?) async {
+        let batchJobIDs = Set(jobs.filter { $0.status == .pending }.map { $0.id })
+
         await withTaskGroup(of: Void.self) { group in
             let workerCount = min(maxConcurrentJobs, max(1, jobs.count))
 
@@ -732,6 +1144,16 @@ final class ImagePetStore: ObservableObject {
         isProcessing = false
         petState = hasFailedJobs ? .error : .happy
         didConfirmOverwrite = false
+
+        let processedJobs = jobs.filter { batchJobIDs.contains($0.id) }
+        let batchHasFailures = processedJobs.contains { $0.status == .failed }
+        let batchHasSuccess = processedJobs.contains { $0.status == .done }
+
+        if !batchHasFailures && batchHasSuccess && enableSuccessSound {
+            SoundManager.shared.playSuccessSound()
+        }
+
+        deliverNotificationSummary(for: processedJobs, batchJobIDs: batchJobIDs)
     }
 
     private func claimNextPendingJob() -> ImageJob? {
@@ -745,19 +1167,26 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func process(_ job: ImageJob, outputDirectory: URL?) async {
-        let options = CompressionOptions(
-            preset: preset,
+        let compressionOptions = CompressionOptions(
+            lossyQuality: effectiveLossyQuality,
             format: outputFormat,
-            locationMode: saveLocationMode,
-            suffix: OutputNameAllocator.sanitizedSuffix(filenameSuffix),
+            jpegEncodingMode: effectiveJPEGEncodingMode,
             maxDimension: maxDimension,
             stripMetadata: stripMetadata
+        )
+        let saveOptions = SaveOptions(
+            locationMode: saveLocationMode,
+            suffix: OutputNameAllocator.sanitizedSuffix(filenameSuffix)
         )
 
         var targetOutputDir = outputDirectory
         var restoredBookmarkURL: URL? = nil
 
-        if saveLocationMode == .originalFolder {
+        if let designated = job.designatedOutputDirectory {
+            targetOutputDir = designated
+            // Make sure we have access to the designated output folder (handled by FolderWatchManager's bookmark resolving implicitly, but we can do it explicitly)
+            // It's actually already startAccessingSecurityScopedResource'd by FolderWatchManager when it resolved the outputURL
+        } else if saveLocationMode == .originalFolder {
             let parentFolder = job.inputURL.deletingLastPathComponent()
             restoredBookmarkURL = bookmarkStore.restoreMulti(for: parentFolder)
             targetOutputDir = parentFolder
@@ -778,7 +1207,8 @@ final class ImagePetStore: ObservableObject {
             let result = try await compressor.compress(
                 inputURL: job.inputURL,
                 outputDirectory: targetOutputDir,
-                options: options
+                compressionOptions: compressionOptions,
+                saveOptions: saveOptions
             )
             updateJob(job.id) { updated in
                 updated.outputURL = result.outputURL
@@ -790,7 +1220,7 @@ final class ImagePetStore: ObservableObject {
         } catch {
             let mapped = CompressionError.map(error)
             updateJob(job.id) { updated in
-                if mapped == .skipped {
+                if mapped.isSkippedResult {
                     updated.status = .skipped
                     updated.errorMessage = mapped.localizedDescription
                 } else {
@@ -811,6 +1241,7 @@ final class ImagePetStore: ObservableObject {
     }
 
     private func failPendingJobs(message: String) {
+        let failedJobIDs = Set(jobs.filter { $0.status == .pending }.map { $0.id })
         for index in jobs.indices where jobs[index].status == .pending {
             jobs[index].status = .failed
             jobs[index].errorMessage = message
@@ -819,6 +1250,57 @@ final class ImagePetStore: ObservableObject {
         processingTask = nil
         isProcessing = false
         petState = .error
+
+        let failedJobs = jobs.filter { failedJobIDs.contains($0.id) }
+        deliverNotificationSummary(for: failedJobs, batchJobIDs: failedJobIDs)
+    }
+
+    private func deliverNotificationSummary(for processedJobs: [ImageJob], batchJobIDs: Set<ImageJob.ID>) {
+        guard !processedJobs.isEmpty else { return }
+
+        let source = notificationSource(for: batchJobIDs)
+        let summary = CompressionBatchSummary(source: source, jobs: processedJobs)
+        notificationManager.handleCompletedSummary(summary, appIsActive: NSApp.isActive)
+    }
+
+    private func notificationSource(for jobIDs: Set<ImageJob.ID>) -> CompressionSource {
+        let sources = Set(jobIDs.compactMap { jobSources[$0] })
+        if sources.count == 1, let source = sources.first {
+            return source
+        }
+        if sources.contains(.folderWatching) {
+            return .folderWatching
+        }
+        if sources.contains(.finderService) {
+            return .finderService
+        }
+        return .manual
+    }
+
+    private func bindNotificationActions() {
+        notificationManager.setActionHandler { [weak self] action, summary in
+            guard let self else { return }
+
+            switch action {
+            case .openImagePet:
+                self.activateMainWindow()
+            case .revealInFinder:
+                self.activateMainWindow()
+                if let outputURL = summary?.representativeOutputURL {
+                    NSWorkspace.shared.activateFileViewerSelecting([outputURL])
+                } else if let outputDirectory = summary?.outputDirectory {
+                    NSWorkspace.shared.open(outputDirectory)
+                } else {
+                    self.revealOutputDirectory()
+                }
+            case .reviewFailed:
+                self.selectedMainTab = .compress
+                self.activateMainWindow()
+                self.petViewMode = .full
+            case .openSettings:
+                self.showSettings(.notifications)
+            }
+        }
     }
 
     private static func fileSize(for url: URL) -> Int64 {
@@ -855,7 +1337,7 @@ final class ImagePetStore: ObservableObject {
         idleTimerTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
             guard !Task.isCancelled else { return }
-            self?.petViewMode = .mini
+            self?.handlePetAction(.collapse)
         }
     }
 
@@ -865,7 +1347,7 @@ final class ImagePetStore: ObservableObject {
             if issuesTimer == nil && !issuesVisuallyDegraded {
                 let isTesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" || NSClassFromString("XCTestCase") != nil
                 let interval: TimeInterval = isTesting ? 2.0 : 600.0
-                
+
                 issuesTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
                     Task { @MainActor [weak self] in
                         guard let self = self else { return }
@@ -891,7 +1373,7 @@ final class ImagePetStore: ObservableObject {
         if isCurrentlyDone {
             if doneTimer == nil && !doneVisuallyDismissed {
                 let interval: TimeInterval = 3.5
-                
+
                 doneTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
                     Task { @MainActor [weak self] in
                         guard let self = self else { return }
@@ -911,4 +1393,42 @@ final class ImagePetStore: ObservableObject {
         doneTimer = nil
         doneVisuallyDismissed = false
     }
+
+    private func updateLaunchAtLogin() {
+        if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
+            return
+        }
+        if #available(macOS 13.0, *) {
+            let service = SMAppService.mainApp
+            if launchAtLoginEnabled {
+                if service.status == .enabled { return }
+                do {
+                    launchAtLoginError = nil
+                    try service.register()
+                } catch {
+                    launchAtLoginError = "Failed to enable launch at login: \(error.localizedDescription)"
+                    launchAtLoginEnabled = false
+                    #if DEBUG
+                    print("[ImagePetStore] Error registering launch service: \(error)")
+                    #endif
+                }
+            } else {
+                if service.status == .notRegistered { return }
+                do {
+                    launchAtLoginError = nil
+                    try service.unregister()
+                } catch {
+                    launchAtLoginError = "Failed to disable launch at login: \(error.localizedDescription)"
+                    launchAtLoginEnabled = true
+                    #if DEBUG
+                    print("[ImagePetStore] Error unregistering launch service: \(error)")
+                    #endif
+                }
+            }
+        }
+    }
+}
+
+extension Notification.Name {
+    static let desktopPetWillCollapse = Notification.Name("ImagePet.desktopPetWillCollapse")
 }

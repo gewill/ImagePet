@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "channel": "mac-app-store",
+  "status": "draft",
+  "sourceLocale": "en-US",
+  "localizedFields": {
+    "appName": "metadata/locales/en-US.json#/appStoreConnect/name",
+    "subtitle": "metadata/locales/en-US.json#/appStoreConnect/subtitle",
+    "promotionalText": "metadata/locales/en-US.json#/appStoreConnect/promotionalText",
+    "description": "metadata/locales/en-US.json#/appStoreConnect/description",
+    "whatsNew": "metadata/locales/en-US.json#/appStoreConnect/whatsNew",
+    "keywords": "metadata/locales/en-US.json#/appStoreConnect/keywords",
+    "reviewNotes": "metadata/locales/en-US.json#/appStoreConnect/reviewNotes"
+  },
+  "appInformation": {
+    "primaryCategory": "Graphics & Design",
+    "secondaryCategory": "Utilities",
+    "contentRights": "ImagePet uses original app UI/assets and third-party open source libraries listed in docs/THIRD_PARTY_NOTICES.md.",
+    "ageRating": "Complete the ASC questionnaire; expected low-age rating because the app has no user-generated content, networking, accounts, ads, purchases, gambling, or unrestricted web access.",
+    "price": "Recommended 1.0 launch pricing: paid app, USA base price USD 7.99; introductory sale option USD 4.99 for the first 7-14 days; raise to USD 9.99 only after review volume and release confidence improve. Use Apple's automatic comparable prices for other storefronts unless a territory-specific strategy is intentionally defined."
+  },
+  "urls": {
+    "support": "metadata/app.json#/links/support",
+    "marketing": "metadata/app.json#/links/marketing",
+    "privacyPolicy": "metadata/app.json#/links/privacyPolicy"
+  },
+  "appPrivacy": {
+    "dataCollected": "metadata/app.json#/privacy/dataCollected",
+    "tracking": "metadata/app.json#/privacy/tracking",
+    "thirdPartyAdvertising": "metadata/app.json#/privacy/thirdPartyAdvertising",
+    "thirdPartyAnalytics": "metadata/app.json#/privacy/thirdPartyAnalytics",
+    "reviewRequirement": "Re-check this before submission against the actual linked SDKs and any support/contact flow."
+  },
+  "screenshotPlan": {
+    "minimum": 1,
+    "maximum": 10,
+    "workflowDoc": "docs/ASC_SCREENSHOT_WORKFLOW.md",
+    "deck": "metadata/asc-screenshot-deck.en-US.json",
+    "sourceDirectory": "screenshots/asc/source/en-US",
+    "outputDirectory": "screenshots/asc/mac/en-US",
+    "renderCommand": "./script/prepare_asc_screenshots.py",
+    "formats": [
+      ".jpeg",
+      ".jpg",
+      ".png"
+    ],
+    "recommendedFirstSet": [
+      "Main Soft Native compression workspace with files queued or completed.",
+      "Drag-and-drop empty state with mascot visible.",
+      "Completed batch showing saved space and per-file results.",
+      "Settings showing output, notifications, or folder watching.",
+      "Desktop Pet visible beside the main app."
+    ],
+    "captureRequirements": [
+      "Use the actual submitted build.",
+      "Do not show private image names or personal folders.",
+      "Do not promise unsupported formats or cloud features.",
+      "Keep captions factual and short if adding marketing frames.",
+      "Prefer a clean light-mode set first; dark-mode screenshots can be added only if they look polished."
+    ]
+  },
+  "submissionChecklist": [
+    "Xcode Cloud build branch produced an ASC build.",
+    "Version number and build number match docs/PROGRESS.md.",
+    "App icon is final in the submitted build.",
+    "Product page copy pasted and proofread.",
+    "Keywords length verified in ASC.",
+    "Support URL is live.",
+    "Privacy Policy URL is live.",
+    "App Privacy answers match the actual binary and dependencies.",
+    "Age rating questionnaire completed.",
+    "Screenshots uploaded for macOS.",
+    "App Review notes pasted.",
+    "Export compliance / encryption questions answered.",
+    "Price and availability configured.",
+    "Final manual smoke passed from the exact ASC build."
+  ],
+  "appleReferences": [
+    "https://developer.apple.com/app-store/review/guidelines/",
+    "https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots/",
+    "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/",
+    "https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/",
+    "https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating/"
+  ]
+}

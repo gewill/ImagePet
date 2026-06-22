@@ -7,15 +7,33 @@ public protocol ImageCompressing: Sendable {
     func compress(
         inputURL: URL,
         outputDirectory: URL?,
-        options: CompressionOptions
+        compressionOptions: CompressionOptions,
+        saveOptions: SaveOptions
     ) async throws -> CompressionResult
 }
 
 public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
     private let allocator: OutputNameAllocator
+    private let capabilities: EncoderCapabilities
+    private let webPEncodingEngine: SwiftWebPEncodingEngine
+    private let webPDecodingEngine: SwiftWebPDecodingEngine
+    private let mozJPEGEncodingEngine: MozJPEGEncodingEngine
 
-    public init(allocator: OutputNameAllocator = OutputNameAllocator()) {
+    public init(
+        allocator: OutputNameAllocator = OutputNameAllocator(),
+        capabilities: EncoderCapabilities = .current,
+        webPEncodingEngine: SwiftWebPEncodingEngine? = nil,
+        webPDecodingEngine: SwiftWebPDecodingEngine? = nil,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine? = nil
+    ) {
         self.allocator = allocator
+        self.capabilities = capabilities
+        self.webPEncodingEngine = webPEncodingEngine ?? SwiftWebPEncodingEngine(capabilities: capabilities)
+        self.webPDecodingEngine = webPDecodingEngine ?? SwiftWebPDecodingEngine(capabilities: capabilities)
+        let mozJPEGAvailability: MozJPEGEncodingEngine.Availability = capabilities.jpegEncodingModes.contains(.advanced)
+            ? .available
+            : .unavailable
+        self.mozJPEGEncodingEngine = mozJPEGEncodingEngine ?? MozJPEGEncodingEngine(availability: mozJPEGAvailability)
     }
 
     public func resetReservations() async {
@@ -27,7 +45,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         outputDirectory: URL,
         preset: CompressionPreset
     ) async throws -> CompressionResult {
-        guard SupportedImageFormat.isSupported(inputURL) else {
+        guard SupportedImageFormat.isSupported(inputURL, capabilities: capabilities) else {
             throw CompressionError.unsupportedImageFormat
         }
 
@@ -44,22 +62,29 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
 
         try validateOutputDirectory(outputDirectory)
 
-        let outputURL = await allocator.reserveOutputURL(for: inputURL, in: outputDirectory)
+        let finalOutputURL = await allocator.reserveOutputURL(for: inputURL, in: outputDirectory)
+        let destinationTemporaryURL = Self.temporaryOutputURL(in: outputDirectory, targetExtension: "jpg")
+        let options = CompressionOptions(lossyQuality: .preset(preset), format: .jpeg, maxDimension: .none, stripMetadata: true)
 
         do {
-            return try await Task.detached(priority: .userInitiated) {
+            return try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
-                        outputURL: outputURL,
-                        options: CompressionOptions(preset: preset, format: .jpeg, locationMode: .designated, suffix: "_compressed", maxDimension: .none, stripMetadata: true),
-                        targetUTType: .jpeg
+                        destinationTemporaryURL: destinationTemporaryURL,
+                        finalOutputURL: finalOutputURL,
+                        options: options,
+                        targetOutputFormat: .jpeg,
+                        capabilities: capabilities,
+                        webPEncodingEngine: webPEncodingEngine,
+                        webPDecodingEngine: webPDecodingEngine,
+                        mozJPEGEncodingEngine: mozJPEGEncodingEngine
                     )
                 }
             }.value
         } catch {
-            try? FileManager.default.removeItem(at: outputURL)
-            await allocator.release(outputURL)
+            try? FileManager.default.removeItem(at: destinationTemporaryURL)
+            await allocator.release(finalOutputURL)
             throw CompressionError.map(error)
         }
     }
@@ -67,9 +92,10 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
     public func compress(
         inputURL: URL,
         outputDirectory: URL?,
-        options: CompressionOptions
+        compressionOptions: CompressionOptions,
+        saveOptions: SaveOptions
     ) async throws -> CompressionResult {
-        guard SupportedImageFormat.isSupported(inputURL) else {
+        guard SupportedImageFormat.isSupported(inputURL, capabilities: capabilities) else {
             throw CompressionError.unsupportedImageFormat
         }
 
@@ -80,9 +106,8 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             }
         }
 
-        // Determine output directory based on location mode
         let resolvedOutputDirectory: URL
-        switch options.locationMode {
+        switch saveOptions.locationMode {
         case .overwrite:
             resolvedOutputDirectory = FileManager.default.temporaryDirectory
         case .originalFolder:
@@ -94,75 +119,105 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             resolvedOutputDirectory = dir
         }
 
-        // Output directory access if not overwriting and not temp
-        let outputAccess = (options.locationMode != .overwrite) ? resolvedOutputDirectory.startAccessingSecurityScopedResource() : false
+        let outputAccess = saveOptions.locationMode != .overwrite
+            ? resolvedOutputDirectory.startAccessingSecurityScopedResource()
+            : false
         defer {
             if outputAccess {
                 resolvedOutputDirectory.stopAccessingSecurityScopedResource()
             }
         }
 
-        if options.locationMode != .overwrite {
+        if saveOptions.locationMode != .overwrite {
             try validateOutputDirectory(resolvedOutputDirectory)
         }
 
-        // Overwrite keeps the original extension, so the encoded bytes must keep
-        // the original file type as well.
-        let targetUTType = options.locationMode == .overwrite
-            ? OutputFormat.original.targetUTType(for: inputURL)
-            : options.format.targetUTType(for: inputURL)
-        let targetExtension = targetUTType.preferredFilenameExtension ?? "jpg"
+        let requestedFormat: OutputFormat = saveOptions.locationMode == .overwrite ? .original : compressionOptions.format
+        let targetOutputFormat = try Self.resolveTargetOutputFormat(for: inputURL, requestedFormat: requestedFormat)
 
-        // Resolve output URL
-        let outputURL: URL
-        if options.locationMode == .overwrite {
-            outputURL = resolvedOutputDirectory.appendingPathComponent(UUID().uuidString, isDirectory: false).appendingPathExtension(targetExtension)
+        guard capabilities.writableFormats.contains(targetOutputFormat) else {
+            if targetOutputFormat == .webp {
+                throw CompressionError.webPOutputUnavailable
+            }
+            throw CompressionError.failedToWriteOutputFile
+        }
+
+        let targetExtension = Self.targetExtension(
+            for: inputURL,
+            requestedFormat: requestedFormat,
+            targetOutputFormat: targetOutputFormat
+        )
+
+        let finalOutputURL: URL
+        if saveOptions.locationMode == .overwrite {
+            finalOutputURL = resolvedOutputDirectory
+                .appendingPathComponent(UUID().uuidString, isDirectory: false)
+                .appendingPathExtension(targetExtension)
         } else {
-            outputURL = await allocator.reserveOutputURL(
+            finalOutputURL = await allocator.reserveOutputURL(
                 for: inputURL,
                 in: resolvedOutputDirectory,
-                suffix: options.suffix,
+                suffix: saveOptions.suffix,
                 targetExtension: targetExtension
             )
         }
 
+        let destinationTemporaryURL = saveOptions.locationMode == .overwrite
+            ? finalOutputURL
+            : Self.temporaryOutputURL(in: resolvedOutputDirectory, targetExtension: targetExtension)
+
+        let effectiveCompressionOptions = CompressionOptions(
+            lossyQuality: compressionOptions.lossyQuality,
+            format: targetOutputFormat,
+            jpegEncodingMode: Self.effectiveJPEGEncodingMode(
+                requestedMode: compressionOptions.jpegEncodingMode,
+                targetOutputFormat: targetOutputFormat,
+                saveOptions: saveOptions
+            ),
+            maxDimension: compressionOptions.maxDimension,
+            stripMetadata: compressionOptions.stripMetadata
+        )
+
         do {
-            let result = try await Task.detached(priority: .userInitiated) {
+            let result = try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
-                        outputURL: outputURL,
-                        options: options,
-                        targetUTType: targetUTType
+                        destinationTemporaryURL: destinationTemporaryURL,
+                        finalOutputURL: finalOutputURL,
+                        options: effectiveCompressionOptions,
+                        targetOutputFormat: targetOutputFormat,
+                        capabilities: capabilities,
+                        webPEncodingEngine: webPEncodingEngine,
+                        webPDecodingEngine: webPDecodingEngine,
+                        mozJPEGEncodingEngine: mozJPEGEncodingEngine
                     )
                 }
             }.value
 
-            if options.locationMode == .overwrite {
-                let finalURL = inputURL
+            if saveOptions.locationMode == .overwrite {
                 let originalSize = try Self.fileSize(for: inputURL)
-                
                 let fileManager = FileManager.default
-                if fileManager.fileExists(atPath: finalURL.path) {
-                    _ = try fileManager.replaceItemAt(finalURL, withItemAt: outputURL, backupItemName: nil, options: [])
+                if fileManager.fileExists(atPath: inputURL.path) {
+                    _ = try fileManager.replaceItemAt(inputURL, withItemAt: result.outputURL, backupItemName: nil, options: [])
                 } else {
-                    try fileManager.moveItem(at: outputURL, to: finalURL)
+                    try fileManager.moveItem(at: result.outputURL, to: inputURL)
                 }
-                
-                let compressedSize = try Self.fileSize(for: finalURL)
+
+                let compressedSize = try Self.fileSize(for: inputURL)
                 return CompressionResult(
                     inputURL: inputURL,
-                    outputURL: finalURL,
+                    outputURL: inputURL,
                     originalSize: originalSize,
                     compressedSize: compressedSize
                 )
-            } else {
-                return result
             }
+
+            return result
         } catch {
-            try? FileManager.default.removeItem(at: outputURL)
-            if options.locationMode != .overwrite {
-                await allocator.release(outputURL)
+            try? FileManager.default.removeItem(at: destinationTemporaryURL)
+            if saveOptions.locationMode != .overwrite {
+                await allocator.release(finalOutputURL)
             }
             throw CompressionError.map(error)
         }
@@ -170,21 +225,158 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
 
     private static func compressSynchronously(
         inputURL: URL,
-        outputURL: URL,
+        destinationTemporaryURL: URL,
+        finalOutputURL: URL,
         options: CompressionOptions,
-        targetUTType: UTType
+        targetOutputFormat: OutputFormat,
+        capabilities: EncoderCapabilities,
+        webPEncodingEngine: SwiftWebPEncodingEngine,
+        webPDecodingEngine: SwiftWebPDecodingEngine,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine
     ) throws -> CompressionResult {
         let originalSize = try fileSize(for: inputURL)
-        try ensureLikelyDiskCapacity(for: originalSize, at: outputURL.deletingLastPathComponent())
+        try ensureLikelyDiskCapacity(for: originalSize, at: destinationTemporaryURL.deletingLastPathComponent())
+
+        let preparedImage = try prepareImage(
+            inputURL: inputURL,
+            maxDimension: options.maxDimension.intValue,
+            targetOutputFormat: targetOutputFormat,
+            capabilities: capabilities,
+            webPDecodingEngine: webPDecodingEngine
+        )
+
+        try encode(
+            preparedImage: preparedImage,
+            destinationTemporaryURL: destinationTemporaryURL,
+            options: options,
+            targetOutputFormat: targetOutputFormat,
+            webPEncodingEngine: webPEncodingEngine,
+            mozJPEGEncodingEngine: mozJPEGEncodingEngine,
+            capabilities: capabilities
+        )
+
+        let compressedSize = try fileSize(for: destinationTemporaryURL)
+        if compressedSize >= originalSize {
+            try? FileManager.default.removeItem(at: destinationTemporaryURL)
+            throw CompressionError.skipped
+        }
+
+        if destinationTemporaryURL != finalOutputURL {
+            try FileManager.default.moveItem(at: destinationTemporaryURL, to: finalOutputURL)
+        }
+
+        return CompressionResult(
+            inputURL: inputURL,
+            outputURL: finalOutputURL,
+            originalSize: originalSize,
+            compressedSize: compressedSize
+        )
+    }
+
+    private static func prepareImage(
+        inputURL: URL,
+        maxDimension: Int?,
+        targetOutputFormat: OutputFormat,
+        capabilities: EncoderCapabilities,
+        webPDecodingEngine: SwiftWebPDecodingEngine
+    ) throws -> PreparedImage {
+        guard let sourceFormat = SupportedImageFormat.format(for: inputURL) else {
+            throw CompressionError.unsupportedImageFormat
+        }
+
+        if sourceFormat == .webp {
+            guard capabilities.readableFormats.contains(.webp) else {
+                throw CompressionError.unsupportedImageFormat
+            }
+
+            do {
+                let data = try Data(contentsOf: inputURL)
+                let metadata = try webPDecodingEngine.inspect(data)
+                if metadata.hasAnimation {
+                    throw CompressionError.unsupportedImageFormat
+                }
+                let decodedImage = try webPDecodingEngine.decodeCGImage(from: data, maxDimension: maxDimension)
+                let standardImage = try flattenToSRGB(decodedImage, preserveAlpha: targetOutputFormat.preservesAlpha)
+                let sourceMetadata = ImageSourceMetadata(
+                    format: .webp,
+                    pixelWidth: metadata.width,
+                    pixelHeight: metadata.height,
+                    hasAlpha: metadata.hasAlpha
+                )
+                return PreparedImage(image: standardImage, sourceMetadata: sourceMetadata, sourceProperties: nil)
+            } catch let error as CompressionError {
+                throw error
+            } catch {
+                throw CompressionError.failedToDecodeImage
+            }
+        }
 
         guard let source = CGImageSourceCreateWithURL(inputURL as CFURL, nil) else {
             throw CompressionError.failedToDecodeImage
         }
 
-        let image = try makeStandardImage(from: source, maxDimension: options.maxDimension.intValue, targetUTType: targetUTType)
+        let sourceProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        let image = try makeStandardImage(from: source, maxDimension: maxDimension, targetOutputFormat: targetOutputFormat)
+        let sourceMetadata = ImageSourceMetadata(
+            format: sourceFormat,
+            pixelWidth: image.width,
+            pixelHeight: image.height,
+            hasAlpha: image.hasUsableAlpha
+        )
+        return PreparedImage(image: image, sourceMetadata: sourceMetadata, sourceProperties: sourceProperties)
+    }
 
+    private static func encode(
+        preparedImage: PreparedImage,
+        destinationTemporaryURL: URL,
+        options: CompressionOptions,
+        targetOutputFormat: OutputFormat,
+        webPEncodingEngine: SwiftWebPEncodingEngine,
+        mozJPEGEncodingEngine: MozJPEGEncodingEngine,
+        capabilities: EncoderCapabilities
+    ) throws {
+        if targetOutputFormat == .webp {
+            try webPEncodingEngine.encode(
+                image: preparedImage.image,
+                source: preparedImage.sourceMetadata,
+                destinationTemporaryURL: destinationTemporaryURL,
+                options: options
+            )
+            return
+        }
+
+        if targetOutputFormat == .jpeg, options.jpegEncodingMode == .advanced {
+            guard capabilities.jpegEncodingModes.contains(.advanced) else {
+                throw CompressionError.advancedJPEGUnavailable
+            }
+            try mozJPEGEncodingEngine.encode(
+                image: preparedImage.image,
+                metadata: preparedImage.sourceMetadata,
+                quality: options.lossyQuality ?? .preset(.balanced),
+                destinationTemporaryURL: destinationTemporaryURL
+            )
+            return
+        }
+
+        try encodeWithImageIO(
+            image: preparedImage.image,
+            sourceProperties: preparedImage.sourceProperties,
+            destinationTemporaryURL: destinationTemporaryURL,
+            options: options,
+            targetOutputFormat: targetOutputFormat
+        )
+    }
+
+    private static func encodeWithImageIO(
+        image: CGImage,
+        sourceProperties: [CFString: Any]?,
+        destinationTemporaryURL: URL,
+        options: CompressionOptions,
+        targetOutputFormat: OutputFormat
+    ) throws {
+        let targetUTType = targetOutputFormat.targetUTType(for: destinationTemporaryURL)
         guard let destination = CGImageDestinationCreateWithURL(
-            outputURL as CFURL,
+            destinationTemporaryURL as CFURL,
             targetUTType.identifier as CFString,
             1,
             nil
@@ -192,21 +384,19 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToWriteOutputFile
         }
 
+        let quality = options.lossyQuality?.value ?? CompressionPreset.balanced.quality
         var properties: [CFString: Any] = [:]
 
-        // Quality applies to lossy formats (JPEG and HEIC)
-        if targetUTType == .jpeg || targetUTType == .heic {
-            properties[kCGImageDestinationLossyCompressionQuality] = options.preset.quality
+        if targetOutputFormat.usesLossyQuality {
+            properties[kCGImageDestinationLossyCompressionQuality] = quality
         }
 
         if !options.stripMetadata {
-            if let originalProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] {
-                for (key, val) in originalProperties {
-                    properties[key] = val
-                }
-                if targetUTType == .jpeg || targetUTType == .heic {
-                    properties[kCGImageDestinationLossyCompressionQuality] = options.preset.quality
-                }
+            sourceProperties?.forEach { key, value in
+                properties[key] = value
+            }
+            if targetOutputFormat.usesLossyQuality {
+                properties[kCGImageDestinationLossyCompressionQuality] = quality
             }
         } else {
             properties[kCGImagePropertyColorModel] = kCGImagePropertyColorModelRGB
@@ -217,23 +407,9 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         guard CGImageDestinationFinalize(destination) else {
             throw CompressionError.failedToWriteOutputFile
         }
-
-        let compressedSize = try fileSize(for: outputURL)
-
-        if compressedSize >= originalSize {
-            try? FileManager.default.removeItem(at: outputURL)
-            throw CompressionError.skipped
-        }
-
-        return CompressionResult(
-            inputURL: inputURL,
-            outputURL: outputURL,
-            originalSize: originalSize,
-            compressedSize: compressedSize
-        )
     }
 
-    private static func makeStandardImage(from source: CGImageSource, maxDimension: Int?, targetUTType: UTType) throws -> CGImage {
+    private static func makeStandardImage(from source: CGImageSource, maxDimension: Int?, targetOutputFormat: OutputFormat) throws -> CGImage {
         let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
 
         var width = (properties?[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
@@ -254,7 +430,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         }
 
         let targetMaxPixelSize: Int
-        if let maxDimension = maxDimension {
+        if let maxDimension {
             targetMaxPixelSize = min(originalMaxPixelSize, maxDimension)
         } else {
             targetMaxPixelSize = originalMaxPixelSize
@@ -276,16 +452,13 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             throw CompressionError.failedToDecodeImage
         }
 
-        let targetHasAlpha = (targetUTType == .png || targetUTType == .heic)
-        return try flattenToSRGB(finalImage, preserveAlpha: targetHasAlpha)
+        return try flattenToSRGB(finalImage, preserveAlpha: targetOutputFormat.preservesAlpha)
     }
 
     private static func flattenToSRGB(_ image: CGImage, preserveAlpha: Bool) throws -> CGImage {
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
-        
-        let hasAlpha = image.alphaInfo != .none && image.alphaInfo != .noneSkipFirst && image.alphaInfo != .noneSkipLast
-        let targetHasAlpha = preserveAlpha && hasAlpha
-        
+        let targetHasAlpha = preserveAlpha && image.hasUsableAlpha
+
         let bitmapInfo: UInt32
         if targetHasAlpha {
             bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
@@ -320,6 +493,57 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         return outputImage
     }
 
+    private static func resolveTargetOutputFormat(for inputURL: URL, requestedFormat: OutputFormat) throws -> OutputFormat {
+        if requestedFormat != .original {
+            return requestedFormat
+        }
+
+        guard let sourceFormat = SupportedImageFormat.format(for: inputURL) else {
+            throw CompressionError.unsupportedImageFormat
+        }
+
+        switch sourceFormat {
+        case .jpeg:
+            return .jpeg
+        case .png:
+            return .png
+        case .heic:
+            return .heic
+        case .webp:
+            return .webp
+        }
+    }
+
+    private static func targetExtension(
+        for inputURL: URL,
+        requestedFormat: OutputFormat,
+        targetOutputFormat: OutputFormat
+    ) -> String {
+        if requestedFormat == .original {
+            let originalExtension = inputURL.pathExtension.lowercased()
+            if !originalExtension.isEmpty {
+                return originalExtension
+            }
+        }
+        return targetOutputFormat.targetExtension(for: inputURL)
+    }
+
+    private static func effectiveJPEGEncodingMode(
+        requestedMode: JPEGEncodingMode,
+        targetOutputFormat: OutputFormat,
+        saveOptions: SaveOptions
+    ) -> JPEGEncodingMode {
+        guard targetOutputFormat == .jpeg, saveOptions.locationMode != .overwrite else {
+            return .standard
+        }
+        return requestedMode
+    }
+
+    private static func temporaryOutputURL(in directory: URL, targetExtension: String) -> URL {
+        directory
+            .appendingPathComponent(".imagepet-\(UUID().uuidString)", isDirectory: false)
+            .appendingPathExtension(targetExtension)
+    }
 
     private static func fileSize(for url: URL) throws -> Int64 {
         do {
@@ -352,5 +576,37 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         guard exists, isDirectory.boolValue else {
             throw CompressionError.outputFolderUnavailable
         }
+    }
+
+    private struct PreparedImage {
+        let image: CGImage
+        let sourceMetadata: ImageSourceMetadata
+        let sourceProperties: [CFString: Any]?
+    }
+}
+
+private extension OutputFormat {
+    var preservesAlpha: Bool {
+        switch self {
+        case .png, .heic, .webp:
+            return true
+        case .original, .jpeg:
+            return false
+        }
+    }
+
+    var usesLossyQuality: Bool {
+        switch self {
+        case .jpeg, .heic, .webp:
+            return true
+        case .original, .png:
+            return false
+        }
+    }
+}
+
+private extension CGImage {
+    var hasUsableAlpha: Bool {
+        alphaInfo != .none && alphaInfo != .noneSkipFirst && alphaInfo != .noneSkipLast
     }
 }

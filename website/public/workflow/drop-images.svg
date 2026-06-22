@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-labelledby="title desc">
+  <title id="title">Drop images workflow illustration</title>
+  <desc id="desc">A clean, simplified drop zone with floating image cards.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f2f7f4"/>
+    </linearGradient>
+    <linearGradient id="card1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef7f61"/>
+      <stop offset="100%" stop-color="#ffba7a"/>
+    </linearGradient>
+    <linearGradient id="card2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#66c9a8"/>
+      <stop offset="100%" stop-color="#1c7a61"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1a342b" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="560" rx="32" fill="url(#bg)"/>
+
+  <!-- Drop Zone Box -->
+  <rect x="180" y="150" width="360" height="260" rx="24" fill="#ffffff" fill-opacity="0.8" stroke="#66c9a8" stroke-width="3" stroke-dasharray="12 8" filter="url(#shadow)"/>
+
+  <!-- Icon inside Drop Zone -->
+  <g transform="translate(360, 250)">
+    <!-- Arrow -->
+    <path d="M 0 -35 L 0 25" stroke="#1c7a61" stroke-width="6" stroke-linecap="round"/>
+    <path d="M -16 9 L 0 25 L 16 9" fill="none" stroke="#1c7a61" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Text below arrow -->
+    <text x="0" y="65" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="18" fill="#1c7a61" text-anchor="middle" letter-spacing="1">DROP IMAGES</text>
+  </g>
+
+  <!-- Floating Image Card Left -->
+  <g transform="translate(110, 240) rotate(-12)" filter="url(#shadow)">
+    <rect x="-45" y="-55" width="90" height="110" rx="12" fill="#ffffff" stroke="#1d2420" stroke-width="3"/>
+    <rect x="-35" y="-45" width="70" height="62" rx="8" fill="url(#card1Grad)"/>
+    <!-- Sun -->
+    <circle cx="-15" cy="-22" r="9" fill="#ffffff" fill-opacity="0.5"/>
+    <!-- Mountain path -->
+    <path d="M-35 17 L-10 -5 L 15 15 L 25 7 L 35 17 Z" fill="#ffffff" fill-opacity="0.3"/>
+    <!-- Text skeletons -->
+    <rect x="-35" y="26" width="50" height="6" rx="3" fill="#dcefe5"/>
+    <rect x="-35" y="36" width="30" height="5" rx="2.5" fill="#dcefe5"/>
+  </g>
+
+  <!-- Floating Image Card Right -->
+  <g transform="translate(610, 260) rotate(12)" filter="url(#shadow)">
+    <rect x="-45" y="-55" width="90" height="110" rx="12" fill="#ffffff" stroke="#1d2420" stroke-width="3"/>
+    <rect x="-35" y="-45" width="70" height="62" rx="8" fill="url(#card2Grad)"/>
+    <!-- Sun -->
+    <circle cx="15" cy="-22" r="8" fill="#ffffff" fill-opacity="0.4"/>
+    <!-- Wave path -->
+    <path d="M-35 17 Q-15 -3 5 12 T 35 7 L 35 17 Z" fill="#ffffff" fill-opacity="0.3"/>
+    <!-- Text skeletons -->
+    <rect x="-35" y="26" width="45" height="6" rx="3" fill="#dcefe5"/>
+    <rect x="-35" y="36" width="55" height="5" rx="2.5" fill="#dcefe5"/>
+  </g>
+
+  <!-- Flow paths to drop zone -->
+  <path d="M 175 285 Q 230 330 290 310" fill="none" stroke="#66c9a8" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 545 305 Q 490 335 435 310" fill="none" stroke="#66c9a8" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round" opacity="0.6"/>
+</svg>

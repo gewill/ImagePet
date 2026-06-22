@@ -25,6 +25,7 @@ final class ModelTests: XCTestCase {
             .failedToWriteOutputFile,
             .notEnoughDiskSpace,
             .skipped,
+            .webPOutputUnavailable,
             .unknown
         ]
 

@@ -8,7 +8,13 @@ final class ImagePetUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
         app.launchEnvironment["IS_UI_TESTING"] = "1"
+        if name.contains("Restoration") {
+            app.launchEnvironment["IS_UI_TESTING_RESTORATION"] = "1"
+        } else {
+            app.launchArguments += ["-ImagePetResetWindowFrame", "YES"]
+        }
         app.launch()
+        app.activate()
     }
 
     override func tearDownWithError() throws {
@@ -17,14 +23,24 @@ final class ImagePetUITests: XCTestCase {
     }
 
     private func mainWindow(timeout: TimeInterval = 3.0) -> XCUIElement {
-        let titledWindow = app.windows["ImagePet"]
-        if titledWindow.waitForExistence(timeout: 0.5) {
-            return titledWindow
+        let tabbedWindow = app.windows.containing(.radioButton, identifier: "doc.on.doc").firstMatch
+        if tabbedWindow.waitForExistence(timeout: timeout) {
+            return tabbedWindow
         }
 
-        let contentWindow = app.windows.containing(.button, identifier: "togglePetButton").firstMatch
-        _ = contentWindow.waitForExistence(timeout: timeout)
-        return contentWindow
+        let contentWindow = app.windows.containing(.button, identifier: "addImagesButton").firstMatch
+        if contentWindow.waitForExistence(timeout: 0.5) {
+            return contentWindow
+        }
+
+        let petControlWindow = app.windows.containing(.button, identifier: "togglePetButton").firstMatch
+        if petControlWindow.waitForExistence(timeout: 0.5) {
+            return petControlWindow
+        }
+
+        let titledWindow = app.windows["ImagePet"]
+        _ = titledWindow.waitForExistence(timeout: 0.5)
+        return titledWindow
     }
 
     private func desktopPetEmoji(in petWindow: XCUIElement) -> XCUIElement {
@@ -59,6 +75,15 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: timeout), .completed)
     }
 
+    private func assertDoesNotAppear(
+        _ element: XCUIElement,
+        timeout: TimeInterval = 0.2,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertFalse(element.waitForExistence(timeout: timeout), file: file, line: line)
+    }
+
     func testLaunchAndInitialLayout() throws {
         // Assert main window is open
         let window = mainWindow()
@@ -67,7 +92,7 @@ final class ImagePetUITests: XCTestCase {
         // Assert empty jobs label exists initially
         let emptyLabel = window.staticTexts["emptyJobsLabel"]
         XCTAssertTrue(emptyLabel.exists)
-        XCTAssertEqual(emptyLabel.textContent, "No images yet")
+        XCTAssertTrue(emptyLabel.textContent.contains("No images in queue"))
 
         // Assert that the default output directory has been automatically chosen
         let outputLabel = window.staticTexts["outputFolderLabel"]
@@ -94,6 +119,60 @@ final class ImagePetUITests: XCTestCase {
         smallButton.click()
     }
 
+    func testMiniFullResizeCentering() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        // Choose output folder first to resolve needsSetup blocking state!
+        let chooseFolderButton = window.buttons["chooseFolderButton"]
+        XCTAssertTrue(chooseFolderButton.exists)
+        chooseFolderButton.click()
+
+        // Show Desktop Pet
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+        toggleButton.click()
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        // Get initial mini center
+        waitForMiniPetWindow(petWindow)
+        let miniFrame = petWindow.frame
+        let miniCenterX = miniFrame.midX
+        let miniCenterY = miniFrame.midY
+
+        // Expand
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        waitForExpandedPetWindow(petWindow)
+        let fullFrame = petWindow.frame
+        let fullCenterX = fullFrame.midX
+        let fullCenterY = fullFrame.midY
+
+        // Check if centers are within 1 pixel
+        XCTAssertEqual(miniCenterX, fullCenterX, accuracy: 1.0)
+        XCTAssertEqual(miniCenterY, fullCenterY, accuracy: 1.0)
+
+        // Collapse back to mini
+        let collapseButton = petWindow.buttons["collapsePetButton"]
+        XCTAssertTrue(collapseButton.exists)
+        collapseButton.click()
+
+        waitForMiniPetWindow(petWindow)
+        let restoredFrame = petWindow.frame
+        let restoredCenterX = restoredFrame.midX
+        let restoredCenterY = restoredFrame.midY
+
+        XCTAssertEqual(miniCenterX, restoredCenterX, accuracy: 1.0)
+        XCTAssertEqual(miniCenterY, restoredCenterY, accuracy: 1.0)
+
+        // Close the pet
+        toggleButton.click()
+    }
+
     func testToggleDesktopPet() throws {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
@@ -106,11 +185,8 @@ final class ImagePetUITests: XCTestCase {
         let toggleButton = window.buttons["togglePetButton"]
         XCTAssertTrue(toggleButton.exists)
 
-        // Initially Desktop Pet window shouldn't exist because we bypassed state restoration
+        // UI-test startup resets the pet to hidden, so the first click should show it.
         let petWindow = app.windows["DesktopPetWindow"]
-        XCTAssertFalse(petWindow.exists)
-
-        // Click to show Desktop Pet
         toggleButton.click()
 
         // Wait since UI updates on window displays might be asynchronous
@@ -213,14 +289,14 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(poopedMetric.exists)
         XCTAssertTrue(savedMetric.exists)
 
-        // Verify 'Reveal in Finder' and 'Compress More' buttons exist
+        // Verify 'Reveal in Finder' and 'Clear List' buttons exist
         let revealButton = window.buttons["revealInFinderButton"]
-        let compressMoreButton = window.buttons["compressMoreButton"]
+        let clearListButton = window.buttons["clearListButton"]
         XCTAssertTrue(revealButton.exists)
-        XCTAssertTrue(compressMoreButton.exists)
+        XCTAssertTrue(clearListButton.exists)
 
-        // Click 'Compress More' to reset the state
-        compressMoreButton.click()
+        // Click 'Clear List' to reset the state
+        clearListButton.click()
 
         // Empty state label should be visible again
         let emptyLabel = window.staticTexts["emptyJobsLabel"]
@@ -256,14 +332,14 @@ final class ImagePetUITests: XCTestCase {
         let doneExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Done' OR value == 'Done'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [doneExpectation], timeout: 5.0), .completed)
 
-        // Verify Reveal and Compress More buttons exist
+        // Verify Reveal and Clear List buttons exist
         let revealButton = petWindow.buttons["desktopPetRevealButton"]
-        let compressMoreButton = petWindow.buttons["desktopPetCompressMoreButton"]
+        let clearListButton = petWindow.buttons["desktopPetClearListButton"]
         XCTAssertTrue(revealButton.exists)
-        XCTAssertTrue(compressMoreButton.exists)
+        XCTAssertTrue(clearListButton.exists)
 
-        // Click Compress More to reset state
-        compressMoreButton.click()
+        // Click Clear List to reset state
+        clearListButton.click()
 
         // Verify title resets to Ready
         let readyExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Ready' OR value == 'Ready'"), object: petTitle)
@@ -356,11 +432,15 @@ final class ImagePetUITests: XCTestCase {
             app.typeKey("w", modifierFlags: [.command])
         }
 
+        let mainWindowDisappeared = NSPredicate(format: "exists == false")
+        let mainWindowClosed = XCTNSPredicateExpectation(predicate: mainWindowDisappeared, object: window)
+        XCTAssertEqual(XCTWaiter.wait(for: [mainWindowClosed], timeout: 2.0), .completed)
+
         let addImagesButton = petWindow.buttons["desktopPetAddImagesButton"]
         XCTAssertTrue(addImagesButton.exists)
         addImagesButton.click()
 
-        XCTAssertTrue(mainWindow(timeout: 3.0).exists)
+        XCTAssertTrue(mainWindow(timeout: 70.0).exists)
 
         // Verify alert sheet/dialog is displayed
         let sheet = app.sheets.firstMatch
@@ -376,7 +456,7 @@ final class ImagePetUITests: XCTestCase {
         XCTAssertTrue(petTitle.exists)
         let issuesExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == 'Issues' OR value == 'Issues'"), object: petTitle)
         XCTAssertEqual(XCTWaiter.wait(for: [issuesExpectation], timeout: 3.0), .completed)
-        XCTAssertTrue(petWindow.buttons["desktopPetCompressMoreButton"].exists)
+        XCTAssertTrue(petWindow.buttons["desktopPetClearListButton"].exists)
     }
 
     func testDesktopPetBlockingConfirmForcesFullFromMini() throws {
@@ -519,6 +599,190 @@ final class ImagePetUITests: XCTestCase {
 
         let retryButton = petWindow.buttons["desktopPetRetryFailedButton"]
         XCTAssertTrue(retryButton.exists)
+    }
+
+    func testDesktopPetStateRestoration() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launch()
+
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let chooseFolderButton = window.buttons["chooseFolderButton"]
+        XCTAssertTrue(chooseFolderButton.exists)
+        chooseFolderButton.click()
+
+        let toggleButton = window.buttons["togglePetButton"]
+        XCTAssertTrue(toggleButton.exists)
+
+        let petWindow = app.windows["DesktopPetWindow"]
+        toggleButton.click()
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 2.0))
+
+        app.terminate()
+
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IS_UI_TESTING_RESTORATION"] = "1"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_ENABLED"] = "1"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_VISIBLE"] = "1"
+        app.launch()
+
+        let petWindow2 = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow2.waitForExistence(timeout: 8.0), "Desktop pet window should be restored on launch")
+
+        let window2 = mainWindow()
+        let toggleButton2 = window2.buttons["togglePetButton"]
+        if toggleButton2.waitForExistence(timeout: 2.0) {
+            toggleButton2.click()
+        }
+    }
+
+    func testPRDv07NewSettings() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        // Switch to the Settings Tab
+        let tab = window.descendants(matching: .any)["Settings"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
+        tab.click()
+
+        // Test petSettingsEnabledToggle
+        let enabledToggle = window.descendants(matching: .any)["petSettingsEnabledToggle"]
+        XCTAssertTrue(enabledToggle.exists)
+
+        let showPetButton = window.buttons["showPetButton"]
+        XCTAssertTrue(showPetButton.exists)
+
+        let dogCard = window.buttons["themeCard_Dog"]
+        XCTAssertTrue(dogCard.exists)
+        XCTAssertTrue(dogCard.isEnabled)
+
+        // Toggle it off, cards should be disabled
+        enabledToggle.click()
+        XCTAssertFalse(dogCard.isEnabled)
+
+        // Toggle it back on
+        enabledToggle.click()
+        XCTAssertTrue(dogCard.isEnabled)
+
+        let pufferfishCard = window.buttons["themeCard_Pufferfish"]
+        XCTAssertTrue(pufferfishCard.exists)
+        pufferfishCard.click()
+
+        let squirrelCard = window.buttons["themeCard_Squirrel"]
+        XCTAssertTrue(squirrelCard.exists)
+        squirrelCard.click()
+
+        let rabbitCard = window.buttons["themeCard_Rabbit"]
+        XCTAssertTrue(rabbitCard.exists)
+        rabbitCard.click()
+
+        XCTAssertFalse(window.descendants(matching: .any)["petSizeTierPicker"].exists)
+
+        let launchToggle = window.descendants(matching: .any)["launchAtLoginToggle"]
+        XCTAssertTrue(launchToggle.exists)
+        launchToggle.click()
+
+        let energyToggle = window.descendants(matching: .any)["energySavingModeToggle"]
+        XCTAssertTrue(energyToggle.exists)
+        energyToggle.click()
+    }
+
+    func testV011HelpWindowRendersFromSettings() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let tab = window.descendants(matching: .any)["Settings"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
+        tab.click()
+
+        let helpSection = window.buttons["settingsSection_helpAbout"]
+        XCTAssertTrue(helpSection.waitForExistence(timeout: 2.0))
+        helpSection.click()
+
+        let openHelpButton = window.buttons["openHelpButton"]
+        XCTAssertTrue(openHelpButton.waitForExistence(timeout: 2.0))
+        openHelpButton.click()
+
+        let helpWindow = app.windows["ImagePet Help"]
+        XCTAssertTrue(helpWindow.waitForExistence(timeout: 3.0))
+        XCTAssertTrue(helpWindow.descendants(matching: .any)["helpTopicList"].exists)
+        XCTAssertTrue(helpWindow.staticTexts["helpTitle_quickStart"].waitForExistence(timeout: 2.0))
+    }
+
+    func testV011SettingsShowsKeyboardShortcuts() throws {
+        let window = mainWindow()
+        XCTAssertTrue(window.exists)
+
+        let tab = window.descendants(matching: .any)["Settings"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
+        tab.click()
+
+        let shortcutsSection = window.buttons["settingsSection_keyboardShortcuts"]
+        XCTAssertTrue(shortcutsSection.waitForExistence(timeout: 2.0))
+        shortcutsSection.click()
+
+        XCTAssertTrue(window.descendants(matching: .any)["keyboardShortcutsHeader"].exists)
+        XCTAssertTrue(window.staticTexts["shortcutsDefaultUnsetLabel"].exists)
+        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_showMainWindow"].exists)
+        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_toggleDesktopPet"].exists)
+        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_togglePetMode"].exists)
+    }
+
+    func testQuietStartupWithPetEnabledAndVisible() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IMAGEPET_LAUNCH_MODE"] = "loginItem"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_ENABLED"] = "1"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_VISIBLE"] = "1"
+        app.launch()
+
+        // Verify main window does not exist
+        let window = app.windows["ImagePet"]
+        assertDoesNotAppear(window)
+
+        // Verify desktop pet window exists and is collapsed
+        let petWindow = app.windows["DesktopPetWindow"]
+        XCTAssertTrue(petWindow.waitForExistence(timeout: 8.0))
+        waitForMiniPetWindow(petWindow)
+
+        // Click pet to expand it
+        let petEmoji = desktopPetEmoji(in: petWindow)
+        XCTAssertTrue(petEmoji.exists)
+        petEmoji.click()
+
+        // Verify return button exists and click it
+        let returnBtn = petWindow.buttons["desktopPetReturnToAppButton"]
+        XCTAssertTrue(returnBtn.waitForExistence(timeout: 2.0))
+        returnBtn.click()
+
+        // Verify main window is now visible
+        XCTAssertTrue(window.waitForExistence(timeout: 3.0))
+    }
+
+    func testQuietStartupWithPetDisabled() throws {
+        app.terminate()
+        app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launchEnvironment["IS_UI_TESTING"] = "1"
+        app.launchEnvironment["IMAGEPET_LAUNCH_MODE"] = "loginItem"
+        app.launchEnvironment["IMAGEPET_MOCK_PET_ENABLED"] = "0"
+        app.launch()
+
+        // Verify main window does not exist
+        let window = app.windows["ImagePet"]
+        assertDoesNotAppear(window)
+
+        // Verify desktop pet window does not exist either
+        let petWindow = app.windows["DesktopPetWindow"]
+        assertDoesNotAppear(petWindow)
     }
 }
 

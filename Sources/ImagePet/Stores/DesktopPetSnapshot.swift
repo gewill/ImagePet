@@ -16,7 +16,7 @@ enum DesktopPetAction: Equatable {
     case addImages
     case revealOutput
     case retryFailed
-    case compressMore
+    case clearList
     case expand
     case collapse
 }
