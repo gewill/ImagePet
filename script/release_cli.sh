@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# ImagePet CLI - Sign and Notarize Script
-# This script is 100% secret-free and can be safely committed to git.
-# It reads credentials from your environment or macOS Keychain.
+# ImagePet CLI - Build, sign, notarize, and package script.
+# This script is secret-free and reads credentials only from your environment or macOS Keychain.
 
 set -euo pipefail
 
@@ -28,74 +27,130 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-# 1. 确定签名证书
-CERTIFICATE_NAME="${CODESIGN_IDENTITY:-}"
-if [[ -z "$CERTIFICATE_NAME" ]]; then
-  # 尝试在 Keychain 中自动查找一个有效的 Developer ID Application 证书
-  echo "🔍 尝试自动查找 Developer ID Application 证书..."
-  # 提取证书 Common Name
-  CERTIFICATE_NAME=$(security find-certificate -a -c "Developer ID Application" | grep "alis" | head -n 1 | cut -d '"' -f 4 || true)
-fi
+PRODUCT_NAME="imagepet"
+RELEASE_VERSION="${RELEASE_VERSION:-v1.0}"
+SKIP_CODESIGN="${SKIP_CODESIGN:-0}"
+SKIP_NOTARIZATION="${SKIP_NOTARIZATION:-0}"
+DIST_DIR="${DIST_DIR:-$PROJECT_DIR/dist/cli/$RELEASE_VERSION}"
+WORK_DIR="$DIST_DIR/work"
+ARCH_NAME="$(uname -m)"
+ARCHIVE_NAME="${PRODUCT_NAME}-cli-${RELEASE_VERSION}-macos-${ARCH_NAME}.zip"
+ARCHIVE_PATH="$DIST_DIR/$ARCHIVE_NAME"
+SHA_PATH="$ARCHIVE_PATH.sha256"
+MANIFEST_PATH="$DIST_DIR/${PRODUCT_NAME}-cli-${RELEASE_VERSION}-manifest.json"
 
-if [[ -z "$CERTIFICATE_NAME" ]]; then
-  echo "❌ Error: 未找到 Developer ID Application 证书。请设置 CODESIGN_IDENTITY 环境变量。"
-  echo "例如: export CODESIGN_IDENTITY=\"Developer ID Application: Your Name (TEAM_ID)\""
-  exit 1
-fi
-echo "✅ 使用签名证书: $CERTIFICATE_NAME"
+rm -rf "$WORK_DIR"
+mkdir -p "$WORK_DIR"
 
-# 2. 准备编译
 echo "=== 1. 正在编译 Release 版本 CLI ==="
 swift build -c release --product imagepet
 
-echo "=== 2. 正在进行 Hardened Runtime 签名 ==="
-codesign --force \
-  --options runtime \
-  --sign "$CERTIFICATE_NAME" \
-  .build/release/imagepet
+cp ".build/release/$PRODUCT_NAME" "$WORK_DIR/$PRODUCT_NAME"
 
-echo "=== 3. 正在打包 ZIP ==="
-cd .build/release
-rm -f imagepet-cli.zip
-zip -r imagepet-cli.zip imagepet
-
-# 3. 提交公证
-echo "=== 4. 正在提交苹果服务器公证 (Notarization) ==="
-NOTARY_PROFILE="${NOTARY_PROFILE:-}"
-
-if [[ -n "$NOTARY_PROFILE" ]]; then
-  echo "👉 使用 Keychain 凭证 Profile: $NOTARY_PROFILE"
-  xcrun notarytool submit imagepet-cli.zip \
-    --keychain-profile "$NOTARY_PROFILE" \
-    --wait
+if [[ "$SKIP_CODESIGN" == "1" ]]; then
+  echo "=== 2. 已跳过 Developer ID 签名 (SKIP_CODESIGN=1) ==="
 else
-  # 检查是否提供了备选的环境变量
-  NOTARY_APPLE_ID="${NOTARY_APPLE_ID:-}"
-  NOTARY_PASSWORD="${NOTARY_PASSWORD:-}"
-  NOTARY_TEAM_ID="${NOTARY_TEAM_ID:-}"
-
-  if [[ -z "$NOTARY_APPLE_ID" ]] || [[ -z "$NOTARY_PASSWORD" ]] || [[ -z "$NOTARY_TEAM_ID" ]]; then
-    echo "❌ Error: 未配置公证凭证。"
-    echo "请设置 NOTARY_PROFILE 环境变量（推荐使用 Keychain 存储）或设置以下环境变量："
-    echo "- NOTARY_APPLE_ID"
-    echo "- NOTARY_PASSWORD"
-    echo "- NOTARY_TEAM_ID"
-    exit 1
+  CERTIFICATE_NAME="${CODESIGN_IDENTITY:-}"
+  if [[ -z "$CERTIFICATE_NAME" ]]; then
+    echo "🔍 尝试自动查找 Developer ID Application 证书..."
+    CERTIFICATE_NAME=$(security find-certificate -a -c "Developer ID Application" | grep "alis" | head -n 1 | cut -d '"' -f 4 || true)
   fi
 
-  echo "👉 使用环境变量公证..."
-  xcrun notarytool submit imagepet-cli.zip \
-    --apple-id "$NOTARY_APPLE_ID" \
-    --password "$NOTARY_PASSWORD" \
-    --team-id "$NOTARY_TEAM_ID" \
-    --wait
+  if [[ -z "$CERTIFICATE_NAME" ]]; then
+    echo "❌ Error: 未找到 Developer ID Application 证书。请设置 CODESIGN_IDENTITY 环境变量。"
+    echo "例如: export CODESIGN_IDENTITY=\"Developer ID Application: Your Name (TEAM_ID)\""
+    echo "本地 dry-run 可使用: SKIP_CODESIGN=1 SKIP_NOTARIZATION=1 ./script/release_cli.sh"
+    exit 1
+  fi
+  echo "✅ 使用签名证书: $CERTIFICATE_NAME"
+
+  echo "=== 2. 正在进行 Hardened Runtime 签名 ==="
+  codesign --force \
+    --options runtime \
+    --timestamp \
+    --sign "$CERTIFICATE_NAME" \
+    "$WORK_DIR/$PRODUCT_NAME"
 fi
 
-echo "=== 5. 正在验证公证结果 ==="
-spctl -a -vvv -t install imagepet-cli.zip
+echo "=== 3. 正在打包 ZIP ==="
+rm -f "$ARCHIVE_PATH" "$SHA_PATH" "$MANIFEST_PATH"
+(
+  cd "$WORK_DIR"
+  ditto -c -k --keepParent "$PRODUCT_NAME" "$ARCHIVE_PATH"
+)
 
-echo "=== 6. 正在验证本地二进制签名 ==="
-codesign --verify --strict --verbose=2 imagepet
-codesign -dv --verbose=4 imagepet
+ARCHIVE_SHA256="$(shasum -a 256 "$ARCHIVE_PATH" | awk '{print $1}')"
+printf "%s  %s\n" "$ARCHIVE_SHA256" "$ARCHIVE_NAME" > "$SHA_PATH"
 
-echo "=== 🎉 完成：CLI 已签名并通过 Notarization ==="
+if [[ "$SKIP_NOTARIZATION" == "1" ]]; then
+  echo "=== 4. 已跳过苹果公证 (SKIP_NOTARIZATION=1) ==="
+else
+  echo "=== 4. 正在提交苹果服务器公证 (Notarization) ==="
+  NOTARY_PROFILE="${NOTARY_PROFILE:-}"
+
+  if [[ -n "$NOTARY_PROFILE" ]]; then
+    echo "👉 使用 Keychain 凭证 Profile: $NOTARY_PROFILE"
+    xcrun notarytool submit "$ARCHIVE_PATH" \
+      --keychain-profile "$NOTARY_PROFILE" \
+      --wait
+  else
+    NOTARY_APPLE_ID="${NOTARY_APPLE_ID:-}"
+    NOTARY_PASSWORD="${NOTARY_PASSWORD:-}"
+    NOTARY_TEAM_ID="${NOTARY_TEAM_ID:-}"
+
+    if [[ -z "$NOTARY_APPLE_ID" ]] || [[ -z "$NOTARY_PASSWORD" ]] || [[ -z "$NOTARY_TEAM_ID" ]]; then
+      echo "❌ Error: 未配置公证凭证。"
+      echo "请设置 NOTARY_PROFILE 环境变量（推荐使用 Keychain 存储）或设置以下环境变量："
+      echo "- NOTARY_APPLE_ID"
+      echo "- NOTARY_PASSWORD"
+      echo "- NOTARY_TEAM_ID"
+      exit 1
+    fi
+
+    echo "👉 使用环境变量公证..."
+    xcrun notarytool submit "$ARCHIVE_PATH" \
+      --apple-id "$NOTARY_APPLE_ID" \
+      --password "$NOTARY_PASSWORD" \
+      --team-id "$NOTARY_TEAM_ID" \
+      --wait
+  fi
+fi
+
+echo "=== 5. 正在验证本地二进制 ==="
+"$WORK_DIR/$PRODUCT_NAME" --version
+
+if [[ "$SKIP_CODESIGN" == "1" ]]; then
+  echo "=== 6. 已跳过签名验证 (SKIP_CODESIGN=1) ==="
+else
+  echo "=== 6. 正在验证本地二进制签名 ==="
+  codesign --verify --strict --verbose=2 "$WORK_DIR/$PRODUCT_NAME"
+  codesign -dv --verbose=4 "$WORK_DIR/$PRODUCT_NAME"
+fi
+
+if [[ "$SKIP_NOTARIZATION" == "1" ]]; then
+  echo "=== 7. 已跳过公证验证 (SKIP_NOTARIZATION=1) ==="
+else
+  echo "=== 7. 正在验证公证结果 ==="
+  spctl -a -vvv -t install "$ARCHIVE_PATH"
+fi
+
+GIT_COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")"
+CREATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+cat > "$MANIFEST_PATH" <<JSON
+{
+  "product": "$PRODUCT_NAME",
+  "version": "$RELEASE_VERSION",
+  "archive": "$ARCHIVE_NAME",
+  "sha256": "$ARCHIVE_SHA256",
+  "arch": "$ARCH_NAME",
+  "gitCommit": "$GIT_COMMIT",
+  "codesigned": $([[ "$SKIP_CODESIGN" == "1" ]] && echo "false" || echo "true"),
+  "notarized": $([[ "$SKIP_NOTARIZATION" == "1" ]] && echo "false" || echo "true"),
+  "createdAt": "$CREATED_AT"
+}
+JSON
+
+echo "=== 完成：CLI 发布产物已生成 ==="
+echo "Archive:  $ARCHIVE_PATH"
+echo "SHA256:   $ARCHIVE_SHA256"
+echo "Manifest: $MANIFEST_PATH"

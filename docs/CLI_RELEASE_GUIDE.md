@@ -1,6 +1,6 @@
-# ImagePet CLI 独立发布与公证指南 (方案 A)
+# ImagePet CLI v1.0 独立发布与 Homebrew 指南
 
-本指南详细介绍了当需要将 `imagepet` 命令行工具 (CLI) 作为独立无沙盒版本分发（通过 GitHub Releases 或 Homebrew）时的打包、签名、公证 (Notarization) 以及凭证附着 (Staple) 的完整流程。
+本指南记录 `imagepet` 命令行工具作为独立无沙盒版本分发时的 v1.0 发布流程。GitHub Releases 使用签名/公证后的 ZIP 产物；Homebrew Tap 使用同一个 GitHub Release asset。
 
 ---
 
@@ -29,77 +29,92 @@
 
 ## 2. 核心打包与公证步骤
 
-我们推荐使用 Swift Package Manager (SPM) 编译 Release 版本的二进制文件，并直接对编译产物进行 Hardened Runtime 签名和公证。
+推荐使用仓库脚本统一编译、签名、打包、生成 SHA256 和 manifest。
 
-### 步骤 1：本地编译 Release 二进制文件
-在项目根目录下，执行以下命令编译出优化后的 Release 版本 CLI：
-```bash
-swift build -c release --product imagepet
-```
-*编译产物将存放在：`.build/release/imagepet`。*
+### 本地 dry-run
 
-### 步骤 2：使用 Developer ID 证书签名
-由于 CLI 运行在沙盒之外，为了通过 macOS 安全防护，**必须启用 Hardened Runtime** (`--options runtime`) 并签名：
+没有 Developer ID 证书或公证凭证时，先跑本地 dry-run，验证 Release 构建、ZIP 和 SHA256 生成：
+
 ```bash
-codesign --force \
-  --options runtime \
-  --sign "Developer ID Application: Your Name (TEAM_ID)" \
-  .build/release/imagepet
+SKIP_CODESIGN=1 SKIP_NOTARIZATION=1 ./script/release_cli.sh
 ```
 
-### 步骤 3：压制成 ZIP 文件
-苹果公证服务只接收归档压缩包 (ZIP) 或磁盘镜像 (DMG)，不能直接上传独立的二进制文件：
-```bash
-# 压缩 imagepet 二进制文件
-cd .build/release
-zip -r imagepet-cli.zip imagepet
+脚本会生成：
+
+```text
+dist/cli/v1.0/imagepet-cli-v1.0-macos-<arch>.zip
+dist/cli/v1.0/imagepet-cli-v1.0-macos-<arch>.zip.sha256
+dist/cli/v1.0/imagepet-cli-v1.0-manifest.json
 ```
 
-### 步骤 4：提交至苹果公证服务器
-我们强烈推荐使用已配置的 Keychain profile 提交公证，以避免在命令行中暴露密码：
-```bash
-# 推荐方式：使用 Keychain Profile
-xcrun notarytool submit imagepet-cli.zip \
-  --keychain-profile "imagepet-notary-profile" \
-  --wait
+`dist/` 已被 `.gitignore` 排除，不要把本地构建产物提交进仓库。
 
-# 备选方式：直接在命令中传入凭证
-xcrun notarytool submit imagepet-cli.zip \
-  --apple-id "YOUR_APPLE_ID_EMAIL" \
-  --password "YOUR_APP_SPECIFIC_PASSWORD" \
-  --team-id "YOUR_TEAM_ID" \
-  --wait
+### 正式签名与公证
+
+正式发布时运行：
+
+```bash
+RELEASE_VERSION=v1.0 \
+NOTARY_PROFILE="imagepet-notary-profile" \
+./script/release_cli.sh
 ```
-*`--wait` 参数会阻塞终端，并实时输出公证进度（通常耗时 1 到 3 分钟），直到服务器返回 `Accepted`（成功）或 `Invalid`（失败）。*
 
-### 步骤 5：验证公证与签名结果
-由于 `stapler` 只能应用于 `.app`、`.dmg` 或 `.pkg` 等打包/包格式，对于单独的命令行工具裸可执行文件（如 `imagepet` CLI），在公证成功后**不需要（也无法）执行 staple**。当用户首次在终端运行时，macOS Gatekeeper 会自动向苹果公证服务器在线核对公证状态。
+如果本机不止一个 Developer ID 证书，显式传入证书名称：
 
-你可以通过以下命令在本地验证签名与公证状态：
 ```bash
-# 验证打包后的 ZIP 压缩包的公证状态
-spctl -a -vvv -t install imagepet-cli.zip
+CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
+RELEASE_VERSION=v1.0 \
+NOTARY_PROFILE="imagepet-notary-profile" \
+./script/release_cli.sh
+```
 
-# 验证本地解压出的二进制文件的签名状态
+脚本会对二进制启用 Hardened Runtime 签名：
+
+```bash
+codesign --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" imagepet
+```
+
+由于 `stapler` 只能应用于 `.app`、`.dmg` 或 `.pkg` 等打包/包格式，对于单独的命令行工具裸可执行文件（如 `imagepet` CLI），在公证成功后不需要也无法执行 staple。用户首次运行时，macOS Gatekeeper 会在线核对公证状态。
+
+脚本内置以下验证：
+
+```bash
+imagepet --version
 codesign --verify --strict --verbose=2 imagepet
-codesign -dv --verbose=4 imagepet
+spctl -a -vvv -t install imagepet-cli-v1.0-macos-<arch>.zip
+```
+
+### GitHub Release 上传项
+
+v1.0 tag 创建后，将以下产物上传到 GitHub Release：
+
+```text
+imagepet-cli-v1.0-macos-<arch>.zip
+imagepet-cli-v1.0-macos-<arch>.zip.sha256
+imagepet-cli-v1.0-manifest.json
 ```
 
 ---
 
-## 3. 一键自动化脚本 `script/release_cli.sh`
+## 3. 自动化脚本 `script/release_cli.sh`
 
-项目已包含一键签名与公证的自动化脚本 [release_cli.sh](file:///Users/rxwill/git/MyApps/ImagePet/script/release_cli.sh)。该脚本**完全不含任何硬编码密钥或证书**，可在开源环境中安全公开。
+项目已包含签名与公证自动化脚本 `script/release_cli.sh`。该脚本不含任何硬编码密钥或证书，可在开源环境中安全公开。
 
 ### 运行方式
 
-#### 运行选项 1：使用 Keychain 凭证（推荐）
+#### 运行选项 1：本地 dry-run
+
+```bash
+SKIP_CODESIGN=1 SKIP_NOTARIZATION=1 ./script/release_cli.sh
+```
+
+#### 运行选项 2：使用 Keychain 凭证（推荐）
 在本地 Keychain 存好凭证后，只需要传入 Profile 名称运行：
 ```bash
 NOTARY_PROFILE="imagepet-notary-profile" ./script/release_cli.sh
 ```
 
-#### 运行选项 2：使用临时环境变量
+#### 运行选项 3：使用临时环境变量
 如果不使用 Keychain，可通过环境变量传入必要凭证：
 ```bash
 CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
@@ -113,24 +128,112 @@ NOTARY_TEAM_ID="YOUR_TEAM_ID" \
 
 ---
 
-## 4. 社区分发推荐 (GitHub Releases & Homebrew)
+## 4. Homebrew Tap
 
-完成上述步骤后，你可以把经过公证的 `imagepet` 可执行二进制文件发布给社区：
+Homebrew v1.0 使用 GitHub Release 里的二进制 ZIP。当前 arm64 产物为：
 
-1. **GitHub Releases**：直接将生成的 `imagepet`（或打包好的 `imagepet-cli.zip`）上传为 GitHub Tag Release 的 Asset。
-2. **Homebrew Tap 分发**：
-   - 编写一个你个人 Tap 的 Homebrew Formula：
-     ```ruby
-     class Imagepet < Formula
-       desc "Local-first macOS batch image compressor"
-       homepage "https://imagepet.gewill.org/"
-       url "https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli.zip"
-       sha256 "ZIP文件的SHA256哈希值"
-       license "MIT"
+```text
+imagepet-cli-v1.0-macos-arm64.zip
+sha256: 74d5eab54048481ef6e376735fc5952ab0d77eb0c2a757ef057b39875fc0ae94
+```
 
-       def install
-         bin.install "imagepet"
-       end
-     end
-     ```
-   - 用户只需在终端运行 `brew install gewill/tap/imagepet` 即可完成免检疫的安全安装。
+对应的下载 URL 是：
+
+```bash
+https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli-v1.0-macos-arm64.zip
+```
+
+发布流程：
+
+1. 先把 CLI 产物上传到 GitHub Release：
+
+```bash
+gh release upload v1.0 \
+  dist/cli/v1.0/imagepet-cli-v1.0-macos-arm64.zip \
+  dist/cli/v1.0/imagepet-cli-v1.0-macos-arm64.zip.sha256 \
+  dist/cli/v1.0/imagepet-cli-v1.0-manifest.json \
+  --clobber
+```
+
+2. 确认 asset URL 可访问：
+
+```bash
+curl -L -o /tmp/imagepet-cli-v1.0-macos-arm64.zip \
+  https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli-v1.0-macos-arm64.zip
+shasum -a 256 /tmp/imagepet-cli-v1.0-macos-arm64.zip
+```
+
+输出必须等于：
+
+```text
+74d5eab54048481ef6e376735fc5952ab0d77eb0c2a757ef057b39875fc0ae94
+```
+
+3. 如果本机还没有 tap，创建 tap：
+
+```bash
+brew tap-new gewill/tap
+```
+
+创建后，本地 tap 仓库位置是：
+
+```text
+/opt/homebrew/Library/Taps/gewill/homebrew-tap
+```
+
+也可以用命令获取，避免写死 Homebrew prefix：
+
+```bash
+brew --repo gewill/tap
+```
+
+4. 新版 Homebrew 需要先信任本地 tap：
+
+```bash
+brew trust gewill/tap
+```
+
+5. 复制 Formula 模板到 tap 仓库：
+
+```bash
+mkdir -p "$(brew --repo gewill/tap)/Formula"
+
+cp packaging/homebrew/imagepet.rb \
+  "$(brew --repo gewill/tap)/Formula/imagepet.rb"
+```
+
+6. 在 tap 仓库验证：
+
+```bash
+brew install --formula "$(brew --repo gewill/tap)/Formula/imagepet.rb"
+brew test "$(brew --repo gewill/tap)/Formula/imagepet.rb"
+brew audit --strict "$(brew --repo gewill/tap)/Formula/imagepet.rb"
+```
+
+7. 提交并推送 tap：
+
+```bash
+cd "$(brew --repo gewill/tap)"
+
+git add Formula/imagepet.rb
+git commit -m "feat(imagepet): add v1.0 formula"
+
+gh repo create gewill/homebrew-tap --public --source=. --remote=origin --push
+```
+
+如果 GitHub repo 已经存在，改用：
+
+```bash
+cd "$(brew --repo gewill/tap)"
+
+git remote add origin git@github.com:gewill/homebrew-tap.git
+git push -u origin main
+```
+
+用户安装命令：
+
+```bash
+brew tap gewill/tap
+brew trust gewill/tap
+brew install gewill/tap/imagepet
+```
