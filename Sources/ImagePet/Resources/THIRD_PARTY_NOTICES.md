@@ -38,11 +38,12 @@ SOFTWARE.
 
 ## Swift-WebP
 
-- Package: `Swift-WebP`
-- Product: `WebP`
-- Version: `0.6.1`
-- Revision: `4e7310667297f066e4884b6258a3a646cac8a50b`
-- Source: https://github.com/ainame/Swift-WebP
+- Package: `SwiftWebP` (fork of `ainame/Swift-WebP`)
+- Product: `SwiftWebP`
+- Version: `0.7.0`
+- Revision: `0480282d9a554c8a357d073e47a018d345f259f8`
+- Source: https://github.com/gewill/Swift-WebP
+- Upstream: https://github.com/ainame/Swift-WebP
 - Build method: Swift Package Manager dependency linked by `ImagePetCore`
 - License: MIT
 
@@ -70,24 +71,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## libwebp-Xcode
+## webp-spm
 
-- Package: `libwebp-Xcode`
-- Product: `libwebp`
-- Version: `1.5.0`
-- Revision: `0d60654eeefd5d7d2bef3835804892c40225e8b2`
-- Source: https://github.com/SDWebImage/libwebp-Xcode
-- Build method: Transitive Swift Package Manager dependency of `Swift-WebP`
-- License: BSD-3-Clause via bundled upstream `libwebp`
+- Package: `webp-spm`
+- Product: `WebP` (C library)
+- Version: `1.6.0`
+- Revision: `b3f1dc16f5dd387e31cd74c2d7c562da6b6d9c4e`
+- Source: https://github.com/gewill/webp-spm
+- Build method: Transitive Swift Package Manager dependency of `SwiftWebP`
+- License: MIT (wrapper) / BSD-3-Clause (upstream libwebp)
 
-`libwebp-Xcode` packages the upstream `libwebp` source for Apple platform builds. Its podspec points to `webmproject/libwebp` tag `v1.5.0` and declares the BSD license file from upstream `libwebp`.
+`webp-spm` packages the upstream `libwebp` source for Swift Package Manager builds. It replaces the previous `libwebp-Xcode` dependency used by the upstream `ainame/Swift-WebP`.
 
 ## libwebp
 
 - Library: `libwebp`
-- Version: `1.5.0`
+- Version: `1.6.0`
 - Source: https://github.com/webmproject/libwebp
-- Build method: Bundled source compiled through `libwebp-Xcode`
+- Build method: Bundled source compiled through `webp-spm`
 - License: BSD-3-Clause
 
 ```text
