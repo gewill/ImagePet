@@ -1,5 +1,6 @@
 import XCTest
 import ImageIO
+import WebP
 @testable import ImagePetCore
 
 final class WebPBenchmarkTests: XCTestCase {
@@ -144,6 +145,232 @@ final class WebPBenchmarkTests: XCTestCase {
         }
 
         print("\n=== BENCHMARK REPORT ===\n\(report)\n========================\n")
+    }
+
+    func testWebPDecodingBenchmark() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        let sizes = [
+            ("small", 128, 128, true),
+            ("medium", 800, 600, false),
+            ("large", 2048, 1536, true)
+        ]
+
+        var report = ""
+        report += "# WebP Decoding Engines Performance Benchmark\n\n"
+        report += "Target OS: macOS 13+ / Sonoma+\n\n"
+        report += "| File Size/Type | Engine | Avg Time (ms) | Loop Count | Peak Mem Delta (MB) |\n"
+        report += "| --- | --- | --- | --- | --- |\n"
+
+        for (name, w, h, alpha) in sizes {
+            let pngURL = directory.appendingPathComponent("\(name).png")
+            try writeSampleImage(width: w, height: h, hasAlpha: alpha, to: pngURL)
+
+            guard let source = CGImageSourceCreateWithURL(pngURL as CFURL, nil),
+                  let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+                XCTFail("Could not read sample image")
+                return
+            }
+
+            let sourceMetadata = ImageSourceMetadata(
+                format: .png,
+                pixelWidth: w,
+                pixelHeight: h,
+                hasAlpha: alpha
+            )
+
+            // Convert to WebP using SwiftWebPEncodingEngine to get WebP data
+            let webpOut = directory.appendingPathComponent("\(name).webp")
+            try SwiftWebPEncodingEngine().encode(
+                image: cgImage,
+                source: sourceMetadata,
+                destinationTemporaryURL: webpOut,
+                options: CompressionOptions(lossyQuality: .custom(80), format: .webp)
+            )
+
+            let webpData = try Data(contentsOf: webpOut)
+            let loopCount = 20
+
+            // 1. Benchmark ImageIO Decoding
+            let startIOMem = getMemoryRSS()
+            let startIO = DispatchTime.now()
+            for _ in 0..<loopCount {
+                autoreleasepool {
+                    guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
+                          let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                        XCTFail("ImageIO failed to decode WebP")
+                        return
+                    }
+                }
+            }
+            let endIO = DispatchTime.now()
+            let endIOMem = getMemoryRSS()
+            let ioTime = Double(endIO.uptimeNanoseconds - startIO.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+            let ioDeltaMem = Double(max(0, Int64(endIOMem) - Int64(startIOMem))) / 1024.0 / 1024.0
+
+            report += "| \(name) (\(w)x\(h), alpha: \(alpha)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) |\n"
+
+            // 2. Benchmark libwebp Decoding
+            let startLibMem = getMemoryRSS()
+            let startLib = DispatchTime.now()
+            for _ in 0..<loopCount {
+                autoreleasepool {
+                    do {
+                        _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                    } catch {
+                        XCTFail("libwebp failed to decode WebP: \(error)")
+                    }
+                }
+            }
+            let endLib = DispatchTime.now()
+            let endLibMem = getMemoryRSS()
+            let libTime = Double(endLib.uptimeNanoseconds - startLib.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+            let libDeltaMem = Double(max(0, Int64(endLibMem) - Int64(startLibMem))) / 1024.0 / 1024.0
+
+            report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) |\n"
+        }
+
+        // Benchmark FreeLarge images if available
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // Tests/ImagePetCoreTests/
+            .deletingLastPathComponent() // Tests/
+            .deletingLastPathComponent() // root/
+        let freeLargeDir = root.appendingPathComponent("TestImages/FreeLarge", isDirectory: true)
+
+        if let contents = try? FileManager.default.contentsOfDirectory(at: freeLargeDir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]),
+           let largeURL = contents.first(where: { ["png", "jpg", "jpeg"].contains($0.pathExtension.lowercased()) }) {
+
+            print("--- Benchmarking with FreeLarge Image: \(largeURL.lastPathComponent) ---")
+
+            if let largeSource = CGImageSourceCreateWithURL(largeURL as CFURL, nil),
+               let cgImage = CGImageSourceCreateImageAtIndex(largeSource, 0, nil) {
+
+                let w = cgImage.width
+                let h = cgImage.height
+                let alpha = cgImage.alphaInfo != .none && cgImage.alphaInfo != .noneSkipLast && cgImage.alphaInfo != .noneSkipFirst
+
+                let sourceMetadata = ImageSourceMetadata(
+                    format: SupportedImageFormat.format(for: largeURL) ?? .png,
+                    pixelWidth: w,
+                    pixelHeight: h,
+                    hasAlpha: alpha
+                )
+
+                let webpOut = directory.appendingPathComponent("freelarge.webp")
+                try SwiftWebPEncodingEngine().encode(
+                    image: cgImage,
+                    source: sourceMetadata,
+                    destinationTemporaryURL: webpOut,
+                    options: CompressionOptions(lossyQuality: .custom(80), format: .webp)
+                )
+
+                let webpData = try Data(contentsOf: webpOut)
+                let loopCount = 3 // For large files, low loop count to prevent timeout
+
+                // ImageIO Decode
+                let startIOMem = getMemoryRSS()
+                let startIO = DispatchTime.now()
+                for _ in 0..<loopCount {
+                    autoreleasepool {
+                        guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
+                              let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                            XCTFail("ImageIO failed to decode WebP Freelarge")
+                            return
+                        }
+                    }
+                }
+                let endIO = DispatchTime.now()
+                let endIOMem = getMemoryRSS()
+                let ioTime = Double(endIO.uptimeNanoseconds - startIO.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+                let ioDeltaMem = Double(max(0, Int64(endIOMem) - Int64(startIOMem))) / 1024.0 / 1024.0
+
+                report += "| FreeLarge (\(largeURL.lastPathComponent), \(w)x\(h)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) |\n"
+
+                // libwebp Decode
+                let startLibMem = getMemoryRSS()
+                let startLib = DispatchTime.now()
+                for _ in 0..<loopCount {
+                    autoreleasepool {
+                        do {
+                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                        } catch {
+                            XCTFail("libwebp failed to decode WebP Freelarge: \(error)")
+                        }
+                    }
+                }
+                let endLib = DispatchTime.now()
+                let endLibMem = getMemoryRSS()
+                let libTime = Double(endLib.uptimeNanoseconds - startLib.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+                let libDeltaMem = Double(max(0, Int64(endLibMem) - Int64(startLibMem))) / 1024.0 / 1024.0
+
+                report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) |\n"
+            }
+        }
+
+        // 3. Concurrent Decode Test
+        let name = "medium"
+        let w = 800
+        let h = 600
+        let pngURL = directory.appendingPathComponent("\(name)_con.png")
+        try writeSampleImage(width: w, height: h, hasAlpha: false, to: pngURL)
+        guard let source = CGImageSourceCreateWithURL(pngURL as CFURL, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            XCTFail("Could not read con sample")
+            return
+        }
+        let webpOut = directory.appendingPathComponent("\(name)_con.webp")
+        try SwiftWebPEncodingEngine().encode(
+            image: cgImage,
+            source: ImageSourceMetadata(format: .png, pixelWidth: w, pixelHeight: h, hasAlpha: false),
+            destinationTemporaryURL: webpOut,
+            options: CompressionOptions(lossyQuality: .custom(80), format: .webp)
+        )
+        let webpData = try Data(contentsOf: webpOut)
+
+        let concurrentCount = 15
+
+        let startConIO = DispatchTime.now()
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 0..<concurrentCount {
+                group.addTask {
+                    autoreleasepool {
+                        guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
+                              let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                            XCTFail("Concurrent ImageIO failed")
+                            return
+                        }
+                    }
+                }
+            }
+        }
+        let endConIO = DispatchTime.now()
+        let conIOTime = Double(endConIO.uptimeNanoseconds - startConIO.uptimeNanoseconds) / 1_000_000.0
+
+        let startConLib = DispatchTime.now()
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 0..<concurrentCount {
+                group.addTask {
+                    autoreleasepool {
+                        do {
+                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                        } catch {
+                            XCTFail("Concurrent libwebp failed")
+                        }
+                    }
+                }
+            }
+        }
+        let endConLib = DispatchTime.now()
+        let conLibTime = Double(endConLib.uptimeNanoseconds - startConLib.uptimeNanoseconds) / 1_000_000.0
+
+        report += "\n### Concurrent Decodes (\(concurrentCount) parallel tasks):\n"
+        report += "- **ImageIO** Total Time: \(String(format: "%.2f", conIOTime)) ms\n"
+        report += "- **libwebp** Total Time: \(String(format: "%.2f", conLibTime)) ms\n"
+
+        print("\n=== DECODING BENCHMARK REPORT ===\n\(report)\n=================================\n")
     }
 
     private func getMemoryRSS() -> UInt64 {
