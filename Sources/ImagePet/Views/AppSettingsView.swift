@@ -44,6 +44,84 @@ struct AppSettingsView: View {
             }
         }
         .frame(minWidth: 680, maxWidth: .infinity, minHeight: 480, maxHeight: .infinity)
+        .background(SettingsWindowConfigurator())
+    }
+}
+
+private struct SettingsWindowConfigurator: NSViewRepresentable {
+    private let minimumSize = CGSize(width: 680, height: 480)
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            configure(window: view.window, coordinator: context.coordinator)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            configure(window: nsView.window, coordinator: context.coordinator)
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(minimumSize: minimumSize)
+    }
+
+    private func configure(window: NSWindow?, coordinator: Coordinator) {
+        guard let window else { return }
+
+        let maximumSize = CGSize(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+
+        window.title = "Settings"
+        window.styleMask.insert([.resizable, .miniaturizable])
+        window.minSize = minimumSize
+        window.contentMinSize = minimumSize
+        window.maxSize = maximumSize
+        window.contentMaxSize = maximumSize
+        window.collectionBehavior.insert(.fullScreenPrimary)
+
+        if window.frame.width < window.minSize.width || window.frame.height < window.minSize.height {
+            var frame = window.frame
+            frame.size.width = max(frame.width, window.minSize.width)
+            frame.size.height = max(frame.height, window.minSize.height)
+            window.setFrame(frame, display: true)
+        }
+
+        window.standardWindowButton(.miniaturizeButton)?.isEnabled = true
+        window.standardWindowButton(.zoomButton)?.isEnabled = true
+
+        if window.delegate == nil || window.delegate === coordinator {
+            coordinator.window = window
+            window.delegate = coordinator
+        }
+    }
+
+    final class Coordinator: NSObject, NSWindowDelegate {
+        weak var window: NSWindow?
+        private let minimumSize: CGSize
+
+        init(minimumSize: CGSize) {
+            self.minimumSize = minimumSize
+        }
+
+        func windowWillUseStandardFrame(_ window: NSWindow, defaultFrame newFrame: NSRect) -> NSRect {
+            guard let screen = window.screen ?? NSScreen.main else {
+                return newFrame
+            }
+
+            let visibleFrame = screen.visibleFrame.insetBy(dx: 24, dy: 24)
+            return NSRect(
+                x: visibleFrame.minX,
+                y: visibleFrame.minY,
+                width: max(visibleFrame.width, minimumSize.width),
+                height: max(visibleFrame.height, minimumSize.height)
+            )
+        }
     }
 }
 
