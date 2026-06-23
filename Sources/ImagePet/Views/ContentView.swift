@@ -10,15 +10,112 @@ struct ContentView: View {
             ZStack {
                 SoftNativeStyle.workspaceBackground
 
-                VStack(spacing: 14) {
-                    HeaderView(store: store)
-
-                    ScrollView {
-                        VStack(spacing: 14) {
-                            ControlsView(store: store)
-                            DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                HStack(spacing: 16) {
+                    // Left Collapsible Sidebar
+                    if store.isQueueExpanded {
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Queue")
+                                    .font(.headline)
+                                    .foregroundStyle(SoftNativeStyle.accent)
+                                    .accessibilityAddTraits(.isHeader)
+                                
+                                Spacer()
+                                
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        store.isQueueExpanded = false
+                                    }
+                                } label: {
+                                    Image(systemName: "sidebar.left")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                                .help("Collapse queue")
+                                .accessibilityIdentifier("collapseQueueButton")
+                                .accessibilityLabel("Collapse queue")
+                            }
+                            
                             JobListView(store: store)
-                            SummaryView(store: store)
+                            
+                            HStack {
+                                Text("Thumbnail Size:")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Picker("Thumbnail Size", selection: $store.thumbnailSize) {
+                                    ForEach(ThumbnailSize.allCases) { size in
+                                        Text(size.displayName).tag(size)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .labelsHidden()
+                                .frame(width: 160)
+                            }
+                            
+                            LeftQueueControlsView(store: store)
+                        }
+                        .frame(width: 320)
+                        .transition(.move(edge: .leading).combined(with: .opacity))
+                    } else {
+                        // Collapsed thin bar
+                        VStack(spacing: 12) {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    store.isQueueExpanded = true
+                                }
+                            } label: {
+                                VStack(spacing: 8) {
+                                    Image(systemName: "sidebar.left")
+                                        .font(.title3)
+                                        .foregroundStyle(SoftNativeStyle.accent)
+                                    
+                                    Text("Queue")
+                                        .font(.caption2.weight(.bold))
+                                        .textCase(.uppercase)
+                                        .tracking(0.6)
+                                        .foregroundStyle(.secondary)
+                                    
+                                    if !store.jobs.isEmpty {
+                                        Text("\(store.jobs.count)")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(store.isProcessing ? SoftNativeStyle.secondary : SoftNativeStyle.accent)
+                                            .foregroundColor(.white)
+                                            .clipShape(Capsule())
+                                    }
+                                    
+                                    if store.isProcessing {
+                                        ProgressView()
+                                            .scaleEffect(0.6)
+                                            .frame(width: 16, height: 16)
+                                    }
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 6)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Expand queue")
+                            .accessibilityIdentifier("expandQueueButton")
+                            .accessibilityLabel("Expand queue, current item count \(store.jobs.count)")
+                            
+                            Spacer()
+                        }
+                        .frame(width: 50)
+                        .softNativeCard(radius: 10, tint: SoftNativeStyle.surface.opacity(0.3))
+                        .transition(.move(edge: .leading).combined(with: .opacity))
+                    }
+
+                    // Right Main Panel
+                    VStack(spacing: 14) {
+                        HeaderView(store: store)
+
+                        ScrollView {
+                            VStack(spacing: 14) {
+                                ControlsView(store: store)
+                                DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                                SummaryView(store: store)
+                            }
                         }
                     }
                 }
@@ -36,7 +133,7 @@ struct ContentView: View {
                 .tag(AppMainTab.settings)
         }
         .tint(SoftNativeStyle.accent)
-        .frame(minWidth: 680, minHeight: 660)
+        .frame(minWidth: 760, minHeight: 660)
         .dropDestination(for: URL.self) { urls, _ in
             store.addDroppedURLs(urls)
             return true
@@ -663,17 +760,14 @@ private struct JobListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ViewThatFits(in: .horizontal) {
-                tableHeader
-                compactHeader
-            }
-            .padding(.horizontal, 12)
-            .frame(height: 34)
-            .font(.caption2.weight(.bold))
-            .textCase(.uppercase)
-            .tracking(0.6)
-            .foregroundStyle(.secondary)
-            .background(SoftNativeStyle.elevated.opacity(0.86))
+            compactHeader
+                .padding(.horizontal, 12)
+                .frame(height: 34)
+                .font(.caption2.weight(.bold))
+                .textCase(.uppercase)
+                .tracking(0.6)
+                .foregroundStyle(.secondary)
+                .background(SoftNativeStyle.elevated.opacity(0.86))
 
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -692,23 +786,8 @@ private struct JobListView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(SoftNativeStyle.border)
         )
-        .frame(height: store.jobs.isEmpty ? 150 : 260)
+        .frame(maxHeight: .infinity)
         .softNativeCard(radius: 10)
-    }
-
-    private var tableHeader: some View {
-        HStack(spacing: 12) {
-            Spacer()
-                .frame(width: 18)
-            Spacer()
-                .frame(width: 28)
-            Text("File")
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Status")
-                .frame(width: 200, alignment: .leading)
-            Text("Size / Saved")
-                .frame(width: 220, alignment: .trailing)
-        }
     }
 
     private var compactHeader: some View {
@@ -751,23 +830,9 @@ private struct EmptyJobListView: View {
 private struct JobRowView: View {
     @ObservedObject var store: ImagePetStore
     let job: ImageJob
+    @State private var isHovering = false
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            regularRow
-            compactRow
-        }
-        .padding(.horizontal, 12)
-        .frame(minHeight: 38)
-        .background(SoftNativeStyle.surface.opacity(0.70))
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(SoftNativeStyle.border)
-                .frame(height: 1)
-        }
-    }
-
-    private var regularRow: some View {
         HStack(spacing: 12) {
             Image(systemName: iconName)
                 .foregroundStyle(iconColor)
@@ -775,76 +840,35 @@ private struct JobRowView: View {
                 .accessibilityIdentifier("jobIcon_\(job.fileName)")
 
             thumbnailView
-                .frame(width: 28, height: 28)
+                .frame(width: store.thumbnailSize.size, height: store.thumbnailSize.size)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
                         .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
                 )
 
-            Text(job.fileName)
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityIdentifier("jobFileName_\(job.fileName)")
-                .accessibilityLabel(job.fileName)
-
-            Text(statusText)
-                .foregroundStyle(statusColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .help(statusText)
-                .frame(width: 200, alignment: .leading)
-                .accessibilityIdentifier("jobStatusText_\(job.fileName)")
-                .accessibilityLabel(statusText)
-
-            Text(sizeText)
-                .font(.system(.callout, design: .monospaced))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.82)
-                .frame(width: 220, alignment: .trailing)
-                .accessibilityIdentifier("jobSizeText_\(job.fileName)")
-                .accessibilityLabel(sizeText)
-        }
-    }
-
-    private var compactRow: some View {
-        HStack(spacing: 12) {
-            Image(systemName: iconName)
-                .foregroundStyle(iconColor)
-                .frame(width: 18)
-                .accessibilityIdentifier("jobIcon_\(job.fileName)")
-
-            thumbnailView
-                .frame(width: 28, height: 28)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
-                )
-
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(job.fileName)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
                     .accessibilityIdentifier("jobFileName_\(job.fileName)")
                     .accessibilityLabel(job.fileName)
 
-                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(statusText)
                         .foregroundStyle(statusColor)
                         .lineLimit(1)
+                        .font(.caption)
                         .minimumScaleFactor(0.85)
                         .help(statusText)
                         .accessibilityIdentifier("jobStatusText_\(job.fileName)")
                         .accessibilityLabel(statusText)
 
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 4)
 
                     Text(sizeText)
-                        .font(.system(.caption, design: .monospaced))
+                        .font(.system(.caption2, design: .monospaced))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
@@ -852,8 +876,66 @@ private struct JobRowView: View {
                         .accessibilityLabel(sizeText)
                 }
             }
+
+            if isHovering && job.status != .processing {
+                HStack(spacing: 6) {
+                    Button {
+                        store.revealInFinder(for: job)
+                    } label: {
+                        Image(systemName: "folder")
+                            .font(.caption)
+                            .foregroundStyle(SoftNativeStyle.accent)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Reveal in Finder")
+                    .accessibilityLabel("Reveal \(job.fileName) in Finder")
+
+                    Button {
+                        store.removeJob(id: job.id)
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Remove from queue")
+                    .accessibilityLabel("Remove \(job.fileName) from queue")
+                }
+                .transition(.opacity)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .padding(.vertical, store.thumbnailSize == .small ? 6 : store.thumbnailSize == .medium ? 10 : 14)
+        .background(isHovering ? SoftNativeStyle.surface.opacity(0.9) : SoftNativeStyle.surface.opacity(0.7))
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(SoftNativeStyle.border)
+                .frame(height: 1)
+        }
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.isHovering = hovering
+            }
+        }
+        .contextMenu {
+            if job.status != .processing {
+                Button {
+                    store.revealInFinder(for: job)
+                } label: {
+                    Label("Reveal in Finder", systemImage: "folder")
+                }
+
+                Button(role: .destructive) {
+                    store.removeJob(id: job.id)
+                } label: {
+                    Label("Remove from Queue", systemImage: "trash")
+                }
+            } else {
+                Text("Processing... cannot modify")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
     }
 
     @ViewBuilder
@@ -970,41 +1052,22 @@ private struct SummaryView: View {
         HStack(spacing: 10) {
             if store.isCompleted {
                 completedMetrics
-
-                Spacer()
-
-                completedActions
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
-                Spacer()
-                processingActions
             } else {
                 SummaryMetric(title: "Quality", value: store.qualitySummary)
                 SummaryMetric(title: "Output", value: store.outputFormat.displayName)
-                Spacer()
             }
+            Spacer()
         }
     }
 
     private var verticalContent: some View {
         VStack(alignment: .leading, spacing: 10) {
             if store.isCompleted {
-                ViewThatFits(in: .horizontal) {
-                    completedMetrics
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        SummaryMetric(title: "Ate", value: FileSizeFormatting.string(from: store.successfulOriginalTotal))
-                        SummaryMetric(title: "Pooped", value: FileSizeFormatting.string(from: store.compressedTotal))
-                        SummaryMetric(
-                            title: "Saved",
-                            value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
-                        )
-                    }
-                }
-                completedActions
+                completedMetrics
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
-                processingActions
             } else {
                 HStack(spacing: 10) {
                     SummaryMetric(title: "Quality", value: store.qualitySummary)
@@ -1022,60 +1085,6 @@ private struct SummaryView: View {
                 title: "Saved",
                 value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
             )
-        }
-    }
-
-    private var processingActions: some View {
-        HStack(spacing: 8) {
-            Button(role: .cancel) {
-                store.cancelProcessing()
-            } label: {
-                if store.isCanceling {
-                    Label("Canceling...", systemImage: "stop.circle")
-                } else {
-                    Label("Cancel", systemImage: "stop.circle")
-                }
-            }
-            .buttonStyle(.bordered)
-            .disabled(store.isCanceling)
-            .keyboardShortcut(".", modifiers: [.command])
-            .help("Cancel processing (⌘.)")
-            .accessibilityIdentifier("cancelButton")
-        }
-    }
-
-    private var completedActions: some View {
-        HStack(spacing: 8) {
-            Button {
-                store.revealOutputDirectory()
-            } label: {
-                Label("Reveal in Finder", systemImage: "folder")
-            }
-            .buttonStyle(.bordered)
-            .help("Reveal in Finder")
-            .accessibilityIdentifier("revealInFinderButton")
-
-            if store.hasFailedJobs {
-                Button {
-                    store.retryFailed()
-                } label: {
-                    Label("Retry Failed", systemImage: "arrow.clockwise")
-                }
-                .buttonStyle(.bordered)
-                .keyboardShortcut("r", modifiers: [.command])
-                .help("Retry Failed (⌘R)")
-                .accessibilityIdentifier("retryFailedButton")
-            }
-
-            Button {
-                store.clearList()
-            } label: {
-                Label("Clear List", systemImage: "xmark.circle")
-            }
-            .buttonStyle(.bordered)
-            .keyboardShortcut("n", modifiers: [.command])
-            .help("Clear List (⌘N)")
-            .accessibilityIdentifier("clearListButton")
         }
     }
 }
@@ -1106,5 +1115,67 @@ private struct SummaryMetric: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(SoftNativeStyle.border)
         )
+    }
+}
+
+private struct LeftQueueControlsView: View {
+    @ObservedObject var store: ImagePetStore
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if store.isProcessing {
+                Button(role: .cancel) {
+                    store.cancelProcessing()
+                } label: {
+                    if store.isCanceling {
+                        Label("Canceling...", systemImage: "stop.circle")
+                    } else {
+                        Label("Cancel", systemImage: "stop.circle")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .disabled(store.isCanceling)
+                .keyboardShortcut(".", modifiers: [.command])
+                .help("Cancel processing (⌘.)")
+                .accessibilityIdentifier("cancelButton")
+                .frame(maxWidth: .infinity)
+            } else if store.isCompleted {
+                Button {
+                    store.revealOutputDirectory()
+                } label: {
+                    Label("Reveal", systemImage: "folder")
+                }
+                .buttonStyle(.bordered)
+                .help("Reveal output directory")
+                .accessibilityIdentifier("revealInFinderButton")
+                .frame(maxWidth: .infinity)
+
+                if store.hasFailedJobs {
+                    Button {
+                        store.retryFailed()
+                    } label: {
+                        Label("Retry", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered)
+                    .keyboardShortcut("r", modifiers: [.command])
+                    .help("Retry Failed (⌘R)")
+                    .accessibilityIdentifier("retryFailedButton")
+                    .frame(maxWidth: .infinity)
+                }
+
+                Button {
+                    store.clearList()
+                } label: {
+                    Label("Clear", systemImage: "xmark.circle")
+                }
+                .buttonStyle(.bordered)
+                .keyboardShortcut("n", modifiers: [.command])
+                .help("Clear List (⌘N)")
+                .accessibilityIdentifier("clearListButton")
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.top, 4)
     }
 }

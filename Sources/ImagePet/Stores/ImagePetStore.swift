@@ -206,6 +206,16 @@ final class ImagePetStore: ObservableObject {
             defaults.set(isParametersExpanded, forKey: isParametersExpandedKey)
         }
     }
+    @Published var thumbnailSize: ThumbnailSize = .medium {
+        didSet {
+            defaults.set(thumbnailSize.rawValue, forKey: thumbnailSizeKey)
+        }
+    }
+    @Published var isQueueExpanded: Bool = true {
+        didSet {
+            defaults.set(isQueueExpanded, forKey: isQueueExpandedKey)
+        }
+    }
     static var shared: ImagePetStore?
 
     private var isInitializing = true
@@ -258,6 +268,8 @@ final class ImagePetStore: ObservableObject {
     private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
     private let petViewModeKey = "ImagePet.petViewMode"
     private let isParametersExpandedKey = "ImagePet.isParametersExpanded"
+    private let thumbnailSizeKey = "ImagePet.thumbnailSize"
+    private let isQueueExpandedKey = "ImagePet.isQueueExpanded"
 
     init(
         compressor: ImageCompressor? = nil,
@@ -291,6 +303,8 @@ final class ImagePetStore: ObservableObject {
         self.isDesktopPetEnabled = true
         self.launchAtLoginEnabled = false
         self.isParametersExpanded = true
+        self.thumbnailSize = .medium
+        self.isQueueExpanded = true
         ImagePetStore.shared = self
 
         self.folderWatchManager = FolderWatchManager(defaults: defaults)
@@ -421,6 +435,16 @@ final class ImagePetStore: ObservableObject {
                 self.isParametersExpanded = defaults.bool(forKey: isParametersExpandedKey)
             } else {
                 self.isParametersExpanded = true
+            }
+            if let savedSize = defaults.string(forKey: thumbnailSizeKey), let size = ThumbnailSize(rawValue: savedSize) {
+                self.thumbnailSize = size
+            } else {
+                self.thumbnailSize = .medium
+            }
+            if defaults.object(forKey: isQueueExpandedKey) != nil {
+                self.isQueueExpanded = defaults.bool(forKey: isQueueExpandedKey)
+            } else {
+                self.isQueueExpanded = true
             }
         }
 
@@ -817,6 +841,47 @@ final class ImagePetStore: ObservableObject {
         if outputDirectory == nil && saveLocationMode == .designated {
             chooseOutputDirectory()
         }
+    }
+
+    func removeJob(id: UUID) {
+        guard let index = jobs.firstIndex(where: { $0.id == id }) else { return }
+        let job = jobs[index]
+        guard job.status != .processing else { return }
+        
+        jobs.remove(at: index)
+        jobSources.removeValue(forKey: id)
+        
+        thumbnailTasks[id]?.cancel()
+        thumbnailTasks.removeValue(forKey: id)
+        thumbnails.removeValue(forKey: id)
+        
+        if jobs.isEmpty {
+            isProcessing = false
+            isCanceling = false
+            petState = .idle
+        }
+    }
+
+    func revealInFinder(for job: ImageJob) {
+        var targetURL: URL?
+        
+        if job.status == .done, let outputURL = job.outputURL, FileManager.default.fileExists(atPath: outputURL.path) {
+            targetURL = outputURL
+        } else if FileManager.default.fileExists(atPath: job.inputURL.path) {
+            targetURL = job.inputURL
+        }
+        
+        guard let url = targetURL else {
+            outputFolderMessage = "File not found"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                if self?.outputFolderMessage == "File not found" {
+                    self?.outputFolderMessage = nil
+                }
+            }
+            return
+        }
+        
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     func revealOutputDirectory() {

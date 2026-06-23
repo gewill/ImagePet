@@ -98,4 +98,56 @@ final class TaskCancellationAndThumbnailTests: XCTestCase {
         XCTAssertEqual(snapshot.title, "Stopped")
         XCTAssertTrue(snapshot.detail.contains("cancel"))
     }
+
+    @MainActor
+    func testThumbnailSizeAdjustmentDoesNotAffectJobs() {
+        let store = ImagePetStore()
+        let url = testImageURL
+        store.addDroppedURLs([url])
+        
+        XCTAssertEqual(store.jobs.count, 1)
+        let initialStatus = store.jobs[0].status
+        
+        store.thumbnailSize = .large
+        XCTAssertEqual(store.thumbnailSize, .large)
+        XCTAssertEqual(store.jobs.count, 1)
+        XCTAssertEqual(store.jobs[0].status, initialStatus)
+    }
+
+    @MainActor
+    func testSingleItemDeletionUpdatesStatsAndCaches() async {
+        let store = ImagePetStore()
+        let url = testImageURL
+        
+        // Disable auto processing to inspect pending state deletion
+        setenv("IS_UI_TESTING", "1", 1)
+        defer { unsetenv("IS_UI_TESTING") }
+        
+        store.addDroppedURLs([url, url])
+        XCTAssertEqual(store.jobs.count, 2)
+        
+        let jobIdToDelete = store.jobs[0].id
+        // Add dummy thumbnail to cache
+        let dummyImage = CGImageSourceCreateImageAtIndex(CGImageSourceCreateWithURL(url as CFURL, nil)!, 0, nil)!
+        store.thumbnails[jobIdToDelete] = dummyImage
+        XCTAssertNotNil(store.thumbnails[jobIdToDelete])
+        
+        // Delete first job
+        store.removeJob(id: jobIdToDelete)
+        
+        XCTAssertEqual(store.jobs.count, 1)
+        XCTAssertNotEqual(store.jobs[0].id, jobIdToDelete)
+        XCTAssertNil(store.thumbnails[jobIdToDelete])
+    }
+
+    @MainActor
+    func testRevealInFinderMissingFileShowsError() {
+        let store = ImagePetStore()
+        let job = ImageJob(inputURL: URL(fileURLWithPath: "/nonexistent/path.png"), originalSize: 100)
+        
+        XCTAssertNil(store.outputFolderMessage)
+        store.revealInFinder(for: job)
+        
+        XCTAssertEqual(store.outputFolderMessage, "File not found")
+    }
 }
