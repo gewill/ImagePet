@@ -130,7 +130,7 @@ private struct SettingsSidebar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(SettingsSection.allCases) { section in
+            ForEach(Array(SettingsSection.allCases.enumerated()), id: \.element.id) { index, section in
                 Button {
                     logger.warning("SettingsSidebar button clicked: \(section.rawValue)")
                     selection = section
@@ -146,6 +146,7 @@ private struct SettingsSidebar: View {
                         .fill(selection == section ? Color.accentColor.opacity(0.14) : Color.clear)
                 )
                 .accessibilityIdentifier("settingsSection_\(section.id)")
+                .keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: [.command])
             }
 
             Spacer()

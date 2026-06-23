@@ -363,7 +363,8 @@ private enum HelpContent {
                         "Shift-Command-P shows or hides the desktop pet.",
                         "Command-N clears a completed queue.",
                         "Command-R retries failed jobs when failures exist.",
-                        "Command-1 shows the main window."
+                        "Command-comma opens Settings.",
+                        "Command-1 through Command-6 switch Settings sections: General, Folder Watching, Notifications, Desktop Pet, Keyboard Shortcuts, and Help & About."
                     ]
                 ),
                 HelpSection(

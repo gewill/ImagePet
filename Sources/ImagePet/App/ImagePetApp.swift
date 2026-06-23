@@ -51,7 +51,6 @@ struct ImagePetApp: App {
                 Button("Show Main Window") {
                     store.activateMainWindow()
                 }
-                .keyboardShortcut("1", modifiers: [.command])
 
                 Divider()
 
