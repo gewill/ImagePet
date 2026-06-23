@@ -856,12 +856,22 @@ private struct JobRowView: View {
                 )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(job.fileName)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .font(.body)
-                    .accessibilityIdentifier("jobFileName_\(job.fileName)")
-                    .accessibilityLabel(job.fileName)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(job.fileName)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .font(.body)
+                        .accessibilityIdentifier("jobFileName_\(job.fileName)")
+                        .accessibilityLabel(job.fileName)
+
+                    let parentFolder = job.inputURL.deletingLastPathComponent().lastPathComponent
+                    if !parentFolder.isEmpty {
+                        Text("(\(parentFolder))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
 
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(statusText)
@@ -885,7 +895,7 @@ private struct JobRowView: View {
                 }
             }
 
-            if isHovering && job.status != .processing {
+            if (isHovering || job.status == .done) && job.status != .processing {
                 HStack(spacing: 6) {
                     Button {
                         store.revealInFinder(for: job)
@@ -901,7 +911,7 @@ private struct JobRowView: View {
                     Button {
                         store.removeJob(id: job.id)
                     } label: {
-                        Image(systemName: "trash")
+                        Image(systemName: "minus.circle.fill")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
@@ -936,7 +946,7 @@ private struct JobRowView: View {
                 Button(role: .destructive) {
                     store.removeJob(id: job.id)
                 } label: {
-                    Label("Remove from Queue", systemImage: "trash")
+                    Label("Remove from Queue", systemImage: "minus.circle")
                 }
             } else {
                 Text("Processing... cannot modify")
@@ -1136,55 +1146,65 @@ private struct SummaryControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        HStack(spacing: 8) {
-            if store.isProcessing {
-                Button(role: .cancel) {
-                    store.cancelProcessing()
-                } label: {
-                    if store.isCanceling {
-                        Label("Canceling...", systemImage: "stop.circle")
-                    } else {
-                        Label("Cancel", systemImage: "stop.circle")
-                    }
-                }
-                .buttonStyle(.bordered)
-                .tint(.red)
-                .disabled(store.isCanceling)
-                .keyboardShortcut(".", modifiers: [.command])
-                .help("Cancel processing (⌘.)")
-                .accessibilityIdentifier("cancelButton")
-            } else if store.isCompleted {
-                Button {
-                    store.revealOutputDirectory()
-                } label: {
-                    Label("Reveal", systemImage: "folder")
-                }
-                .buttonStyle(.bordered)
-                .help("Reveal output directory")
-                .accessibilityIdentifier("revealInFinderButton")
-
-                if store.hasFailedJobs {
-                    Button {
-                        store.retryFailed()
-                    } label: {
-                        Label("Retry", systemImage: "arrow.clockwise")
-                    }
-                    .buttonStyle(.bordered)
-                    .keyboardShortcut("r", modifiers: [.command])
-                    .help("Retry Failed (⌘R)")
-                    .accessibilityIdentifier("retryFailedButton")
-                }
-
-                Button {
-                    store.clearList()
-                } label: {
-                    Label("Clear", systemImage: "xmark.circle")
-                }
-                .buttonStyle(.bordered)
-                .keyboardShortcut("n", modifiers: [.command])
-                .help("Clear List (⌘N)")
-                .accessibilityIdentifier("clearListButton")
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                buttons
             }
+            VStack(alignment: .trailing, spacing: 6) {
+                buttons
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var buttons: some View {
+        if store.isProcessing {
+            Button(role: .cancel) {
+                store.cancelProcessing()
+            } label: {
+                if store.isCanceling {
+                    Label("Canceling...", systemImage: "stop.circle")
+                } else {
+                    Label("Cancel", systemImage: "stop.circle")
+                }
+            }
+            .buttonStyle(.bordered)
+            .tint(.red)
+            .disabled(store.isCanceling)
+            .keyboardShortcut(".", modifiers: [.command])
+            .help("Cancel processing (⌘.)")
+            .accessibilityIdentifier("cancelButton")
+        } else if store.isCompleted {
+            Button {
+                store.revealOutputDirectory()
+            } label: {
+                Label("Reveal", systemImage: "folder")
+            }
+            .buttonStyle(.bordered)
+            .help("Reveal output directory")
+            .accessibilityIdentifier("revealInFinderButton")
+
+            if store.hasFailedJobs {
+                Button {
+                    store.retryFailed()
+                } label: {
+                    Label("Retry", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+                .keyboardShortcut("r", modifiers: [.command])
+                .help("Retry Failed (⌘R)")
+                .accessibilityIdentifier("retryFailedButton")
+            }
+
+            Button {
+                store.clearList()
+            } label: {
+                Label("Clear", systemImage: "xmark.circle")
+            }
+            .buttonStyle(.bordered)
+            .keyboardShortcut("n", modifiers: [.command])
+            .help("Clear List (⌘N)")
+            .accessibilityIdentifier("clearListButton")
         }
     }
 }

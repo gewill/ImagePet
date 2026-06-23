@@ -43,7 +43,7 @@ struct AppSettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .frame(width: 680, height: 480)
+        .frame(minWidth: 680, maxWidth: .infinity, minHeight: 480, maxHeight: .infinity)
     }
 }
 
