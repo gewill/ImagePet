@@ -112,11 +112,13 @@ struct ImagePetApp: App {
         Settings {
             AppSettingsView(store: store)
         }
+        .windowResizability(.contentMinSize)
     }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var windowUpdateObserver: Any?
+    private var settingsWindowObserver: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.servicesProvider = self
@@ -173,6 +175,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             NSApp.setActivationPolicy(.regular)
             NSApp.activate(ignoringOtherApps: true)
+        }
+
+        // Force Settings window to be resizable whenever it first becomes key
+        settingsWindowObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeKeyNotification,
+            object: nil,
+            queue: .main
+        ) { notification in
+            guard let window = notification.object as? NSWindow,
+                  window.title == "Settings" else { return }
+            window.styleMask.insert(.resizable)
+            window.minSize = CGSize(width: 680, height: 480)
         }
     }
 

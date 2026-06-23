@@ -232,6 +232,7 @@ final class ImagePetStore: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var openMainWindow: (() -> Void)?
     private var openHelpWindow: (() -> Void)?
+    private var openSettingsWindow: (() -> Void)?
     private var desktopPetWindowController: DesktopPetWindowController?
     private var isPetHovering = false
     private var didPromptForInitialFolder = false
@@ -538,13 +539,22 @@ final class ImagePetStore: ObservableObject {
         openHelpWindow = opener
     }
 
+    func setSettingsWindowOpener(_ opener: @escaping () -> Void) {
+        openSettingsWindow = opener
+    }
+
     func openHelp() {
         openHelpWindow?()
     }
 
     func showSettings(_ section: SettingsSection) {
         selectedSettingsSection = section
-        NSApp.sendAction(Selector(("showSettingsPanel:")), to: nil, from: nil)
+        if let openSettingsWindow {
+            openSettingsWindow()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+            NSApp.sendAction(Selector(("showSettingsPanel:")), to: nil, from: nil)
+        }
     }
 
     func activateMainWindow() {

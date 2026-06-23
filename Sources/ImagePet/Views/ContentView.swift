@@ -141,6 +141,9 @@ struct ContentView: View {
         }
         .background {
             DesktopPetPresenter(store: store)
+            if #available(macOS 14, *) {
+                OpenSettingsRegistrar(store: store)
+            }
         }
         .confirmationDialog(
             "Overwrite Original Files?",
@@ -156,6 +159,17 @@ struct ContentView: View {
         } message: {
             Text("Are you sure you want to overwrite the original images? This will replace your original files and cannot be undone.")
         }
+    }
+}
+
+
+@available(macOS 14, *)
+private struct OpenSettingsRegistrar: View {
+    @Environment(\.openSettings) private var openSettings
+    let store: ImagePetStore
+    var body: some View {
+        Color.clear
+            .onAppear { store.setSettingsWindowOpener { openSettings() } }
     }
 }
 
