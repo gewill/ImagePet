@@ -889,13 +889,19 @@ final class ImagePetStore: ObservableObject {
                 chooseOutputDirectory()
                 return
             }
+            let access = outputDirectory.startAccessingSecurityScopedResource()
+            defer { if access { outputDirectory.stopAccessingSecurityScopedResource() } }
             NSWorkspace.shared.open(outputDirectory)
         } else {
             if let firstSuccess = jobs.first(where: { $0.status == .done && $0.outputURL != nil }),
                let outputURL = firstSuccess.outputURL {
                 let parentDir = outputURL.deletingLastPathComponent()
+                let access = parentDir.startAccessingSecurityScopedResource()
+                defer { if access { parentDir.stopAccessingSecurityScopedResource() } }
                 NSWorkspace.shared.open(parentDir)
             } else if let outputDirectory {
+                let access = outputDirectory.startAccessingSecurityScopedResource()
+                defer { if access { outputDirectory.stopAccessingSecurityScopedResource() } }
                 NSWorkspace.shared.open(outputDirectory)
             }
         }
