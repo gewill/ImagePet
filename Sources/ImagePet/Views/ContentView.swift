@@ -501,10 +501,26 @@ private struct ControlsView: View {
     }
 
     private var outputFolderRow: some View {
-        HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             outputFolderLabel
-            chooseOutputFolderButton
-            Spacer()
+            HStack(spacing: 8) {
+                revealOutputFolderButton
+                Spacer()
+                chooseOutputFolderButton
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var revealOutputFolderButton: some View {
+        if store.outputDirectory != nil {
+            Button {
+                store.revealOutputDirectory()
+            } label: {
+                Text("Reveal in Finder")
+            }
+            .help("Reveal output folder in Finder")
+            .accessibilityIdentifier("revealOutputFolderButton")
         }
     }
 
@@ -668,14 +684,7 @@ private struct ControlsView: View {
                         Divider()
                             .padding(.vertical, 2)
 
-                        ViewThatFits(in: .horizontal) {
-                            outputFolderRow
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                outputFolderLabel
-                                chooseOutputFolderButton
-                            }
-                        }
+                        outputFolderRow
                         .font(.callout)
 
                         if let message = store.outputFolderMessage {
