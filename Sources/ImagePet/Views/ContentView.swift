@@ -516,8 +516,6 @@ private struct ControlsView: View {
 
             Text(outputFolderText)
                 .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
-                .lineLimit(3)
-                .truncationMode(.tail)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("outputFolderLabel")
         }
@@ -871,6 +869,20 @@ private struct JobRowView: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+
+                    if (isHovering || job.status == .done) && job.status != .processing {
+                        Button {
+                            store.revealInFinder(for: job)
+                        } label: {
+                            Image(systemName: "folder")
+                                .font(.caption)
+                                .foregroundStyle(SoftNativeStyle.accent)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Reveal in Finder")
+                        .accessibilityLabel("Reveal \(job.fileName) in Finder")
+                        .transition(.opacity)
+                    }
                 }
 
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -896,29 +908,16 @@ private struct JobRowView: View {
             }
 
             if (isHovering || job.status == .done) && job.status != .processing {
-                HStack(spacing: 6) {
-                    Button {
-                        store.revealInFinder(for: job)
-                    } label: {
-                        Image(systemName: "folder")
-                            .font(.caption)
-                            .foregroundStyle(SoftNativeStyle.accent)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Reveal in Finder")
-                    .accessibilityLabel("Reveal \(job.fileName) in Finder")
-
-                    Button {
-                        store.removeJob(id: job.id)
-                    } label: {
-                        Image(systemName: "minus.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Remove from queue")
-                    .accessibilityLabel("Remove \(job.fileName) from queue")
+                Button {
+                    store.removeJob(id: job.id)
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
+                .buttonStyle(.plain)
+                .help("Remove from queue")
+                .accessibilityLabel("Remove \(job.fileName) from queue")
                 .transition(.opacity)
             }
         }
