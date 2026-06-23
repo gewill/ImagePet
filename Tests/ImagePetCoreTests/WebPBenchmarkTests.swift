@@ -240,8 +240,8 @@ final class WebPBenchmarkTests: XCTestCase {
         var report = ""
         report += "# WebP Decoding Engines Performance Benchmark\n\n"
         report += "Target OS: macOS 13+ / Sonoma+\n\n"
-        report += "| File Size/Type | Engine | Avg Time (ms) | Loop Count | Peak Mem Delta (MB) |\n"
-        report += "| --- | --- | --- | --- | --- |\n"
+        report += "| File Size/Type | Engine | Avg Time (ms) | Loop Count | Peak Mem Delta (MB) | Note |\n"
+        report += "| --- | --- | --- | --- | --- | --- |\n"
 
         for (name, w, h, alpha) in sizes {
             let pngURL = directory.appendingPathComponent("\(name).png")
@@ -290,7 +290,7 @@ final class WebPBenchmarkTests: XCTestCase {
             let ioTime = Double(endIO.uptimeNanoseconds - startIO.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
             let ioDeltaMem = Double(max(0, Int64(endIOMem) - Int64(startIOMem))) / 1024.0 / 1024.0
 
-            report += "| \(name) (\(w)x\(h), alpha: \(alpha)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) |\n"
+            report += "| \(name) (\(w)x\(h), alpha: \(alpha)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) | Forced Decompression |\n"
 
             // 2. Benchmark libwebp Decoding
             let startLibMem = getMemoryRSS()
@@ -298,8 +298,7 @@ final class WebPBenchmarkTests: XCTestCase {
             for _ in 0..<loopCount {
                 autoreleasepool {
                     do {
-                        let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
-                        _ = Self.forceDecompression(of: cgImage)
+                        _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
                     } catch {
                         XCTFail("libwebp failed to decode WebP: \(error)")
                     }
@@ -310,7 +309,7 @@ final class WebPBenchmarkTests: XCTestCase {
             let libTime = Double(endLib.uptimeNanoseconds - startLib.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
             let libDeltaMem = Double(max(0, Int64(endLibMem) - Int64(startLibMem))) / 1024.0 / 1024.0
 
-            report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) |\n"
+            report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) | Direct Decode |\n"
         }
 
         // Benchmark FreeLarge images if available
@@ -368,7 +367,7 @@ final class WebPBenchmarkTests: XCTestCase {
                 let ioTime = Double(endIO.uptimeNanoseconds - startIO.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
                 let ioDeltaMem = Double(max(0, Int64(endIOMem) - Int64(startIOMem))) / 1024.0 / 1024.0
 
-                report += "| FreeLarge (\(largeURL.lastPathComponent), \(w)x\(h)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) |\n"
+                report += "| FreeLarge (\(largeURL.lastPathComponent), \(w)x\(h)) | ImageIO | \(String(format: "%.2f", ioTime)) | \(loopCount) | \(String(format: "%.2f", ioDeltaMem)) | Forced Decompression |\n"
 
                 // libwebp Decode
                 let startLibMem = getMemoryRSS()
@@ -376,8 +375,7 @@ final class WebPBenchmarkTests: XCTestCase {
                 for _ in 0..<loopCount {
                     autoreleasepool {
                         do {
-                            let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
-                            _ = Self.forceDecompression(of: cgImage)
+                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
                         } catch {
                             XCTFail("libwebp failed to decode WebP Freelarge: \(error)")
                         }
@@ -388,7 +386,7 @@ final class WebPBenchmarkTests: XCTestCase {
                 let libTime = Double(endLib.uptimeNanoseconds - startLib.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
                 let libDeltaMem = Double(max(0, Int64(endLibMem) - Int64(startLibMem))) / 1024.0 / 1024.0
 
-                report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) |\n"
+                report += "| | libwebp | \(String(format: "%.2f", libTime)) | \(loopCount) | \(String(format: "%.2f", libDeltaMem)) | Direct Decode |\n"
             }
         }
 
@@ -438,8 +436,7 @@ final class WebPBenchmarkTests: XCTestCase {
                 group.addTask {
                     autoreleasepool {
                         do {
-                            let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
-                            _ = Self.forceDecompression(of: cgImage)
+                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
                         } catch {
                             XCTFail("Concurrent libwebp failed")
                         }
