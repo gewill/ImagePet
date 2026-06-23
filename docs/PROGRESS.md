@@ -1,10 +1,10 @@
 # ImagePet MVP Progress
 
-更新日期：2026-06-22
+更新日期：2026-06-24
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已进入实现阶段，已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。V1.1 任务控制、缩略图与 WebP 性能优化已完成 PRD 规划，重点是中止任务、队列缩略图，以及 Apple 官方 ImageIO / UTType WebP 路线 spike。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist，并继续评估后续是否加入自定义主题导入。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入 MAS build 验收和 ASC metadata 提交准备。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。V1.1 任务控制、队列缩略图、主窗口队列管理、独立设置窗口、通知总开关、设置分区快捷键，以及 Apple 官方 ImageIO / UTType WebP 路线 spike 已实现并进入 RC 验收。当前版本号已推进到 `1.1` / build `2`；`swift test`、完整 `xcodebuild ... test` 和 `./script/build_and_run.sh --verify` 均已通过。下一步是完成真实批量图片、WebP 输出打开、MAS/release-like sandbox 和 App Store Connect 提交前手工验收。
 
 已完成：
 
@@ -23,7 +23,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.13 本地通知与发布完整性闭环 (Batch Summary 模型、Folder Watching 2秒防抖合并、Shortcuts/Folder Watching 智能静默与防骚扰策略、20条通知历史持久化与 Debug UI、独立发布 Checklists)
 - V0.15 Release Candidate 与 Mac App Store 上线准备 PRD
 - V0.16 桌面 Pet 主题生产与验证管线基础能力
-- V1.1 任务控制、缩略图与 WebP 性能优化 PRD
+- V1.1 任务控制、缩略图、队列布局与 WebP 性能优化实现
 - App Store Connect / website 共享 metadata 源
 - Cloudflare Pages 友好的静态官网
 - App Sandbox entitlements
@@ -34,12 +34,16 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 
 尚未完成验收：
 
-- App Store Connect metadata / privacy / screenshots / App Review notes
+- V1.1 真实批量图片取消、单项删除、单项 Reveal in Finder 手工验收
+- V1.1 WebP 输出在 Preview / Safari / Chrome 打开验证
+- V1.1 MAS/release-like sandbox build smoke 与 App Store Connect 提交前材料
 - 真实手工录制并触发 global shortcuts 的发布前 smoke
 
 已自动化验证：
 
-- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，最近一次总耗时 0.22 秒，内存峰值约 174.2 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
+- 性能与鲁棒性验收：已实现自动化并发压缩测试，跑完 20 张大图，最近一次总耗时 0.21 秒，内存峰值约 168.1 MB（限制为 1.5GB），且单图失败不会崩溃（由 `PerformanceAndRobustnessTests` 验证）。
+- v1.1 任务控制与缩略图验收：`TaskCancellationAndThumbnailTests` 覆盖取消后停止调度、缩略图生成与取消、缩略图尺寸调整不影响 job、单项删除清理统计/缓存、缺失文件 Reveal 错误。
+- 通知设置验收：`LocalNotificationManagerTests` 覆盖通知历史、Shortcuts/Folder Watching 策略、10 分钟 attention throttle、Folder Watching debounce、App 内通知总开关持久化与关闭后阻止投递。
 - UI 与交互验收：已实现 XCUITest 自动化 UI 测试，包含首屏加载、质量预设更改、桌面宠物小窗开关、桌面宠物返回主窗口、完成态动作、失败重试、覆盖确认、批量压缩完整流程、Help Center 和 Keyboard Shortcuts 设置区（由 `ImagePetUITests` 验证）。
 
 ## 追踪入口
@@ -70,10 +74,10 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | --- | --- | --- | --- |
 | JPG / JPEG / PNG / HEIC 输入 | 已实现 | `SupportedImageFormat` + ImageIO 解码；fixture 覆盖 JPG/PNG/HEIC | 用真实 iPhone HEIC 做手工验收 |
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
-| WebP | 已实现，本机验证通过 | Swift-WebP `0.6.1` + libwebp-Xcode `1.5.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；MAS review build smoke |
-| WebP 性能优化 / Apple 官方路线 | 已评估 (不采用) | WebPBenchmarkTests.swift 证实 macOS 13/14 下 CGImageDestination 不支持 WebP write (canWriteWebP = false)。保留 Swift-WebP 路线作为 write 主路径，ImageIO 作为 decode/inspect 快路径。已添加 AppleWebPEncodingEngine 作未来备用 | 无 |
+| WebP | 已实现，本机验证通过 | SwiftWebP `0.7.0` + webp-spm `1.6.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；MAS review build smoke |
+| WebP 性能优化 / Apple 官方路线 | 已评估 (不采用) | `WebPBenchmarkTests.swift` 证实当前本机环境下 `CGImageDestination` 不支持 WebP write。保留 SwiftWebP/libwebp 路线作为 write 主路径，ImageIO 作为 decode/inspect 快路径；`docs/WEBP_BENCHMARK_REPORT.md` 已记录 benchmark 结论。已添加 `AppleWebPEncodingEngine` 作未来备用 | 无 |
 | Advanced JPEG / mozjpeg | 已实现，本机验证通过 | `awxkee/mozjpeg.swift` `1.1.3` 已接入；`EncoderCapabilities.jpegEncodingModes` 分离 standard/advanced；Advanced JPEG 只影响 JPEG 输出并由 smoke encode gate 控制；Third Party Notices 已扩展 | 补 benchmark fixture、Preview/Safari/Chrome 打开验证、MAS review build smoke |
-| App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `3.0.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口 | 发布前手工录制并触发 Show Main Window / Show / Hide Desktop Pet global shortcuts |
+| App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `2.4.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口；Settings 分区支持 `Command-1` 到 `Command-6` 切换 | 发布前手工录制并触发 Show Main Window / Show / Hide Desktop Pet global shortcuts |
 | AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
 | 3 个压缩预设 | 已实现 | `CompressionPreset.high/balanced/small` | UI 里继续保持默认 Balanced |
 | 最大边长限制 | 已实现 | `MaxDimensionLimit` + compressor 单测覆盖缩放 | 用真实大图做视觉验收 |
@@ -85,8 +89,8 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | maxConcurrentJobs = 2 | 已实现 | `ImagePetStore` 队列 worker 限制 | 性能测试时观察吞吐和内存 |
 | autoreleasepool | 已实现 | `ImageCompressor` decode/encode/write 包裹 | 压测确认峰值内存 |
 | 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态、size 和 saved ratio | GUI 手工检查状态变化 |
-| 中止任务 | 已实现 | 支持 pending/processing cancel，在 `ImagePetStore` 提供 cancel 逻辑，单图失败/取消不破坏批次，UI 对应 Canceled 态 | 保持验证 |
-| 队列缩略图 | 已实现 | 支持异步生成与限制 3 并发不阻塞 UI 线程。UI 支持 28x28 圆角缩略图与 VoiceOver 兼容 | 保持验证 |
+| 中止任务 | 已实现，本机验证通过 | 支持 pending/processing cancel，在 `ImagePetStore` 提供 cancel 逻辑，单图失败/取消不破坏批次，UI 对应 Canceled 态；`TaskCancellationAndThumbnailTests` 覆盖取消后停止调度 | 真实 20 张混合图片手工中止验收 |
+| 队列缩略图 | 已实现，本机验证通过 | 支持异步生成与限制 3 并发不阻塞 UI 线程；UI 支持 small / medium / large 缩略图尺寸；`TaskCancellationAndThumbnailTests` 覆盖缩略图生成、取消和尺寸调整 | 长列表滚动手工验收 |
 | 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏、返回主窗口并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |
@@ -97,7 +101,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 覆盖模式保护 | 已实现 | UI 强制原格式、二次确认、临时文件替换；单测覆盖格式保持 | 手工验证取消和确认路径 |
 | Core 失败路径 | 已实现 | 单测覆盖不支持格式、坏图解码失败、输出目录不可用、WebP read/write capability 分离、WebP write 不可用的 skipped reason；GIF/PDF/SVG/TIFF 继续拒绝 | 补充真实 animated WebP fixture 拒绝测试 |
 | 总计 Ate / Pooped / Saved | 已实现 | `ImagePetStore` 汇总，GUI 展示 | 手工核对展示 |
-| Reveal in Finder | 已实现 | GUI 调用 Finder reveal/open | 手工点击验证 |
+| Reveal in Finder | 已实现，本机验证通过 | GUI 调用 Finder reveal/open；单项 Reveal 和输出目录 Reveal 已接入，缺失文件短错误由 `TaskCancellationAndThumbnailTests` 覆盖 | 手工点击真实输入/输出文件验证 |
 | Retry Failed | 已实现 | 失败任务重置后重跑 | 用坏文件混入批次验证 |
 | Clear List | 已实现 | 清空队列并保留设置 | 手工验证设置保留 |
 | Committed Xcode project | 已完成 | `ImagePet.xcodeproj` 已入库 | CI 后续直接用 Xcode project |
@@ -108,7 +112,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 快捷指令 (Shortcuts) 集成 | 已实现 | `AppIntents` 编写 `CompressImagesIntent` 并注册 `ImagePetShortcuts` | 真实 Shortcuts app 内搜索动作和传参验证 |
 | 本地通知与发布完整性闭环 | 已实现，本机验证通过 | 整合 `CompressionBatchSummary` 摘要模型、`LocalNotificationManager` 包含防抖合并、防骚扰限频与 Shortcuts/Folder Watching 静默成功策略、历史纪录持久化、设置页面通知控制项及 Debug UI、独立 `RELEASE_CHECKLIST.md` | 手工触发不同入口压缩检查通知展示与通知动作的 Finder 唤起 |
 | Soft Native 主窗口重设计 | DesignSpike 已实现 | `DESIGN.md` + `docs/SoftNative.html` + `docs/PRD_v0.14_soft_native_main_window_redesign.md`；主窗口使用 Soft Native token、紧凑 header、响应式控制项、列表和 summary 视觉重构；Desktop Pet 配色同步 | `swift test`、`git diff --check`、`./script/build_and_run.sh --verify` 已通过；仍需手工视觉验收 |
-| Release Candidate 与上线准备 | 已规划 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引 | 补齐 `docs/RELEASE_CHECKLIST.md` MAS 上线验收项，执行 ASC/TestFlight RC 验收 |
+| Release Candidate 与上线准备 | v1.1 RC 验收中 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引；当前 `marketingVersion=1.1`、`buildNumber=2` | 执行真实图片、WebP 打开、MAS sandbox、ASC metadata 与截图验收 |
 | 桌面 Pet 主题生产与验证管线 | 基础能力已实现，本机验证通过 | `docs/PRD_v0.16_desktop_pet_theme_authoring_pipeline.md` 已定义 `theme.json` 包契约、离线 authoring run、validator、contact sheet / preview QA、visual QA 与 manifest-backed runtime 方向；当前可选内置主题已补齐 `theme.json`，`script/validate_pet_theme.py` 可离线生成 review JSON、contact sheet 与 GIF preview，运行时主题 metadata 由 manifest 优先加载并保留 fallback；`docs/theme-qa/v0.16/` 已记录 bundled themes 的 contact sheet、preview 和模型视觉验收 | 后续 PRD 再决定是否加入自定义主题导入；未来新增或替换主题时重新生成 visual QA |
 
 ## 已验证
@@ -118,31 +122,33 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 ```text
 swift test
 结果：通过
-测试数：46
-性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.21 秒，峰值内存 169.6 MB）
+测试数：39
+性能与鲁棒性验证：通过（21 个 job，10 个成功、1 个预期失败，耗时 0.21 秒，峰值内存 168.1 MB）
 ```
 
 ```text
 xcodebuild -project ImagePet.xcodeproj \
   -scheme ImagePet \
   -configuration Debug \
-  -derivedDataPath DerivedData/UserBuild \
+  -derivedDataPath DerivedData \
   -destination 'platform=macOS' \
   test
 结果：通过
-测试数：65 (46 Unit Tests + 19 UI Tests)
-性能与鲁棒性验证：通过（21 个 job，18 个成功、1 个预期失败，耗时 0.22 秒，峰值内存 174.2 MB）
-UI suite：通过（19 tests，196.522 秒）
+测试数：36 (17 ImagePetTests + 19 UI Tests)
+任务控制与缩略图验证：通过（6 tests）
+通知设置验证：通过（8 tests）
+UI suite：通过（19 tests，245.356 秒）
 ```
 
 KeyboardShortcuts dependency spike：
 
 ```text
-KeyboardShortcuts version: 3.0.0
-revision: f7d08ba4109d5ca025e1a64165be169cdf089206
+KeyboardShortcuts version: 2.4.0
+revision: 1aef85578fdd4f9eaeeb8d53b7b4fc31bf08fe27
 target boundary: ImagePet GUI target only; ImagePetCore remains dependency-free
 global shortcut defaults: unset
 settings UI: KeyboardShortcuts.Recorder renders for Show Main Window, Show / Hide Desktop Pet, Toggle Pet Mini / Full
+settings section shortcuts: Command-1 through Command-6
 handler smoke: UI-test registration disabled through IS_UI_TESTING to avoid global hotkey side effects
 manual trigger smoke: pending before release candidate
 license: MIT, archived in docs/THIRD_PARTY_NOTICES.md
@@ -154,16 +160,18 @@ Swift-WebP dependency spike：
 macOS version: 26.5.1 (25F80)
 hardware / runner: local arm64 Mac
 Swift / Xcode version: Swift 6.3.2 / Xcode 26.5 (17F42)
-Swift-WebP version: 0.6.1
-libwebp-Xcode version: 1.5.0
+SwiftWebP version: 0.7.0
+SwiftWebP revision: a85311f3d768a0ecbf4390d27d35071c840f6d77
+webp-spm version: 1.6.0
+webp-spm revision: c5d21d16f5d7cca8fd635869410644be9dd96522
 SPM resolve: pass
 swift test: pass
 xcodebuild test: pass
 app sandbox smoke: pass, sandbox entitlement present in Debug build
 codesign smoke: pass, adhoc Debug signature
 notarization smoke: not verified
-Swift-WebP encode: yes
-Swift-WebP decode: yes
+SwiftWebP encode: yes
+SwiftWebP decode: yes
 bitstream inspection: yes
 alpha: pass, 100% transparent and 50% alpha fixtures covered
 animated/multi-frame rejection: not verified with real animated fixture
@@ -187,7 +195,7 @@ macOS artifact architecture: arm64 + x86_64
 reported header version: LIBJPEG_TURBO_VERSION 4.1.0
 SPM resolve: pass
 standalone mozjpeg.swift swift test: pass, 1 placeholder test
-ImagePet swift test: pass, 38 tests
+ImagePet swift test: pass, 39 tests
 Advanced JPEG smoke encode: pass
 ImageIO decode of Advanced JPEG output: pass in unit test
 xcodebuild targeted Desktop Pet overwrite UI regression: pass

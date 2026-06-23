@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-06-18",
+  "updatedAt": "2026-06-24",
   "product": {
     "id": "imagepet",
     "name": "ImagePet",
     "bundleIdentifier": "org.gewill.ImagePet",
     "platform": "macOS",
     "minimumOS": "macOS 13",
-    "marketingVersion": "1.0",
-    "appStoreVersion": "1.0",
-    "buildNumber": "1",
+    "marketingVersion": "1.1",
+    "appStoreVersion": "1.1",
+    "buildNumber": "2",
     "primaryLocale": "en-US",
     "supportedLocales": [
       "en-US"
