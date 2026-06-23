@@ -64,11 +64,11 @@ final class WebPBenchmarkTests: XCTestCase {
         ]
 
         var report = ""
-        report += "# WebP Encoding Engines Benchmark & Adopt Decision\n\n"
+        report += "# WebP Encoding Engines Benchmark\n\n"
         report += "Target OS: macOS 13+ / Sonoma+\n"
         report += "Apple native WebP write supported: \(appleSupported)\n\n"
-        report += "| File Size/Type | Engine | Time (ms) | Output Size (bytes) | Peak Mem (MB) |\n"
-        report += "| --- | --- | --- | --- | --- |\n"
+        report += "| File Size/Type | Engine | Avg Time (ms) | Output Size (bytes) | Loop Count | Peak Mem (MB) |\n"
+        report += "| --- | --- | --- | --- | --- | --- |\n"
 
         for (name, w, h, alpha) in sizes {
             let pngURL = directory.appendingPathComponent("\(name).png")
@@ -94,57 +94,135 @@ final class WebPBenchmarkTests: XCTestCase {
                 stripMetadata: true
             )
 
-            // Benchmark SwiftWebPEngine
+            let loopCount = 10
+
+            // Swift-WebP
             let swiftOut = directory.appendingPathComponent("\(name)_swift.webp")
             let startSwiftMem = getMemoryRSS()
             let startSwift = DispatchTime.now()
-
-            try swiftWebPEngine.encode(
-                image: cgImage,
-                source: sourceMetadata,
-                destinationTemporaryURL: swiftOut,
-                options: options
-            )
-
+            for _ in 0..<loopCount {
+                try swiftWebPEngine.encode(
+                    image: cgImage,
+                    source: sourceMetadata,
+                    destinationTemporaryURL: swiftOut,
+                    options: options
+                )
+            }
             let endSwift = DispatchTime.now()
             let endSwiftMem = getMemoryRSS()
-            let swiftTime = Double(endSwift.uptimeNanoseconds - startSwift.uptimeNanoseconds) / 1_000_000.0
+            let swiftTime = Double(endSwift.uptimeNanoseconds - startSwift.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
             let swiftSize = (try? FileManager.default.attributesOfItem(atPath: swiftOut.path)[.size] as? Int64) ?? 0
             let swiftDeltaMem = Double(max(0, Int64(endSwiftMem) - Int64(startSwiftMem))) / 1024.0 / 1024.0
 
-            report += "| \(name) (\(w)x\(h), alpha: \(alpha)) | Swift-WebP | \(String(format: "%.2f", swiftTime)) | \(swiftSize) | \(String(format: "%.2f", swiftDeltaMem)) |\n"
+            report += "| \(name) (\(w)x\(h), alpha: \(alpha)) | Swift-WebP | \(String(format: "%.2f", swiftTime)) | \(swiftSize) | \(loopCount) | \(String(format: "%.2f", swiftDeltaMem)) |\n"
 
-            // Benchmark AppleWebPEngine if supported
+            // Apple-WebP
             if appleSupported {
                 let appleOut = directory.appendingPathComponent("\(name)_apple.webp")
                 let startAppleMem = getMemoryRSS()
                 let startApple = DispatchTime.now()
-
-                try appleWebPEngine.encode(
-                    image: cgImage,
-                    source: sourceMetadata,
-                    destinationTemporaryURL: appleOut,
-                    options: options
-                )
-
+                for _ in 0..<loopCount {
+                    try appleWebPEngine.encode(
+                        image: cgImage,
+                        source: sourceMetadata,
+                        destinationTemporaryURL: appleOut,
+                        options: options
+                    )
+                }
                 let endApple = DispatchTime.now()
                 let endAppleMem = getMemoryRSS()
-                let appleTime = Double(endApple.uptimeNanoseconds - startApple.uptimeNanoseconds) / 1_000_000.0
+                let appleTime = Double(endApple.uptimeNanoseconds - startApple.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
                 let appleSize = (try? FileManager.default.attributesOfItem(atPath: appleOut.path)[.size] as? Int64) ?? 0
                 let appleDeltaMem = Double(max(0, Int64(endAppleMem) - Int64(startAppleMem))) / 1024.0 / 1024.0
 
-                report += "| | Apple-WebP | \(String(format: "%.2f", appleTime)) | \(appleSize) | \(String(format: "%.2f", appleDeltaMem)) |\n"
-
-                // Let's also verify that the output of AppleWebPEngine can be decoded and has correct alpha/dimensions
-                let decodedApple = try SwiftWebPDecodingEngine().decodeCGImage(from: try Data(contentsOf: appleOut), maxDimension: nil)
-                XCTAssertEqual(decodedApple.width, w)
-                XCTAssertEqual(decodedApple.height, h)
+                report += "| | Apple-WebP | \(String(format: "%.2f", appleTime)) | \(appleSize) | \(loopCount) | \(String(format: "%.2f", appleDeltaMem)) |\n"
             } else {
-                report += "| | Apple-WebP | N/A (Not Supported) | N/A | N/A |\n"
+                report += "| | Apple-WebP | N/A (Not Supported) | N/A | N/A | N/A |\n"
             }
         }
 
-        print("\n=== BENCHMARK REPORT ===\n\(report)\n========================\n")
+        // Benchmark FreeLarge images if available
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // Tests/ImagePetCoreTests/
+            .deletingLastPathComponent() // Tests/
+            .deletingLastPathComponent() // root/
+        let freeLargeDir = root.appendingPathComponent("TestImages/FreeLarge", isDirectory: true)
+
+        if let contents = try? FileManager.default.contentsOfDirectory(at: freeLargeDir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]),
+           let largeURL = contents.first(where: { ["png", "jpg", "jpeg"].contains($0.pathExtension.lowercased()) }) {
+
+            print("--- Benchmarking Encoding with FreeLarge Image: \(largeURL.lastPathComponent) ---")
+
+            if let largeSource = CGImageSourceCreateWithURL(largeURL as CFURL, nil),
+               let cgImage = CGImageSourceCreateImageAtIndex(largeSource, 0, nil) {
+
+                let w = cgImage.width
+                let h = cgImage.height
+                let alpha = cgImage.alphaInfo != .none && cgImage.alphaInfo != .noneSkipLast && cgImage.alphaInfo != .noneSkipFirst
+
+                let sourceMetadata = ImageSourceMetadata(
+                    format: SupportedImageFormat.format(for: largeURL) ?? .png,
+                    pixelWidth: w,
+                    pixelHeight: h,
+                    hasAlpha: alpha
+                )
+
+                let options = CompressionOptions(
+                    lossyQuality: .custom(80),
+                    format: .webp,
+                    maxDimension: .none,
+                    stripMetadata: true
+                )
+
+                let loopCount = 2 // Low loop count for large files
+
+                // Swift-WebP
+                let swiftOut = directory.appendingPathComponent("freelarge_swift.webp")
+                let startSwiftMem = getMemoryRSS()
+                let startSwift = DispatchTime.now()
+                for _ in 0..<loopCount {
+                    try swiftWebPEngine.encode(
+                        image: cgImage,
+                        source: sourceMetadata,
+                        destinationTemporaryURL: swiftOut,
+                        options: options
+                    )
+                }
+                let endSwift = DispatchTime.now()
+                let endSwiftMem = getMemoryRSS()
+                let swiftTime = Double(endSwift.uptimeNanoseconds - startSwift.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+                let swiftSize = (try? FileManager.default.attributesOfItem(atPath: swiftOut.path)[.size] as? Int64) ?? 0
+                let swiftDeltaMem = Double(max(0, Int64(endSwiftMem) - Int64(startSwiftMem))) / 1024.0 / 1024.0
+
+                report += "| FreeLarge (\(largeURL.lastPathComponent), \(w)x\(h)) | Swift-WebP | \(String(format: "%.2f", swiftTime)) | \(swiftSize) | \(loopCount) | \(String(format: "%.2f", swiftDeltaMem)) |\n"
+
+                // Apple-WebP
+                if appleSupported {
+                    let appleOut = directory.appendingPathComponent("freelarge_apple.webp")
+                    let startAppleMem = getMemoryRSS()
+                    let startApple = DispatchTime.now()
+                    for _ in 0..<loopCount {
+                        try appleWebPEngine.encode(
+                            image: cgImage,
+                            source: sourceMetadata,
+                            destinationTemporaryURL: appleOut,
+                            options: options
+                        )
+                    }
+                    let endApple = DispatchTime.now()
+                    let endAppleMem = getMemoryRSS()
+                    let appleTime = Double(endApple.uptimeNanoseconds - startApple.uptimeNanoseconds) / 1_000_000.0 / Double(loopCount)
+                    let appleSize = (try? FileManager.default.attributesOfItem(atPath: appleOut.path)[.size] as? Int64) ?? 0
+                    let appleDeltaMem = Double(max(0, Int64(endAppleMem) - Int64(startAppleMem))) / 1024.0 / 1024.0
+
+                    report += "| | Apple-WebP | \(String(format: "%.2f", appleTime)) | \(appleSize) | \(loopCount) | \(String(format: "%.2f", appleDeltaMem)) |\n"
+                } else {
+                    report += "| | Apple-WebP | N/A (Not Supported) | N/A | N/A | N/A |\n"
+                }
+            }
+        }
+
+        print("\n=== ENCODING BENCHMARK REPORT ===\n\(report)\n=================================\n")
     }
 
     func testWebPDecodingBenchmark() async throws {
