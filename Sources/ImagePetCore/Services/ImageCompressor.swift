@@ -336,12 +336,21 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         capabilities: EncoderCapabilities
     ) throws {
         if targetOutputFormat == .webp {
-            try webPEncodingEngine.encode(
-                image: preparedImage.image,
-                source: preparedImage.sourceMetadata,
-                destinationTemporaryURL: destinationTemporaryURL,
-                options: options
-            )
+            if AppleWebPCapabilityProbe.canWriteWebP() {
+                try AppleWebPEncodingEngine().encode(
+                    image: preparedImage.image,
+                    source: preparedImage.sourceMetadata,
+                    destinationTemporaryURL: destinationTemporaryURL,
+                    options: options
+                )
+            } else {
+                try webPEncodingEngine.encode(
+                    image: preparedImage.image,
+                    source: preparedImage.sourceMetadata,
+                    destinationTemporaryURL: destinationTemporaryURL,
+                    options: options
+                )
+            }
             return
         }
 

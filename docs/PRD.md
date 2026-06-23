@@ -40,6 +40,10 @@ ImagePet 是一个 macOS 本地图片压缩小工具。
 
 WebP 支持静态图片输入/输出；动画 WebP、WebP Lossless、AVIF 仍不在当前范围内。
 
+## 版本规划入口
+
+- v1.1 小修小补与性能优化：[PRD_v1.1_task_control_thumbnails_webp_performance.md](PRD_v1.1_task_control_thumbnails_webp_performance.md)
+
 ## 核心功能
 
 - 拖拽图片到窗口

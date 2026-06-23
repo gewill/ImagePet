@@ -17,7 +17,7 @@ struct ContentView: View {
                         VStack(spacing: 14) {
                             ControlsView(store: store)
                             DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
-                            JobListView(jobs: store.jobs)
+                            JobListView(store: store)
                             SummaryView(store: store)
                         }
                     }
@@ -659,7 +659,7 @@ private struct DropZoneView: View {
 }
 
 private struct JobListView: View {
-    let jobs: [ImageJob]
+    @ObservedObject var store: ImagePetStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -677,11 +677,11 @@ private struct JobListView: View {
 
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    if jobs.isEmpty {
+                    if store.jobs.isEmpty {
                         EmptyJobListView()
                     } else {
-                        ForEach(jobs) { job in
-                            JobRowView(job: job)
+                        ForEach(store.jobs) { job in
+                            JobRowView(store: store, job: job)
                         }
                     }
                 }
@@ -692,7 +692,7 @@ private struct JobListView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(SoftNativeStyle.border)
         )
-        .frame(height: jobs.isEmpty ? 150 : 260)
+        .frame(height: store.jobs.isEmpty ? 150 : 260)
         .softNativeCard(radius: 10)
     }
 
@@ -700,6 +700,8 @@ private struct JobListView: View {
         HStack(spacing: 12) {
             Spacer()
                 .frame(width: 18)
+            Spacer()
+                .frame(width: 28)
             Text("File")
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text("Status")
@@ -713,7 +715,7 @@ private struct JobListView: View {
         HStack {
             Text("Queue")
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text("\(jobs.count) \(jobs.count == 1 ? "image" : "images")")
+            Text("\(store.jobs.count) \(store.jobs.count == 1 ? "image" : "images")")
         }
     }
 }
@@ -747,6 +749,7 @@ private struct EmptyJobListView: View {
 }
 
 private struct JobRowView: View {
+    @ObservedObject var store: ImagePetStore
     let job: ImageJob
 
     var body: some View {
@@ -770,6 +773,14 @@ private struct JobRowView: View {
                 .foregroundStyle(iconColor)
                 .frame(width: 18)
                 .accessibilityIdentifier("jobIcon_\(job.fileName)")
+
+            thumbnailView
+                .frame(width: 28, height: 28)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+                )
 
             Text(job.fileName)
                 .lineLimit(1)
@@ -799,42 +810,66 @@ private struct JobRowView: View {
     }
 
     private var compactRow: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Image(systemName: iconName)
-                    .foregroundStyle(iconColor)
-                    .frame(width: 18)
-                    .accessibilityIdentifier("jobIcon_\(job.fileName)")
+        HStack(spacing: 12) {
+            Image(systemName: iconName)
+                .foregroundStyle(iconColor)
+                .frame(width: 18)
+                .accessibilityIdentifier("jobIcon_\(job.fileName)")
 
+            thumbnailView
+                .frame(width: 28, height: 28)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+                )
+
+            VStack(alignment: .leading, spacing: 6) {
                 Text(job.fileName)
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier("jobFileName_\(job.fileName)")
                     .accessibilityLabel(job.fileName)
-            }
 
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(statusText)
-                    .foregroundStyle(statusColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                    .help(statusText)
-                    .accessibilityIdentifier("jobStatusText_\(job.fileName)")
-                    .accessibilityLabel(statusText)
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(statusText)
+                        .foregroundStyle(statusColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .help(statusText)
+                        .accessibilityIdentifier("jobStatusText_\(job.fileName)")
+                        .accessibilityLabel(statusText)
 
-                Spacer(minLength: 8)
+                    Spacer(minLength: 8)
 
-                Text(sizeText)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                    .accessibilityIdentifier("jobSizeText_\(job.fileName)")
-                    .accessibilityLabel(sizeText)
+                    Text(sizeText)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+                        .accessibilityIdentifier("jobSizeText_\(job.fileName)")
+                        .accessibilityLabel(sizeText)
+                }
             }
         }
         .padding(.vertical, 8)
+    }
+
+    @ViewBuilder
+    private var thumbnailView: some View {
+        if let cgImage = store.thumbnails[job.id] {
+            Image(cgImage, scale: 1.0, label: Text("Thumbnail"))
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } else {
+            Image(systemName: "photo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .padding(4)
+                .foregroundStyle(.tertiary)
+                .background(SoftNativeStyle.elevated)
+        }
     }
 
     private var iconName: String {
@@ -849,6 +884,8 @@ private struct JobRowView: View {
             return "xmark.octagon.fill"
         case .skipped:
             return "arrow.right.circle"
+        case .canceled:
+            return "slash.circle"
         }
     }
 
@@ -864,6 +901,8 @@ private struct JobRowView: View {
             return .red
         case .skipped:
             return SoftNativeStyle.secondary
+        case .canceled:
+            return .orange
         }
     }
 
@@ -879,6 +918,8 @@ private struct JobRowView: View {
             return "Failed: \(job.errorMessage ?? "Unknown error")"
         case .skipped:
             return job.errorMessage ?? "Skipped"
+        case .canceled:
+            return "Canceled"
         }
     }
 
@@ -888,6 +929,8 @@ private struct JobRowView: View {
             return .red
         case .skipped:
             return SoftNativeStyle.secondary
+        case .canceled:
+            return .orange
         default:
             return .secondary
         }
@@ -905,7 +948,7 @@ private struct JobRowView: View {
             return "\(FileSizeFormatting.string(from: job.originalSize)) -> Skipped"
         case .failed:
             return FileSizeFormatting.string(from: job.originalSize)
-        default:
+        case .pending, .processing, .canceled:
             return FileSizeFormatting.string(from: job.originalSize)
         }
     }
@@ -934,6 +977,7 @@ private struct SummaryView: View {
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
                 Spacer()
+                processingActions
             } else {
                 SummaryMetric(title: "Quality", value: store.qualitySummary)
                 SummaryMetric(title: "Output", value: store.outputFormat.displayName)
@@ -960,6 +1004,7 @@ private struct SummaryView: View {
                 completedActions
             } else if store.isProcessing {
                 SummaryMetric(title: "Processing", value: "\(store.completedCount) / \(store.jobs.count)")
+                processingActions
             } else {
                 HStack(spacing: 10) {
                     SummaryMetric(title: "Quality", value: store.qualitySummary)
@@ -977,6 +1022,25 @@ private struct SummaryView: View {
                 title: "Saved",
                 value: "\(FileSizeFormatting.string(from: store.savedTotal)) / \(FileSizeFormatting.percent(store.savedRatio))"
             )
+        }
+    }
+
+    private var processingActions: some View {
+        HStack(spacing: 8) {
+            Button(role: .cancel) {
+                store.cancelProcessing()
+            } label: {
+                if store.isCanceling {
+                    Label("Canceling...", systemImage: "stop.circle")
+                } else {
+                    Label("Cancel", systemImage: "stop.circle")
+                }
+            }
+            .buttonStyle(.bordered)
+            .disabled(store.isCanceling)
+            .keyboardShortcut(".", modifiers: [.command])
+            .help("Cancel processing (⌘.)")
+            .accessibilityIdentifier("cancelButton")
         }
     }
 

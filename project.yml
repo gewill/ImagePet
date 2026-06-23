@@ -91,9 +91,12 @@ targets:
       - path: Tests/ImagePetTests
     dependencies:
       - target: ImagePetCore
+      - target: ImagePet
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetTests
+        DEVELOPMENT_TEAM: RLK76T8Y89
+        CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
   ImagePetUITests:
     type: bundle.ui-testing
@@ -105,6 +108,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.gewill.ImagePetUITests
+        DEVELOPMENT_TEAM: RLK76T8Y89
+        CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: ImagePet
   ImagePetCLI:

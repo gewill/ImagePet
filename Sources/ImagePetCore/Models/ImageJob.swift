@@ -51,6 +51,7 @@ public enum JobStatus: Equatable, Sendable {
     case done
     case failed
     case skipped
+    case canceled
 }
 
 public enum PetState: Equatable, Sendable {

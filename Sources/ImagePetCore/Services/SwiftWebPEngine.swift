@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import ImageIO
 import WebP
 
 public struct ImageSourceMetadata: Sendable, Equatable {
@@ -128,7 +129,40 @@ public struct SwiftWebPDecodingEngine: Sendable {
         self.capabilities = capabilities
     }
 
+    private static func isWebPData(_ data: Data) -> Bool {
+        guard data.count >= 12 else { return false }
+        let riff = data.prefix(4)
+        let webp = data.subdata(in: 8..<12)
+        return riff == Data([0x52, 0x49, 0x46, 0x46]) && webp == Data([0x57, 0x45, 0x42, 0x50])
+    }
+
     public func inspect(_ data: Data) throws -> WebPBitstreamMetadata {
+        guard capabilities.readableFormats.contains(.webp) else {
+            throw CompressionError.unsupportedImageFormat
+        }
+        guard Self.isWebPData(data) else {
+            throw CompressionError.unsupportedImageFormat
+        }
+
+        // Try ImageIO first
+        if let source = CGImageSourceCreateWithData(data as CFData, nil) {
+            let count = CGImageSourceGetCount(source)
+            if count > 0,
+               let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] {
+                let width = (properties[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue ?? 0
+                let height = (properties[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue ?? 0
+                let hasAlpha = (properties[kCGImagePropertyHasAlpha] as? NSNumber)?.boolValue ?? true
+                if width > 0 && height > 0 {
+                    return WebPBitstreamMetadata(
+                        width: width,
+                        height: height,
+                        hasAlpha: hasAlpha,
+                        hasAnimation: count > 1
+                    )
+                }
+            }
+        }
+
         guard capabilities.supportsBitstreamInspection else {
             throw CompressionError.unsupportedImageFormat
         }
@@ -156,6 +190,31 @@ public struct SwiftWebPDecodingEngine: Sendable {
             throw CompressionError.unsupportedImageFormat
         }
 
+        // Try ImageIO first
+        if let source = CGImageSourceCreateWithData(data as CFData, nil) {
+            var options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false
+            ]
+            let needsThumbnail = maxDimension != nil && max(metadata.width, metadata.height) > (maxDimension ?? 0)
+            if let maxDimension, needsThumbnail {
+                options[kCGImageSourceCreateThumbnailFromImageAlways] = true
+                options[kCGImageSourceThumbnailMaxPixelSize] = maxDimension
+                options[kCGImageSourceCreateThumbnailWithTransform] = true
+            }
+
+            if needsThumbnail {
+                if let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) {
+                    return cgImage
+                }
+                // If thumbnail generation failed, fall through to libwebp decoder so it can handle scaling.
+            } else {
+                if let cgImage = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) {
+                    return cgImage
+                }
+            }
+        }
+
+        // Fallback to WebPDecoder
         var options = WebPDecoderOptions()
         if let maxDimension, max(metadata.width, metadata.height) > maxDimension {
             let scale = Double(maxDimension) / Double(max(metadata.width, metadata.height))
@@ -194,6 +253,12 @@ enum SwiftWebPCapabilityProbe {
                 readableFormats.insert(.webp)
                 alphaCapableFormats.insert(.webp)
             }
+        }
+
+        if AppleWebPCapabilityProbe.canWriteWebP() {
+            writableFormats.insert(.webp)
+            readableFormats.insert(.webp)
+            alphaCapableFormats.insert(.webp)
         }
 
         if MozJPEGCapabilityProbe.canEncode() {

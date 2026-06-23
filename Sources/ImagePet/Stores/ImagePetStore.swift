@@ -227,6 +227,11 @@ final class ImagePetStore: ObservableObject {
     private var didPromptForInitialFolder = false
     private var jobSources: [ImageJob.ID: CompressionSource] = [:]
 
+    @Published var thumbnails: [UUID: CGImage] = [:]
+    @Published var isCanceling = false
+    private let thumbnailGenerator = ThumbnailGenerator(maxConcurrent: 3)
+    private var thumbnailTasks: [UUID: Task<Void, Never>] = [:]
+
     @Published public var folderWatchManager: FolderWatchManager!
     @Published var notificationManager: LocalNotificationManager
 
@@ -433,7 +438,7 @@ final class ImagePetStore: ObservableObject {
     }
 
     var completedCount: Int {
-        jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped }.count
+        jobs.filter { $0.status == .done || $0.status == .failed || $0.status == .skipped || $0.status == .canceled }.count
     }
 
     var builtInThemes: [BuiltInPetTheme] {
@@ -614,8 +619,12 @@ final class ImagePetStore: ObservableObject {
         failedCount > 0
     }
 
+    var canceledCount: Int {
+        jobs.filter { $0.status == .canceled }.count
+    }
+
     var isCompleted: Bool {
-        !jobs.isEmpty && jobs.allSatisfy { $0.status == .done || $0.status == .failed || $0.status == .skipped }
+        !jobs.isEmpty && jobs.allSatisfy { $0.status == .done || $0.status == .failed || $0.status == .skipped || $0.status == .canceled }
     }
 
     var successfulOriginalTotal: Int64 {
@@ -700,6 +709,9 @@ final class ImagePetStore: ObservableObject {
         jobs.append(contentsOf: newJobs)
         for job in newJobs {
             jobSources[job.id] = source
+            if job.status == .pending {
+                generateThumbnail(for: job)
+            }
         }
 
         if jobs.contains(where: { $0.status == .pending }) {
@@ -707,6 +719,28 @@ final class ImagePetStore: ObservableObject {
         } else if hasFailedJobs {
             petState = .error
         }
+    }
+
+    private func generateThumbnail(for job: ImageJob) {
+        let jobID = job.id
+        let inputURL = job.inputURL
+
+        let task = Task { [weak self] in
+            guard let self else { return }
+            let thumbnail = await self.thumbnailGenerator.generate(for: inputURL)
+            guard !Task.isCancelled else { return }
+            await self.updateJobThumbnail(jobID, thumbnail: thumbnail)
+        }
+        thumbnailTasks[jobID] = task
+    }
+
+    @MainActor
+    private func updateJobThumbnail(_ id: UUID, thumbnail: CGImage?) {
+        defer {
+            self.thumbnailTasks.removeValue(forKey: id)
+        }
+        guard let thumbnail else { return }
+        self.thumbnails[id] = thumbnail
     }
 
     func processWatchedFiles(_ urls: [URL], outputDirectory: URL) {
@@ -735,6 +769,9 @@ final class ImagePetStore: ObservableObject {
         jobs.append(contentsOf: newJobs)
         for job in newJobs {
             jobSources[job.id] = .folderWatching
+            if job.status == .pending {
+                generateThumbnail(for: job)
+            }
         }
 
         if jobs.contains(where: { $0.status == .pending }) {
@@ -770,6 +807,12 @@ final class ImagePetStore: ObservableObject {
             await compressor.resetReservations()
         }
         jobSources.removeAll()
+
+        for task in thumbnailTasks.values {
+            task.cancel()
+        }
+        thumbnailTasks.removeAll()
+        thumbnails.removeAll()
 
         if outputDirectory == nil && saveLocationMode == .designated {
             chooseOutputDirectory()
@@ -842,7 +885,7 @@ final class ImagePetStore: ObservableObject {
         }
 
         if isCompleted {
-            if failedCount == 0 {
+            if failedCount == 0 && canceledCount == 0 {
                 let hasSuccess = jobs.contains { $0.status == .done }
                 let secondary: [DesktopPetAction]
                 if hasSuccess {
@@ -860,17 +903,20 @@ final class ImagePetStore: ObservableObject {
                 )
             } else {
                 let detailText: String
-                if skippedCount > 0 {
-                    detailText = "\(succeededCount) ok, \(skippedCount) skip, \(failedCount) fail"
-                } else {
-                    detailText = "\(succeededCount) ok, \(failedCount) fail"
-                }
+                var components: [String] = []
+                if succeededCount > 0 { components.append("\(succeededCount) ok") }
+                if skippedCount > 0 { components.append("\(skippedCount) skip") }
+                if failedCount > 0 { components.append("\(failedCount) fail") }
+                if canceledCount > 0 { components.append("\(canceledCount) cancel") }
+                detailText = components.joined(separator: ", ")
+
+                let titleText = failedCount > 0 ? "Issues" : "Stopped"
                 return DesktopPetSnapshot(
                     state: .issues,
-                    title: "Issues",
+                    title: titleText,
                     detail: detailText,
-                    primaryAction: .retryFailed,
-                    secondaryActions: [.addImages, .retryFailed, .clearList, .hidePet],
+                    primaryAction: failedCount > 0 ? .retryFailed : .addImages,
+                    secondaryActions: [.addImages, .clearList, .hidePet],
                     canAcceptDrop: true
                 )
             }
@@ -1123,12 +1169,12 @@ final class ImagePetStore: ObservableObject {
 
             for _ in 0..<workerCount {
                 group.addTask { [weak self] in
-                    while !Task.isCancelled {
-                        guard let job = await self?.claimNextPendingJob() else {
+                    while let self = self {
+                        guard let job = await self.claimNextPendingJob() else {
                             break
                         }
 
-                        await self?.process(job, outputDirectory: outputDirectory)
+                        await self.process(job, outputDirectory: outputDirectory)
                     }
                 }
             }
@@ -1142,7 +1188,8 @@ final class ImagePetStore: ObservableObject {
         }
 
         isProcessing = false
-        petState = hasFailedJobs ? .error : .happy
+        isCanceling = false
+        petState = (hasFailedJobs || canceledCount > 0) ? .error : .happy
         didConfirmOverwrite = false
 
         let processedJobs = jobs.filter { batchJobIDs.contains($0.id) }
@@ -1156,7 +1203,25 @@ final class ImagePetStore: ObservableObject {
         deliverNotificationSummary(for: processedJobs, batchJobIDs: batchJobIDs)
     }
 
+    func cancelProcessing() {
+        guard isProcessing, !isCanceling else { return }
+        isCanceling = true
+
+        // Mark pending as canceled
+        for index in jobs.indices where jobs[index].status == .pending {
+            jobs[index].status = .canceled
+            jobs[index].errorMessage = "Canceled"
+        }
+
+        // Cancel all pending thumbnail tasks
+        for task in thumbnailTasks.values {
+            task.cancel()
+        }
+        thumbnailTasks.removeAll()
+    }
+
     private func claimNextPendingJob() -> ImageJob? {
+        guard !isCanceling else { return nil }
         guard let index = jobs.firstIndex(where: { $0.status == .pending }) else {
             return nil
         }

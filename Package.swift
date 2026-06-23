@@ -33,9 +33,14 @@ let package = Package(
             path: "Sources/ImagePetCLI"
         ),
         .testTarget(
-            name: "ImagePetTests",
+            name: "ImagePetCoreTests",
             dependencies: ["ImagePetCore"],
-            path: "Tests/ImagePetTests"
+            path: "Tests/ImagePetCoreTests"
+        ),
+        .testTarget(
+            name: "ImagePetCLITests",
+            dependencies: ["ImagePetCLI"],
+            path: "Tests/ImagePetCLITests"
         )
     ]
 )

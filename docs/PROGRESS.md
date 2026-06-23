@@ -1,10 +1,10 @@
 # ImagePet MVP Progress
 
-更新日期：2026-06-19
+更新日期：2026-06-22
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已进入实现阶段，已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist，并继续评估后续是否加入自定义主题导入。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入 MAS build 验收和 ASC metadata 提交准备。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已进入实现阶段，已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。V1.1 任务控制、缩略图与 WebP 性能优化已完成 PRD 规划，重点是中止任务、队列缩略图，以及 Apple 官方 ImageIO / UTType WebP 路线 spike。下一步是补齐截图、隐私页面 URL、支持页面 URL、App Review notes 提交和 RC checklist，并继续评估后续是否加入自定义主题导入。当前自动化 Unit Tests 与 Xcode verify 构建已通过，可以进入 MAS build 验收和 ASC metadata 提交准备。
 
 已完成：
 
@@ -23,6 +23,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.13 本地通知与发布完整性闭环 (Batch Summary 模型、Folder Watching 2秒防抖合并、Shortcuts/Folder Watching 智能静默与防骚扰策略、20条通知历史持久化与 Debug UI、独立发布 Checklists)
 - V0.15 Release Candidate 与 Mac App Store 上线准备 PRD
 - V0.16 桌面 Pet 主题生产与验证管线基础能力
+- V1.1 任务控制、缩略图与 WebP 性能优化 PRD
 - App Store Connect / website 共享 metadata 源
 - Cloudflare Pages 友好的静态官网
 - App Sandbox entitlements
@@ -56,6 +57,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - V0.14 Soft Native 主窗口重设计方案：[PRD_v0.14_soft_native_main_window_redesign.md](PRD_v0.14_soft_native_main_window_redesign.md)
 - V0.15 Release Candidate 与上线准备：[PRD_v0.15_release_candidate_and_distribution.md](PRD_v0.15_release_candidate_and_distribution.md)
 - V0.16 桌面 Pet 主题生产与验证管线：[PRD_v0.16_desktop_pet_theme_authoring_pipeline.md](PRD_v0.16_desktop_pet_theme_authoring_pipeline.md)
+- V1.1 任务控制、缩略图与 WebP 性能优化：[PRD_v1.1_task_control_thumbnails_webp_performance.md](PRD_v1.1_task_control_thumbnails_webp_performance.md)
 - Metadata 数据源：[../metadata/README.md](../metadata/README.md)
 - 静态官网：[../website/README.md](../website/README.md)
 - App Store Connect Metadata 索引：[APP_STORE_METADATA.md](APP_STORE_METADATA.md)
@@ -69,6 +71,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | JPG / JPEG / PNG / HEIC 输入 | 已实现 | `SupportedImageFormat` + ImageIO 解码；fixture 覆盖 JPG/PNG/HEIC | 用真实 iPhone HEIC 做手工验收 |
 | Original / JPEG / PNG / HEIC 输出 | 已实现 | `OutputFormat` + ImageIO 写出；覆盖模式强制保持原格式 | 检查输出色彩和方向样本 |
 | WebP | 已实现，本机验证通过 | Swift-WebP `0.6.1` + libwebp-Xcode `1.5.0`；`EncoderCapabilities` 分离 read/write；WebP encode/decode/bitstream inspection/alpha round-trip 单测覆盖；`Package.resolved` 与 `docs/THIRD_PARTY_NOTICES.md` 已归档 | 手工验证 Preview/Safari/Chrome 打开输出 WebP；补齐旧 macOS/CI/虚拟机验证；MAS review build smoke |
+| WebP 性能优化 / Apple 官方路线 | 已评估 (不采用) | WebPBenchmarkTests.swift 证实 macOS 13/14 下 CGImageDestination 不支持 WebP write (canWriteWebP = false)。保留 Swift-WebP 路线作为 write 主路径，ImageIO 作为 decode/inspect 快路径。已添加 AppleWebPEncodingEngine 作未来备用 | 无 |
 | Advanced JPEG / mozjpeg | 已实现，本机验证通过 | `awxkee/mozjpeg.swift` `1.1.3` 已接入；`EncoderCapabilities.jpegEncodingModes` 分离 standard/advanced；Advanced JPEG 只影响 JPEG 输出并由 smoke encode gate 控制；Third Party Notices 已扩展 | 补 benchmark fixture、Preview/Safari/Chrome 打开验证、MAS review build smoke |
 | App 完整性 / 帮助中心 / 可自定义快捷键 | 已实现，本机验证通过 | `KeyboardShortcuts` `3.0.0` 只接入 GUI target；`HelpView` 离线帮助窗口、`AppSettingsView` 设置分区、`GlobalShortcutCoordinator` 默认 unset 全局快捷键、菜单分组与 Help window 已实现；XCUITest 覆盖 Help 与 Keyboard Shortcuts 设置入口 | 发布前手工录制并触发 Show Main Window / Show / Hide Desktop Pet global shortcuts |
 | AVIF 不做 | 已锁定 | V0.9 仍明确排除 AVIF，避免格式范围失控 | 保持范围，不引入 AVIF |
@@ -82,6 +85,8 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | maxConcurrentJobs = 2 | 已实现 | `ImagePetStore` 队列 worker 限制 | 性能测试时观察吞吐和内存 |
 | autoreleasepool | 已实现 | `ImageCompressor` decode/encode/write 包裹 | 压测确认峰值内存 |
 | 每张图即时更新 UI | 已实现 | 每个 job 完成后更新状态、size 和 saved ratio | GUI 手工检查状态变化 |
+| 中止任务 | 已实现 | 支持 pending/processing cancel，在 `ImagePetStore` 提供 cancel 逻辑，单图失败/取消不破坏批次，UI 对应 Canceled 态 | 保持验证 |
+| 队列缩略图 | 已实现 | 支持异步生成与限制 3 并发不阻塞 UI 线程。UI 支持 28x28 圆角缩略图与 VoiceOver 兼容 | 保持验证 |
 | 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏、返回主窗口并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |

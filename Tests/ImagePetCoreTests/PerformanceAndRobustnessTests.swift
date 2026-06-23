@@ -18,7 +18,7 @@ final class PerformanceAndRobustnessTests: XCTestCase {
             throw XCTSkip("Local Apple fixtures are not present.")
         }
 
-        let outputDirectory = fixtureRoot.appendingPathComponent("output-performance-test", isDirectory: true)
+        let outputDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("output-performance-test-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.removeItem(at: outputDirectory)
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
         defer {

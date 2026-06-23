@@ -14,7 +14,7 @@ final class AppleFixtureCompressionTests: XCTestCase {
             throw XCTSkip("Local Apple fixtures are not present.")
         }
 
-        let outputDirectory = fixtureRoot.appendingPathComponent("output-balanced", isDirectory: true)
+        let outputDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("output-balanced-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.removeItem(at: outputDirectory)
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
 
