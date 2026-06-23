@@ -17,14 +17,15 @@ This document contains the manual acceptance criteria for validating a Release C
 
 - **Test Case 1.2: Notification Authorization Request**
   1. Open Settings -> **Notifications**.
-  2. Under System Permission, click **Enable Notifications**.
+  2. Under System Permission, click **Allow Notifications...**.
   3. Verify the system prompt appears. Choose **Allow**.
-  4. Verify the permission status in settings updates to **Enabled**.
+  4. Verify the permission status in settings updates to **Allowed**.
+  5. Verify **ImagePet Notifications** remains **ON**.
 
 - **Test Case 1.3: Revoking Permission Recovery**
   1. Go to System Settings -> Notifications -> ImagePet. Turn off notifications.
   2. Bring ImagePet to the foreground and open Settings -> Notifications.
-  3. Verify the System Permission status updates to **Denied**.
+  3. Verify the System Permission status updates to **Blocked in System Settings**.
   4. Verify that the **Open System Settings** button is displayed. Click it and verify it opens macOS System Settings to the Notifications section.
 
 ---

@@ -58,11 +58,11 @@ enum LocalNotificationAuthorizationState: String {
     var displayName: String {
         switch self {
         case .notDetermined:
-            return "Not Enabled"
+            return "Not Requested"
         case .denied:
-            return "Denied"
+            return "Blocked in System Settings"
         case .authorized:
-            return "Enabled"
+            return "Allowed"
         case .provisional:
             return "Provisional"
         case .ephemeral:
@@ -86,6 +86,9 @@ enum LocalNotificationAction: String {
 
 final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sendable {
     @Published private(set) var authorizationState: LocalNotificationAuthorizationState = .unknown
+    @Published var notificationsEnabled: Bool {
+        didSet { defaults.set(notificationsEnabled, forKey: notificationsEnabledKey) }
+    }
     @Published var notifyBackgroundCompletion: Bool {
         didSet { defaults.set(notifyBackgroundCompletion, forKey: notifyBackgroundCompletionKey) }
     }
@@ -106,6 +109,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
 
     private let center: NotificationCenterProtocol
     private let defaults: UserDefaults
+    private let notificationsEnabledKey = "ImagePet.notifications.enabled"
     private let notifyBackgroundCompletionKey = "ImagePet.notifications.backgroundCompletion"
     private let notifyAttentionNeededKey = "ImagePet.notifications.attentionNeeded"
     private let notifyForegroundCompletionKey = "ImagePet.notifications.foregroundCompletion"
@@ -122,6 +126,7 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
     init(center: NotificationCenterProtocol = UNUserNotificationCenter.current(), defaults: UserDefaults = .standard) {
         self.center = center
         self.defaults = defaults
+        self.notificationsEnabled = defaults.object(forKey: notificationsEnabledKey) as? Bool ?? true
         self.notifyBackgroundCompletion = defaults.object(forKey: notifyBackgroundCompletionKey) as? Bool ?? true
         self.notifyAttentionNeeded = defaults.object(forKey: notifyAttentionNeededKey) as? Bool ?? true
         self.notifyForegroundCompletion = defaults.object(forKey: notifyForegroundCompletionKey) as? Bool ?? false
@@ -220,6 +225,11 @@ final class LocalNotificationManager: NSObject, ObservableObject, @unchecked Sen
 
     @MainActor
     func deliverSummaryImmediately(_ summary: CompressionBatchSummary, appIsActive: Bool) {
+        guard notificationsEnabled else {
+            lastDeliveryStatus = "Not delivered: notifications off"
+            return
+        }
+
         guard shouldDeliver(summary, appIsActive: appIsActive) else {
             lastDeliveryStatus = "Not delivered: visible in ImagePet"
             return

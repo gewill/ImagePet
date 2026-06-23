@@ -346,7 +346,7 @@ private struct NotificationsSection: View {
                         Button {
                             manager.requestAuthorization()
                         } label: {
-                            Label("Enable Notifications", systemImage: "bell")
+                            Label("Allow Notifications...", systemImage: "bell.badge")
                         }
                         .accessibilityIdentifier("enableNotificationsButton")
                     }
@@ -363,6 +363,27 @@ private struct NotificationsSection: View {
 
                 Divider()
 
+                Toggle(isOn: $manager.notificationsEnabled) {
+                    SettingToggleLabel(
+                        title: "ImagePet Notifications",
+                        detail: "Allow ImagePet to send local alerts when macOS permission is granted."
+                    )
+                }
+                .accessibilityIdentifier("notificationsEnabledToggle")
+
+                if !manager.authorizationState.canDeliverNotifications {
+                    Text("Notifications will not be delivered until macOS permission is allowed.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("notificationPermissionDeliveryWarning")
+                }
+
+                Divider()
+
+                Text("Notification Types")
+                    .font(.headline)
+
                 Toggle(isOn: $manager.notifyBackgroundCompletion) {
                     SettingToggleLabel(
                         title: "Background Completion",
@@ -370,6 +391,7 @@ private struct NotificationsSection: View {
                     )
                 }
                 .accessibilityIdentifier("notifyBackgroundCompletionToggle")
+                .disabled(!manager.notificationsEnabled)
 
                 Toggle(isOn: $manager.notifyAttentionNeeded) {
                     SettingToggleLabel(
@@ -378,6 +400,7 @@ private struct NotificationsSection: View {
                     )
                 }
                 .accessibilityIdentifier("notifyAttentionNeededToggle")
+                .disabled(!manager.notificationsEnabled)
 
                 Toggle(isOn: $manager.notifyForegroundCompletion) {
                     SettingToggleLabel(
@@ -386,6 +409,7 @@ private struct NotificationsSection: View {
                     )
                 }
                 .accessibilityIdentifier("notifyForegroundCompletionToggle")
+                .disabled(!manager.notificationsEnabled)
 
                 Toggle(isOn: $manager.notifyFolderWatchingCompletion) {
                     SettingToggleLabel(
@@ -394,6 +418,7 @@ private struct NotificationsSection: View {
                     )
                 }
                 .accessibilityIdentifier("notifyFolderWatchingCompletionToggle")
+                .disabled(!manager.notificationsEnabled)
 
                 Divider()
 

@@ -131,6 +131,16 @@ final class LocalNotificationManagerTests: XCTestCase {
         XCTAssertEqual(newManager.recentSummaries.first?.successfulCount, 25)
     }
 
+    @MainActor
+    func testNotificationsEnabledPreferencePersists() {
+        XCTAssertTrue(manager.notificationsEnabled)
+
+        manager.notificationsEnabled = false
+
+        let newManager = LocalNotificationManager(center: mockCenter, defaults: defaults)
+        XCTAssertFalse(newManager.notificationsEnabled)
+    }
+
     private func waitForAuthorization(_ expected: LocalNotificationAuthorizationState = .authorized) async {
         let start = Date()
         while manager.authorizationState != expected {
@@ -187,6 +197,33 @@ final class LocalNotificationManagerTests: XCTestCase {
         // Verify mockCenter received request
         XCTAssertEqual(mockCenter.addedRequests.count, 1)
         XCTAssertEqual(mockCenter.addedRequests.first?.content.title, "Shortcuts needs attention")
+    }
+
+    @MainActor
+    func testNotificationsDisabledBlocksDelivery() async {
+        mockCenter.mockStatus = .authorized
+        manager.refreshAuthorizationStatus()
+        await waitForAuthorization(.authorized)
+
+        manager.notificationsEnabled = false
+
+        let summary = CompressionBatchSummary(
+            source: .manual,
+            successfulCount: 3,
+            failedCount: 0,
+            skippedCount: 0,
+            totalInputBytes: 100,
+            totalOutputBytes: 50,
+            outputDirectory: nil,
+            representativeOutputURL: nil,
+            requiresUserAction: false,
+            primaryErrorMessage: nil
+        )
+
+        manager.deliverSummaryImmediately(summary, appIsActive: false)
+
+        XCTAssertEqual(manager.lastDeliveryStatus, "Not delivered: notifications off")
+        XCTAssertEqual(mockCenter.addedRequests.count, 0)
     }
 
     // 4. Test Folder Watching Success Policy
