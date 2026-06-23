@@ -54,14 +54,17 @@ public actor ThumbnailGenerator {
 
         // WebP fallback
         if url.pathExtension.lowercased() == "webp" {
-            do {
-                let data = try Data(contentsOf: url)
-                let engine = SwiftWebPDecodingEngine()
-                return try engine.decodeCGImage(from: data, maxDimension: Int(maxPixelSize))
-            } catch {
-                #if DEBUG
-                print("[ThumbnailGenerator] Fallback WebP thumbnail generation failed: \(error)")
-                #endif
+            return autoreleasepool {
+                do {
+                    let data = try Data(contentsOf: url)
+                    let engine = SwiftWebPDecodingEngine()
+                    return try engine.decodeCGImage(from: data, maxDimension: Int(maxPixelSize))
+                } catch {
+                    #if DEBUG
+                    print("[ThumbnailGenerator] Fallback WebP thumbnail generation failed: \(error)")
+                    #endif
+                    return nil
+                }
             }
         }
 
