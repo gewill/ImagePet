@@ -11,9 +11,9 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "13.0"
     CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
 packages:
-  Swift-WebP:
-    url: https://github.com/ainame/Swift-WebP.git
-    exactVersion: 0.6.1
+  SwiftWebP:
+    url: https://github.com/gewill/Swift-WebP.git
+    exactVersion: 0.7.0
   mozjpeg.swift:
     url: https://github.com/awxkee/mozjpeg.swift.git
     exactVersion: 1.1.3
@@ -30,8 +30,8 @@ targets:
     sources:
       - path: Sources/ImagePetCore
     dependencies:
-      - package: Swift-WebP
-        product: WebP
+      - package: SwiftWebP
+        product: SwiftWebP
       - package: mozjpeg.swift
         product: mozjpeg
     settings:

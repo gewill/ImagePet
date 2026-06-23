@@ -23,7 +23,7 @@
 		468ABFAA6A7B08517772B948 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 6F8F586A1135EAED6910EB32 /* Resources */; };
 		468BDB0185A3FB1706EBCCD3 /* AppSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D6D9C6C992578DE4DC36E4 /* AppSettingsView.swift */; };
 		48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */; };
-		4A7AA8FEB5D3A491903A1F11 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = C42098C3933CF7DD11C29203 /* WebP */; };
+		4A7AA8FEB5D3A491903A1F11 /* SwiftWebP in Frameworks */ = {isa = PBXBuildFile; productRef = C42098C3933CF7DD11C29203 /* SwiftWebP */; };
 		52773B56345C42FA506C3AD6 /* ImagePetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5368111CDDC59E6968A763 /* ImagePetUITests.swift */; };
 		53882A231CD77781C8F98CB9 /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
 		55A6897AAB3BBDE1BC4F7094 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A0E344263EE215722E53D3 /* CompressionPreset.swift */; };
@@ -200,7 +200,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A7AA8FEB5D3A491903A1F11 /* WebP in Frameworks */,
+				4A7AA8FEB5D3A491903A1F11 /* SwiftWebP in Frameworks */,
 				578AEEC958D8E5B6FA98D21C /* mozjpeg in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,7 +502,7 @@
 			);
 			name = ImagePetCore;
 			packageProductDependencies = (
-				C42098C3933CF7DD11C29203 /* WebP */,
+				C42098C3933CF7DD11C29203 /* SwiftWebP */,
 				6C570CEF6D94E6B62E4ACD10 /* mozjpeg */,
 			);
 			productName = ImagePetCore;
@@ -1112,10 +1112,10 @@
 		};
 		522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ainame/Swift-WebP.git";
+			repositoryURL = "https://github.com/gewill/Swift-WebP.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.6.1;
+				version = 0.7.0;
 			};
 		};
 		862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
@@ -1147,10 +1147,10 @@
 			package = 862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		C42098C3933CF7DD11C29203 /* WebP */ = {
+		C42098C3933CF7DD11C29203 /* SwiftWebP */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 522A0C04983D5798CF2F5BE6 /* XCRemoteSwiftPackageReference "Swift-WebP" */;
-			productName = WebP;
+			productName = SwiftWebP;
 		};
 		F6B0246EDBD395211A9A2FCF /* ArgumentParser */ = {
 			isa = XCSwiftPackageProductDependency;

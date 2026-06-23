@@ -41,7 +41,7 @@ SOFTWARE.
 - Package: `SwiftWebP` (fork of `ainame/Swift-WebP`)
 - Product: `SwiftWebP`
 - Version: `0.7.0`
-- Revision: `0480282d9a554c8a357d073e47a018d345f259f8`
+- Revision: `a85311f3d768a0ecbf4390d27d35071c840f6d77`
 - Source: https://github.com/gewill/Swift-WebP
 - Upstream: https://github.com/ainame/Swift-WebP
 - Build method: Swift Package Manager dependency linked by `ImagePetCore`
@@ -76,7 +76,7 @@ SOFTWARE.
 - Package: `webp-spm`
 - Product: `WebP` (C library)
 - Version: `1.6.0`
-- Revision: `b3f1dc16f5dd387e31cd74c2d7c562da6b6d9c4e`
+- Revision: `c5d21d16f5d7cca8fd635869410644be9dd96522`
 - Source: https://github.com/gewill/webp-spm
 - Build method: Transitive Swift Package Manager dependency of `SwiftWebP`
 - License: MIT (wrapper) / BSD-3-Clause (upstream libwebp)

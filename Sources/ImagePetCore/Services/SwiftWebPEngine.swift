@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 import ImageIO
-import WebP
+import SwiftWebP
 
 public struct ImageSourceMetadata: Sendable, Equatable {
     public let format: SupportedImageFormat

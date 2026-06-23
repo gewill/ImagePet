@@ -1,6 +1,6 @@
 import XCTest
 import ImageIO
-import WebP
+import SwiftWebP
 @testable import ImagePetCore
 
 final class WebPBenchmarkTests: XCTestCase {

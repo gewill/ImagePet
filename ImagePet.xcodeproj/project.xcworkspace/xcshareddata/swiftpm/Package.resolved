@@ -1,5 +1,5 @@
 {
-  "originHash" : "3326630d5cbc3c65a1da7385f2df45646f55b4b221da8e737e36470af03e6262",
+  "originHash" : "cc93b8b4afaa301ac5e4112519c069f82e6653021dc5744d5d9d8f2131f615fe",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "1aef85578fdd4f9eaeeb8d53b7b4fc31bf08fe27",
         "version" : "2.4.0"
-      }
-    },
-    {
-      "identity" : "libwebp-xcode",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libwebp-Xcode.git",
-      "state" : {
-        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
-        "version" : "1.5.0"
       }
     },
     {
@@ -40,10 +31,19 @@
     {
       "identity" : "swift-webp",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ainame/Swift-WebP.git",
+      "location" : "https://github.com/gewill/Swift-WebP.git",
       "state" : {
-        "revision" : "4e7310667297f066e4884b6258a3a646cac8a50b",
-        "version" : "0.6.1"
+        "revision" : "a85311f3d768a0ecbf4390d27d35071c840f6d77",
+        "version" : "0.7.0"
+      }
+    },
+    {
+      "identity" : "webp-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gewill/webp-spm.git",
+      "state" : {
+        "revision" : "c5d21d16f5d7cca8fd635869410644be9dd96522",
+        "version" : "1.6.0"
       }
     }
   ],
