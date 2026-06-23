@@ -1042,7 +1042,7 @@ private struct JobRowView: View {
                 return FileSizeFormatting.string(from: job.originalSize)
             }
             let savedPercent = job.savedRatio.map(FileSizeFormatting.percent) ?? "0.0%"
-            return "\(FileSizeFormatting.string(from: job.originalSize)) -> \(FileSizeFormatting.string(from: compressedSize)) / \(savedPercent)"
+            return "\(FileSizeFormatting.string(from: job.originalSize)) -> \(FileSizeFormatting.string(from: compressedSize)) ↓\(savedPercent)"
         case .skipped:
             return "\(FileSizeFormatting.string(from: job.originalSize)) -> Skipped"
         case .failed:
