@@ -270,7 +270,7 @@ final class WebPBenchmarkTests: XCTestCase {
             )
 
             let webpData = try Data(contentsOf: webpOut)
-            let loopCount = 20
+            let loopCount = 10 // Reduced slightly for forced rasterization
 
             // 1. Benchmark ImageIO Decoding
             let startIOMem = getMemoryRSS()
@@ -278,10 +278,11 @@ final class WebPBenchmarkTests: XCTestCase {
             for _ in 0..<loopCount {
                 autoreleasepool {
                     guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
-                          let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                          let cgImage = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
                         XCTFail("ImageIO failed to decode WebP")
                         return
                     }
+                    _ = Self.forceDecompression(of: cgImage)
                 }
             }
             let endIO = DispatchTime.now()
@@ -297,7 +298,8 @@ final class WebPBenchmarkTests: XCTestCase {
             for _ in 0..<loopCount {
                 autoreleasepool {
                     do {
-                        _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                        let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                        _ = Self.forceDecompression(of: cgImage)
                     } catch {
                         XCTFail("libwebp failed to decode WebP: \(error)")
                     }
@@ -346,7 +348,7 @@ final class WebPBenchmarkTests: XCTestCase {
                 )
 
                 let webpData = try Data(contentsOf: webpOut)
-                let loopCount = 3 // For large files, low loop count to prevent timeout
+                let loopCount = 2 // Reduced loop count for huge file decompression
 
                 // ImageIO Decode
                 let startIOMem = getMemoryRSS()
@@ -354,10 +356,11 @@ final class WebPBenchmarkTests: XCTestCase {
                 for _ in 0..<loopCount {
                     autoreleasepool {
                         guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
-                              let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                              let cgImage = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
                             XCTFail("ImageIO failed to decode WebP Freelarge")
                             return
                         }
+                        _ = Self.forceDecompression(of: cgImage)
                     }
                 }
                 let endIO = DispatchTime.now()
@@ -373,7 +376,8 @@ final class WebPBenchmarkTests: XCTestCase {
                 for _ in 0..<loopCount {
                     autoreleasepool {
                         do {
-                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                            let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                            _ = Self.forceDecompression(of: cgImage)
                         } catch {
                             XCTFail("libwebp failed to decode WebP Freelarge: \(error)")
                         }
@@ -408,7 +412,7 @@ final class WebPBenchmarkTests: XCTestCase {
         )
         let webpData = try Data(contentsOf: webpOut)
 
-        let concurrentCount = 15
+        let concurrentCount = 10
 
         let startConIO = DispatchTime.now()
         await withTaskGroup(of: Void.self) { group in
@@ -416,10 +420,11 @@ final class WebPBenchmarkTests: XCTestCase {
                 group.addTask {
                     autoreleasepool {
                         guard let ioSource = CGImageSourceCreateWithData(webpData as CFData, nil),
-                              let _ = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
+                              let cgImage = CGImageSourceCreateImageAtIndex(ioSource, 0, nil) else {
                             XCTFail("Concurrent ImageIO failed")
                             return
                         }
+                        _ = Self.forceDecompression(of: cgImage)
                     }
                 }
             }
@@ -433,7 +438,8 @@ final class WebPBenchmarkTests: XCTestCase {
                 group.addTask {
                     autoreleasepool {
                         do {
-                            _ = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                            let cgImage = try WebPDecoder().decodeCGImage(from: webpData, options: WebPDecoderOptions())
+                            _ = Self.forceDecompression(of: cgImage)
                         } catch {
                             XCTFail("Concurrent libwebp failed")
                         }
@@ -449,6 +455,25 @@ final class WebPBenchmarkTests: XCTestCase {
         report += "- **libwebp** Total Time: \(String(format: "%.2f", conLibTime)) ms\n"
 
         print("\n=== DECODING BENCHMARK REPORT ===\n\(report)\n=================================\n")
+    }
+
+    private static func forceDecompression(of cgImage: CGImage) -> Bool {
+        let width = cgImage.width
+        let height = cgImage.height
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
+            return false
+        }
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+        return context.makeImage() != nil
     }
 
     private func getMemoryRSS() -> UInt64 {
