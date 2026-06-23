@@ -336,7 +336,27 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         capabilities: EncoderCapabilities
     ) throws {
         if targetOutputFormat == .webp {
-            if AppleWebPCapabilityProbe.canWriteWebP() {
+            if capabilities.writableFormats.contains(.webp) {
+                do {
+                    try webPEncodingEngine.encode(
+                        image: preparedImage.image,
+                        source: preparedImage.sourceMetadata,
+                        destinationTemporaryURL: destinationTemporaryURL,
+                        options: options
+                    )
+                } catch {
+                    if AppleWebPCapabilityProbe.canWriteWebP() {
+                        try AppleWebPEncodingEngine().encode(
+                            image: preparedImage.image,
+                            source: preparedImage.sourceMetadata,
+                            destinationTemporaryURL: destinationTemporaryURL,
+                            options: options
+                        )
+                    } else {
+                        throw error
+                    }
+                }
+            } else if AppleWebPCapabilityProbe.canWriteWebP() {
                 try AppleWebPEncodingEngine().encode(
                     image: preparedImage.image,
                     source: preparedImage.sourceMetadata,
@@ -344,12 +364,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                     options: options
                 )
             } else {
-                try webPEncodingEngine.encode(
-                    image: preparedImage.image,
-                    source: preparedImage.sourceMetadata,
-                    destinationTemporaryURL: destinationTemporaryURL,
-                    options: options
-                )
+                throw CompressionError.webPOutputUnavailable
             }
             return
         }

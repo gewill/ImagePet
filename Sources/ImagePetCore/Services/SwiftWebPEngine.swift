@@ -144,7 +144,22 @@ public struct SwiftWebPDecodingEngine: Sendable {
             throw CompressionError.unsupportedImageFormat
         }
 
-        // Try ImageIO first
+        // Try LibWebP first
+        if capabilities.supportsBitstreamInspection {
+            do {
+                let feature = try WebPImageInspector.inspect(data)
+                return WebPBitstreamMetadata(
+                    width: feature.width,
+                    height: feature.height,
+                    hasAlpha: feature.hasAlpha,
+                    hasAnimation: feature.hasAnimation
+                )
+            } catch {
+                // Fall through to ImageIO
+            }
+        }
+
+        // Fallback to ImageIO
         if let source = CGImageSourceCreateWithData(data as CFData, nil) {
             let count = CGImageSourceGetCount(source)
             if count > 0,
@@ -163,21 +178,7 @@ public struct SwiftWebPDecodingEngine: Sendable {
             }
         }
 
-        guard capabilities.supportsBitstreamInspection else {
-            throw CompressionError.unsupportedImageFormat
-        }
-
-        do {
-            let feature = try WebPImageInspector.inspect(data)
-            return WebPBitstreamMetadata(
-                width: feature.width,
-                height: feature.height,
-                hasAlpha: feature.hasAlpha,
-                hasAnimation: feature.hasAnimation
-            )
-        } catch {
-            throw CompressionError.failedToDecodeImage
-        }
+        throw CompressionError.failedToDecodeImage
     }
 
     public func decodeCGImage(from data: Data, maxDimension: Int?) throws -> CGImage {
@@ -190,42 +191,39 @@ public struct SwiftWebPDecodingEngine: Sendable {
             throw CompressionError.unsupportedImageFormat
         }
 
-        // Try ImageIO first
-        if let source = CGImageSourceCreateWithData(data as CFData, nil) {
-            var options: [CFString: Any] = [
-                kCGImageSourceShouldCache: false
-            ]
-            let needsThumbnail = maxDimension != nil && max(metadata.width, metadata.height) > (maxDimension ?? 0)
-            if let maxDimension, needsThumbnail {
-                options[kCGImageSourceCreateThumbnailFromImageAlways] = true
-                options[kCGImageSourceThumbnailMaxPixelSize] = maxDimension
-                options[kCGImageSourceCreateThumbnailWithTransform] = true
-            }
-
-            if needsThumbnail {
-                if let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) {
-                    return cgImage
-                }
-                // If thumbnail generation failed, fall through to libwebp decoder so it can handle scaling.
-            } else {
-                if let cgImage = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) {
-                    return cgImage
-                }
-            }
-        }
-
-        // Fallback to WebPDecoder
-        var options = WebPDecoderOptions()
-        if let maxDimension, max(metadata.width, metadata.height) > maxDimension {
-            let scale = Double(maxDimension) / Double(max(metadata.width, metadata.height))
-            options.useScaling = true
-            options.scaledWidth = max(1, Int(Double(metadata.width) * scale))
-            options.scaledHeight = max(1, Int(Double(metadata.height) * scale))
-        }
-
+        // Try WebPDecoder (LibWebP) first
         do {
+            var options = WebPDecoderOptions()
+            if let maxDimension, max(metadata.width, metadata.height) > maxDimension {
+                let scale = Double(maxDimension) / Double(max(metadata.width, metadata.height))
+                options.useScaling = true
+                options.scaledWidth = max(1, Int(Double(metadata.width) * scale))
+                options.scaledHeight = max(1, Int(Double(metadata.height) * scale))
+            }
             return try WebPDecoder().decodeCGImage(from: data, options: options)
         } catch {
+            // Fallback to ImageIO
+            if let source = CGImageSourceCreateWithData(data as CFData, nil) {
+                var options: [CFString: Any] = [
+                    kCGImageSourceShouldCache: false
+                ]
+                let needsThumbnail = maxDimension != nil && max(metadata.width, metadata.height) > (maxDimension ?? 0)
+                if let maxDimension, needsThumbnail {
+                    options[kCGImageSourceCreateThumbnailFromImageAlways] = true
+                    options[kCGImageSourceThumbnailMaxPixelSize] = maxDimension
+                    options[kCGImageSourceCreateThumbnailWithTransform] = true
+                }
+
+                if needsThumbnail {
+                    if let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) {
+                        return cgImage
+                    }
+                } else {
+                    if let cgImage = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) {
+                        return cgImage
+                    }
+                }
+            }
             throw CompressionError.failedToDecodeImage
         }
     }
