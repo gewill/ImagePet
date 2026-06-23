@@ -211,9 +211,9 @@ final class ImagePetStore: ObservableObject {
             defaults.set(thumbnailSize.rawValue, forKey: thumbnailSizeKey)
         }
     }
-    @Published var isQueueExpanded: Bool = true {
+    @Published var isSettingsExpanded: Bool = true {
         didSet {
-            defaults.set(isQueueExpanded, forKey: isQueueExpandedKey)
+            defaults.set(isSettingsExpanded, forKey: isSettingsExpandedKey)
         }
     }
     static var shared: ImagePetStore?
@@ -269,7 +269,7 @@ final class ImagePetStore: ObservableObject {
     private let petViewModeKey = "ImagePet.petViewMode"
     private let isParametersExpandedKey = "ImagePet.isParametersExpanded"
     private let thumbnailSizeKey = "ImagePet.thumbnailSize"
-    private let isQueueExpandedKey = "ImagePet.isQueueExpanded"
+    private let isSettingsExpandedKey = "ImagePet.isSettingsExpanded"
 
     init(
         compressor: ImageCompressor? = nil,
@@ -304,7 +304,7 @@ final class ImagePetStore: ObservableObject {
         self.launchAtLoginEnabled = false
         self.isParametersExpanded = true
         self.thumbnailSize = .medium
-        self.isQueueExpanded = true
+        self.isSettingsExpanded = true
         ImagePetStore.shared = self
 
         self.folderWatchManager = FolderWatchManager(defaults: defaults)
@@ -441,10 +441,10 @@ final class ImagePetStore: ObservableObject {
             } else {
                 self.thumbnailSize = .medium
             }
-            if defaults.object(forKey: isQueueExpandedKey) != nil {
-                self.isQueueExpanded = defaults.bool(forKey: isQueueExpandedKey)
+            if defaults.object(forKey: isSettingsExpandedKey) != nil {
+                self.isSettingsExpanded = defaults.bool(forKey: isSettingsExpandedKey)
             } else {
-                self.isQueueExpanded = true
+                self.isSettingsExpanded = true
             }
         }
 
@@ -544,8 +544,7 @@ final class ImagePetStore: ObservableObject {
 
     func showSettings(_ section: SettingsSection) {
         selectedSettingsSection = section
-        selectedMainTab = .settings
-        activateMainWindow()
+        NSApp.sendAction(Selector(("showSettingsPanel:")), to: nil, from: nil)
     }
 
     func activateMainWindow() {

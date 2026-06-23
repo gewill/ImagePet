@@ -2,12 +2,22 @@ import KeyboardShortcuts
 import ImagePetCore
 import SwiftUI
 import AppKit
+import OSLog
+
+private let logger = Logger(subsystem: "org.gewill.ImagePet", category: "AppSettingsView")
 
 struct AppSettingsView: View {
     @ObservedObject var store: ImagePetStore
 
+    init(store: ImagePetStore) {
+        let activeStore = ImagePetStore.shared ?? store
+        logger.warning("AppSettingsView init: activeStore=\(String(describing: ObjectIdentifier(activeStore))), passedStore=\(String(describing: ObjectIdentifier(store))), sharedStore=\(ImagePetStore.shared != nil ? String(describing: ObjectIdentifier(ImagePetStore.shared!)) : "nil")")
+        self._store = ObservedObject(wrappedValue: activeStore)
+    }
+
     var body: some View {
-        HStack(spacing: 0) {
+        logger.warning("AppSettingsView body: store=\(String(describing: ObjectIdentifier(store))), selectedSection=\(store.selectedSettingsSection.rawValue)")
+        return HStack(spacing: 0) {
             SettingsSidebar(selection: $store.selectedSettingsSection)
 
             Divider()
@@ -33,6 +43,7 @@ struct AppSettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .frame(width: 680, height: 480)
     }
 }
 
@@ -43,6 +54,7 @@ private struct SettingsSidebar: View {
         VStack(alignment: .leading, spacing: 6) {
             ForEach(SettingsSection.allCases) { section in
                 Button {
+                    logger.warning("SettingsSidebar button clicked: \(section.rawValue)")
                     selection = section
                 } label: {
                     Label(section.title, systemImage: section.systemImage)

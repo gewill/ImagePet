@@ -5,8 +5,13 @@ import SwiftUI
 struct ImagePetApp: App {
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var store = ImagePetStore()
+    @StateObject private var store: ImagePetStore
     @StateObject private var shortcutCoordinator = GlobalShortcutCoordinator()
+
+    init() {
+        let sharedStore = ImagePetStore.shared ?? ImagePetStore()
+        _store = StateObject(wrappedValue: sharedStore)
+    }
 
     var body: some Scene {
         WindowGroup("ImagePet") {
@@ -103,6 +108,10 @@ struct ImagePetApp: App {
             HelpView()
         }
         .defaultSize(width: 820, height: 560)
+
+        Settings {
+            AppSettingsView(store: store)
+        }
     }
 }
 

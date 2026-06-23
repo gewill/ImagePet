@@ -1,139 +1,127 @@
 import ImagePetCore
 import SwiftUI
+import OSLog
+
+private let logger = Logger(subsystem: "org.gewill.ImagePet", category: "ContentView")
 
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        TabView(selection: $store.selectedMainTab) {
-            ZStack {
-                SoftNativeStyle.workspaceBackground
+        logger.warning("ContentView body: store=\(String(describing: ObjectIdentifier(store)))")
+        return ZStack {
+            SoftNativeStyle.workspaceBackground
 
-                HStack(spacing: 16) {
-                    // Left Collapsible Sidebar
-                    if store.isQueueExpanded {
-                        VStack(spacing: 12) {
-                            HStack {
-                                Text("Queue")
-                                    .font(.headline)
-                                    .foregroundStyle(SoftNativeStyle.accent)
-                                    .accessibilityAddTraits(.isHeader)
-                                
-                                Spacer()
-                                
-                                Button {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        store.isQueueExpanded = false
-                                    }
-                                } label: {
-                                    Image(systemName: "sidebar.left")
-                                        .foregroundStyle(.secondary)
-                                }
-                                .buttonStyle(.plain)
-                                .help("Collapse queue")
-                                .accessibilityIdentifier("collapseQueueButton")
-                                .accessibilityLabel("Collapse queue")
-                            }
-                            
-                            JobListView(store: store)
-                            
-                            HStack {
-                                Text("Thumbnail Size:")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Picker("Thumbnail Size", selection: $store.thumbnailSize) {
-                                    ForEach(ThumbnailSize.allCases) { size in
-                                        Text(size.displayName).tag(size)
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                                .labelsHidden()
-                                .frame(width: 160)
-                            }
-                            
-                            LeftQueueControlsView(store: store)
-                        }
-                        .frame(width: 320)
-                        .transition(.move(edge: .leading).combined(with: .opacity))
-                    } else {
-                        // Collapsed thin bar
-                        VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                // Left Collapsible Sidebar
+                if store.isSettingsExpanded {
+                    VStack(spacing: 12) {
+                        HStack {
+                            Text("Parameters")
+                                .font(.headline)
+                                .foregroundStyle(SoftNativeStyle.accent)
+                                .accessibilityAddTraits(.isHeader)
+
+                            Spacer()
+
                             Button {
                                 withAnimation(.easeInOut(duration: 0.2)) {
-                                    store.isQueueExpanded = true
+                                    store.isSettingsExpanded = false
                                 }
                             } label: {
-                                VStack(spacing: 8) {
-                                    Image(systemName: "sidebar.left")
-                                        .font(.title3)
-                                        .foregroundStyle(SoftNativeStyle.accent)
-                                    
-                                    Text("Queue")
-                                        .font(.caption2.weight(.bold))
-                                        .textCase(.uppercase)
-                                        .tracking(0.6)
-                                        .foregroundStyle(.secondary)
-                                    
-                                    if !store.jobs.isEmpty {
-                                        Text("\(store.jobs.count)")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 2)
-                                            .background(store.isProcessing ? SoftNativeStyle.secondary : SoftNativeStyle.accent)
-                                            .foregroundColor(.white)
-                                            .clipShape(Capsule())
-                                    }
-                                    
-                                    if store.isProcessing {
-                                        ProgressView()
-                                            .scaleEffect(0.6)
-                                            .frame(width: 16, height: 16)
-                                    }
-                                }
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 6)
+                                Image(systemName: "sidebar.left")
+                                    .foregroundStyle(.secondary)
                             }
                             .buttonStyle(.plain)
-                            .help("Expand queue")
-                            .accessibilityIdentifier("expandQueueButton")
-                            .accessibilityLabel("Expand queue, current item count \(store.jobs.count)")
-                            
-                            Spacer()
+                            .help("Collapse settings")
+                            .accessibilityIdentifier("collapseSettingsButton")
+                            .accessibilityLabel("Collapse settings")
                         }
-                        .frame(width: 50)
-                        .softNativeCard(radius: 10, tint: SoftNativeStyle.surface.opacity(0.3))
-                        .transition(.move(edge: .leading).combined(with: .opacity))
-                    }
-
-                    // Right Main Panel
-                    VStack(spacing: 14) {
-                        HeaderView(store: store)
 
                         ScrollView {
-                            VStack(spacing: 14) {
+                            VStack(spacing: 12) {
                                 ControlsView(store: store)
-                                DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
-                                SummaryView(store: store)
                             }
                         }
-                    }
-                }
-                .padding(20)
-            }
-            .tabItem {
-                Label("Compress", systemImage: "doc.on.doc")
-            }
-            .tag(AppMainTab.compress)
 
-            AppSettingsView(store: store)
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                        HStack {
+                            Button {
+                                store.showSettings(.general)
+                            } label: {
+                                Image(systemName: "gearshape")
+                                    .font(.title2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Settings")
+                            .accessibilityIdentifier("Settings")
+                            .accessibilityLabel("Settings")
+                            Spacer()
+                        }
+                        .padding(.top, 8)
+                    }
+                    .frame(width: 420)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                } else {
+                    // Collapsed thin bar
+                    VStack(spacing: 16) {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                store.isSettingsExpanded = true
+                            }
+                        } label: {
+                            VStack(spacing: 8) {
+                                Image(systemName: "slider.horizontal.3")
+                                    .font(.title3)
+                                    .foregroundStyle(SoftNativeStyle.accent)
+
+                                Text("Params")
+                                    .font(.caption2.weight(.bold))
+                                    .textCase(.uppercase)
+                                    .tracking(0.6)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 6)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Expand parameters")
+                        .accessibilityIdentifier("expandSettingsButton")
+                        .accessibilityLabel("Expand parameters")
+
+                        Spacer()
+
+                        Button {
+                            store.showSettings(.general)
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .font(.title2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Settings")
+                        .accessibilityIdentifier("Settings")
+                        .accessibilityLabel("Settings")
+                        .padding(.bottom, 12)
+                    }
+                    .frame(width: 50)
+                    .softNativeCard(radius: 10, tint: SoftNativeStyle.surface.opacity(0.3))
+                    .transition(.move(edge: .leading).combined(with: .opacity))
                 }
-                .tag(AppMainTab.settings)
+
+                // Right Main Panel
+                VStack(spacing: 14) {
+                    HeaderView(store: store)
+                    DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
+                    JobListView(store: store)
+                    SummaryView(store: store)
+                }
+            }
+            .padding(20)
         }
         .tint(SoftNativeStyle.accent)
-        .frame(minWidth: 760, minHeight: 660)
+        .frame(minWidth: 860, minHeight: 660)
         .dropDestination(for: URL.self) { urls, _ in
             store.addDroppedURLs(urls)
             return true
@@ -393,57 +381,6 @@ private struct ControlsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     controlOptions
 
-                    if store.qualityMode == .custom && store.outputFormat != .png {
-                        ViewThatFits(in: .horizontal) {
-                            customQualitySlider
-
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Quality \(store.customQuality)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                qualitySlider
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                    }
-
-                    // Options details based on selection
-                    Group {
-                        if store.saveLocationMode == .overwrite {
-                            HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.red)
-                                Text("Mode Overwrite will replace your source files directly and keep each file's original format. This action cannot be undone.")
-                                    .font(.callout)
-                                    .foregroundStyle(.red.opacity(0.85))
-                                    .fontWeight(.semibold)
-                            }
-                            .padding(8)
-                            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-                        } else {
-                            ViewThatFits(in: .horizontal) {
-                                suffixRow
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    suffixEditor
-                                    filenamePreview
-                                }
-                            }
-
-                            if store.saveLocationMode == .designated {
-                                ViewThatFits(in: .horizontal) {
-                                    outputFolderRow
-
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        outputFolderLabel
-                                        chooseOutputFolderButton
-                                    }
-                                }
-                                .font(.callout)
-                            }
-                        }
-                    }
-
                     // Option Toggles (Metadata and PNG Lossless notice)
                     ViewThatFits(in: .horizontal) {
                         HStack(spacing: 18) {
@@ -457,12 +394,6 @@ private struct ControlsView: View {
                             advancedJPEGToggle
                             compressionHint
                         }
-                    }
-
-                    if let message = store.outputFolderMessage, store.saveLocationMode == .designated {
-                        Label(message, systemImage: "exclamationmark.triangle")
-                            .font(.callout)
-                            .foregroundStyle(SoftNativeStyle.secondary)
                     }
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
@@ -482,36 +413,12 @@ private struct ControlsView: View {
 
     @ViewBuilder
     private var controlOptions: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) {
-                qualityCard
-                    .frame(minWidth: 240, maxWidth: .infinity)
-                formatCard
-                    .frame(minWidth: 240, maxWidth: .infinity)
-                maxEdgeCard
-                    .frame(minWidth: 240, maxWidth: .infinity)
-                saveToCard
-                    .frame(minWidth: 240, maxWidth: .infinity)
-            }
-
-            VStack(spacing: 8) {
-                HStack(spacing: 8) {
-                    qualityCard
-                    formatCard
-                }
-
-                HStack(spacing: 8) {
-                    maxEdgeCard
-                    saveToCard
-                }
-            }
-
-            VStack(spacing: 8) {
-                qualityCard
-                formatCard
-                maxEdgeCard
-                saveToCard
-            }
+        VStack(spacing: 8) {
+            qualityCard
+            formatCard
+            maxEdgeCard
+            saveToCard
+            thumbnailSizeCard
         }
     }
 
@@ -562,12 +469,35 @@ private struct ControlsView: View {
     }
 
     private var filenamePreview: some View {
-        Text(store.filenamePreview)
-            .font(.system(.caption, design: .monospaced))
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .truncationMode(.middle)
-            .accessibilityIdentifier("filenamePreviewLabel")
+        let preview = store.filenamePreview
+        let suffix = store.filenameSuffix
+        
+        return Group {
+            if !suffix.isEmpty, let suffixRange = preview.range(of: suffix, options: .backwards) {
+                let prefixIndex = suffixRange.lowerBound
+                let suffixIndex = suffixRange.upperBound
+                
+                let prefixPart = String(preview[..<prefixIndex])
+                let suffixPart = String(preview[suffixRange])
+                let extensionPart = String(preview[suffixIndex...])
+                
+                HStack(spacing: 0) {
+                    Text(prefixPart)
+                        .foregroundStyle(.secondary)
+                    Text(suffixPart)
+                        .foregroundStyle(SoftNativeStyle.accent)
+                        .fontWeight(.bold)
+                    Text(extensionPart)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Text(preview)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.system(.caption, design: .monospaced))
+        .lineLimit(1)
+        .accessibilityIdentifier("filenamePreviewLabel")
     }
 
     private var outputFolderRow: some View {
@@ -579,14 +509,16 @@ private struct ControlsView: View {
     }
 
     private var outputFolderLabel: some View {
-        HStack(spacing: 8) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
             Image(systemName: "folder.badge.gearshape")
                 .foregroundStyle(.secondary)
+                .alignmentGuide(.firstTextBaseline) { d in d[.bottom] - 2 }
 
             Text(outputFolderText)
                 .foregroundStyle(store.outputDirectory == nil ? .secondary : .primary)
-                .lineLimit(1)
-                .truncationMode(.middle)
+                .lineLimit(3)
+                .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("outputFolderLabel")
         }
     }
@@ -642,15 +574,31 @@ private struct ControlsView: View {
 
     private var qualityCard: some View {
         ControlCard(title: "Quality") {
-            Picker("Quality", selection: $store.qualityMode) {
-                ForEach(CompressionQualityMode.allCases) { mode in
-                    Text(mode.displayName).tag(mode)
+            VStack(alignment: .leading, spacing: 8) {
+                Picker("Quality", selection: $store.qualityMode) {
+                    ForEach(CompressionQualityMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .disabled(store.isProcessing || store.outputFormat == .png)
+                .accessibilityIdentifier("presetPicker")
+
+                if store.qualityMode == .custom && store.outputFormat != .png {
+                    ViewThatFits(in: .horizontal) {
+                        customQualitySlider
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Quality \(store.customQuality)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            qualitySlider
+                        }
+                    }
+                    .padding(.top, 4)
                 }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .disabled(store.isProcessing || store.outputFormat == .png)
-            .accessibilityIdentifier("presetPicker")
         }
     }
 
@@ -684,15 +632,75 @@ private struct ControlsView: View {
 
     private var saveToCard: some View {
         ControlCard(title: "Save to") {
-            Picker("Location", selection: $store.saveLocationMode) {
-                ForEach(SaveLocationMode.allCases) { mode in
-                    Text(mode.displayName).tag(mode)
+            VStack(alignment: .leading, spacing: 8) {
+                Picker("Location", selection: $store.saveLocationMode) {
+                    ForEach(SaveLocationMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .disabled(store.isProcessing)
+                .accessibilityIdentifier("locationModePicker")
+
+                if store.saveLocationMode == .overwrite {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                        Text("Mode Overwrite will replace your source files directly and keep each file's original format. This action cannot be undone.")
+                            .font(.callout)
+                            .foregroundStyle(.red.opacity(0.85))
+                            .fontWeight(.semibold)
+                    }
+                    .padding(8)
+                    .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                    .padding(.top, 4)
+                } else {
+                    ViewThatFits(in: .horizontal) {
+                        suffixRow
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            suffixEditor
+                            filenamePreview
+                        }
+                    }
+                    .padding(.top, 4)
+
+                    if store.saveLocationMode == .designated {
+                        Divider()
+                            .padding(.vertical, 2)
+
+                        ViewThatFits(in: .horizontal) {
+                            outputFolderRow
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                outputFolderLabel
+                                chooseOutputFolderButton
+                            }
+                        }
+                        .font(.callout)
+
+                        if let message = store.outputFolderMessage {
+                            Label(message, systemImage: "exclamationmark.triangle")
+                                .font(.callout)
+                                .foregroundStyle(SoftNativeStyle.secondary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var thumbnailSizeCard: some View {
+        ControlCard(title: "Thumbnail Size") {
+            Picker("Thumbnail Size", selection: $store.thumbnailSize) {
+                ForEach(ThumbnailSize.allCases) { size in
+                    Text(size.displayName).tag(size)
                 }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
-            .disabled(store.isProcessing)
-            .accessibilityIdentifier("locationModePicker")
+            .accessibilityIdentifier("thumbnailSizePicker")
         }
     }
 }
@@ -1040,9 +1048,15 @@ private struct SummaryView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            horizontalContent
-            verticalContent
+        HStack(alignment: .center, spacing: 16) {
+            ViewThatFits(in: .horizontal) {
+                horizontalContent
+                verticalContent
+            }
+
+            Spacer()
+
+            SummaryControlsView(store: store)
         }
         .padding(12)
         .softNativeCard(radius: 10, tint: SoftNativeStyle.elevated)
@@ -1118,7 +1132,7 @@ private struct SummaryMetric: View {
     }
 }
 
-private struct LeftQueueControlsView: View {
+private struct SummaryControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
@@ -1139,7 +1153,6 @@ private struct LeftQueueControlsView: View {
                 .keyboardShortcut(".", modifiers: [.command])
                 .help("Cancel processing (⌘.)")
                 .accessibilityIdentifier("cancelButton")
-                .frame(maxWidth: .infinity)
             } else if store.isCompleted {
                 Button {
                     store.revealOutputDirectory()
@@ -1149,7 +1162,6 @@ private struct LeftQueueControlsView: View {
                 .buttonStyle(.bordered)
                 .help("Reveal output directory")
                 .accessibilityIdentifier("revealInFinderButton")
-                .frame(maxWidth: .infinity)
 
                 if store.hasFailedJobs {
                     Button {
@@ -1161,7 +1173,6 @@ private struct LeftQueueControlsView: View {
                     .keyboardShortcut("r", modifiers: [.command])
                     .help("Retry Failed (⌘R)")
                     .accessibilityIdentifier("retryFailedButton")
-                    .frame(maxWidth: .infinity)
                 }
 
                 Button {
@@ -1173,9 +1184,7 @@ private struct LeftQueueControlsView: View {
                 .keyboardShortcut("n", modifiers: [.command])
                 .help("Clear List (⌘N)")
                 .accessibilityIdentifier("clearListButton")
-                .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 4)
     }
 }

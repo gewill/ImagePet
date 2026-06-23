@@ -23,13 +23,8 @@ final class ImagePetUITests: XCTestCase {
     }
 
     private func mainWindow(timeout: TimeInterval = 3.0) -> XCUIElement {
-        let tabbedWindow = app.windows.containing(.radioButton, identifier: "doc.on.doc").firstMatch
-        if tabbedWindow.waitForExistence(timeout: timeout) {
-            return tabbedWindow
-        }
-
         let contentWindow = app.windows.containing(.button, identifier: "addImagesButton").firstMatch
-        if contentWindow.waitForExistence(timeout: 0.5) {
+        if contentWindow.waitForExistence(timeout: timeout) {
             return contentWindow
         }
 
@@ -41,6 +36,54 @@ final class ImagePetUITests: XCTestCase {
         let titledWindow = app.windows["ImagePet"]
         _ = titledWindow.waitForExistence(timeout: 0.5)
         return titledWindow
+    }
+
+    private func settingsWindow() -> XCUIElement {
+        let predicate = NSPredicate(format: "title CONTAINS[c] 'settings' OR title CONTAINS[c] 'preferences'")
+        return app.windows.element(matching: predicate)
+    }
+
+    private func openSettingsWindow() {
+        let window = mainWindow()
+        let settingsButton = window.buttons["Settings"]
+        if settingsButton.exists {
+            settingsButton.click()
+        }
+
+        let settingsWin = settingsWindow()
+        if settingsWin.waitForExistence(timeout: 1.5) {
+            settingsWin.click()
+            return
+        }
+
+        // Try Command-Comma
+        window.typeKey(",", modifierFlags: .command)
+        if settingsWin.waitForExistence(timeout: 1.5) {
+            settingsWin.click()
+            return
+        }
+
+        // Try Menu Bar
+        let menuBar = app.menuBars.element
+        if menuBar.exists {
+            let appMenu = menuBar.menuBarItems.element(boundBy: 0)
+            if appMenu.exists {
+                appMenu.click()
+                let settingsMenuItem = appMenu.menus.menuItems["Settings…"]
+                if settingsMenuItem.exists {
+                    settingsMenuItem.click()
+                } else {
+                    let preferencesMenuItem = appMenu.menus.menuItems["Preferences…"]
+                    if preferencesMenuItem.exists {
+                        preferencesMenuItem.click()
+                    }
+                }
+            }
+        }
+
+        if settingsWin.waitForExistence(timeout: 1.5) {
+            settingsWin.click()
+        }
     }
 
     private func desktopPetEmoji(in petWindow: XCUIElement) -> XCUIElement {
@@ -646,20 +689,28 @@ final class ImagePetUITests: XCTestCase {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
 
-        // Switch to the Settings Tab
-        let tab = window.descendants(matching: .any)["Settings"]
-        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
-        tab.click()
+        openSettingsWindow()
+
+        let settingsWin = settingsWindow()
+        XCTAssertTrue(settingsWin.waitForExistence(timeout: 5.0), "Settings window should appear")
+
+        // Select desktopPet section first
+        let desktopPetSection = settingsWin.buttons["settingsSection_desktopPet"]
+        XCTAssertTrue(desktopPetSection.waitForExistence(timeout: 2.0))
+        desktopPetSection.click()
+
+        print("SETTINGS WINDOW DEBUG DESCRIPTION:")
+        print(settingsWin.debugDescription)
 
         // Test petSettingsEnabledToggle
-        let enabledToggle = window.descendants(matching: .any)["petSettingsEnabledToggle"]
-        XCTAssertTrue(enabledToggle.exists)
+        let enabledToggle = settingsWin.descendants(matching: .any)["petSettingsEnabledToggle"]
+        XCTAssertTrue(enabledToggle.waitForExistence(timeout: 3.0))
 
-        let showPetButton = window.buttons["showPetButton"]
-        XCTAssertTrue(showPetButton.exists)
+        let showPetButton = settingsWin.buttons["showPetButton"]
+        XCTAssertTrue(showPetButton.waitForExistence(timeout: 2.0))
 
-        let dogCard = window.buttons["themeCard_Dog"]
-        XCTAssertTrue(dogCard.exists)
+        let dogCard = settingsWin.buttons["themeCard_Dog"]
+        XCTAssertTrue(dogCard.waitForExistence(timeout: 2.0))
         XCTAssertTrue(dogCard.isEnabled)
 
         // Toggle it off, cards should be disabled
@@ -670,68 +721,91 @@ final class ImagePetUITests: XCTestCase {
         enabledToggle.click()
         XCTAssertTrue(dogCard.isEnabled)
 
-        let pufferfishCard = window.buttons["themeCard_Pufferfish"]
-        XCTAssertTrue(pufferfishCard.exists)
+        let pufferfishCard = settingsWin.buttons["themeCard_Pufferfish"]
+        XCTAssertTrue(pufferfishCard.waitForExistence(timeout: 2.0))
         pufferfishCard.click()
 
-        let squirrelCard = window.buttons["themeCard_Squirrel"]
-        XCTAssertTrue(squirrelCard.exists)
+        let squirrelCard = settingsWin.buttons["themeCard_Squirrel"]
+        XCTAssertTrue(squirrelCard.waitForExistence(timeout: 2.0))
         squirrelCard.click()
 
-        let rabbitCard = window.buttons["themeCard_Rabbit"]
-        XCTAssertTrue(rabbitCard.exists)
+        let rabbitCard = settingsWin.buttons["themeCard_Rabbit"]
+        XCTAssertTrue(rabbitCard.waitForExistence(timeout: 2.0))
         rabbitCard.click()
 
-        XCTAssertFalse(window.descendants(matching: .any)["petSizeTierPicker"].exists)
+        XCTAssertFalse(settingsWin.descendants(matching: .any)["petSizeTierPicker"].exists)
 
-        let launchToggle = window.descendants(matching: .any)["launchAtLoginToggle"]
-        XCTAssertTrue(launchToggle.exists)
+        let launchToggle = settingsWin.descendants(matching: .any)["launchAtLoginToggle"]
+        XCTAssertTrue(launchToggle.waitForExistence(timeout: 2.0))
         launchToggle.click()
 
-        let energyToggle = window.descendants(matching: .any)["energySavingModeToggle"]
-        XCTAssertTrue(energyToggle.exists)
+        let energyToggle = settingsWin.descendants(matching: .any)["energySavingModeToggle"]
+        XCTAssertTrue(energyToggle.waitForExistence(timeout: 2.0))
         energyToggle.click()
+
+        settingsWin.typeKey("w", modifierFlags: .command)
     }
 
     func testV011HelpWindowRendersFromSettings() throws {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
 
-        let tab = window.descendants(matching: .any)["Settings"]
-        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
-        tab.click()
+        openSettingsWindow()
 
-        let helpSection = window.buttons["settingsSection_helpAbout"]
+        let settingsWin = settingsWindow()
+        XCTAssertTrue(settingsWin.waitForExistence(timeout: 5.0), "Settings window should appear")
+
+        let helpSection = settingsWin.buttons["settingsSection_helpAbout"]
         XCTAssertTrue(helpSection.waitForExistence(timeout: 2.0))
         helpSection.click()
 
-        let openHelpButton = window.buttons["openHelpButton"]
-        XCTAssertTrue(openHelpButton.waitForExistence(timeout: 2.0))
+        let openHelpButton = settingsWin.buttons["openHelpButton"]
+        XCTAssertTrue(openHelpButton.waitForExistence(timeout: 3.0))
         openHelpButton.click()
 
         let helpWindow = app.windows["ImagePet Help"]
-        XCTAssertTrue(helpWindow.waitForExistence(timeout: 3.0))
+        XCTAssertTrue(helpWindow.waitForExistence(timeout: 5.0), "Help window should appear")
         XCTAssertTrue(helpWindow.descendants(matching: .any)["helpTopicList"].exists)
         XCTAssertTrue(helpWindow.staticTexts["helpTitle_quickStart"].waitForExistence(timeout: 2.0))
+
+        // Close help window
+        helpWindow.typeKey("w", modifierFlags: .command)
+
+        // Close settings window
+        if settingsWin.exists {
+            settingsWin.typeKey("w", modifierFlags: .command)
+        }
     }
 
     func testV011SettingsShowsKeyboardShortcuts() throws {
         let window = mainWindow()
         XCTAssertTrue(window.exists)
 
-        let tab = window.descendants(matching: .any)["Settings"]
-        XCTAssertTrue(tab.waitForExistence(timeout: 2.0))
-        tab.click()
+        openSettingsWindow()
 
-        let shortcutsSection = window.buttons["settingsSection_keyboardShortcuts"]
+        let settingsWin = settingsWindow()
+        XCTAssertTrue(settingsWin.waitForExistence(timeout: 5.0), "Settings window should appear")
+
+        let shortcutsSection = settingsWin.buttons["settingsSection_keyboardShortcuts"]
         XCTAssertTrue(shortcutsSection.waitForExistence(timeout: 2.0))
         shortcutsSection.click()
 
-        XCTAssertTrue(window.descendants(matching: .any)["keyboardShortcutsHeader"].exists)
-        XCTAssertTrue(window.staticTexts["shortcutsDefaultUnsetLabel"].exists)
-        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_showMainWindow"].exists)
-        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_toggleDesktopPet"].exists)
-        XCTAssertTrue(window.descendants(matching: .any)["shortcutRecorder_togglePetMode"].exists)
+        let keyboardShortcutsHeader = settingsWin.descendants(matching: .any)["keyboardShortcutsHeader"]
+        XCTAssertTrue(keyboardShortcutsHeader.waitForExistence(timeout: 3.0))
+
+        let shortcutsDefaultUnsetLabel = settingsWin.staticTexts["shortcutsDefaultUnsetLabel"]
+        XCTAssertTrue(shortcutsDefaultUnsetLabel.waitForExistence(timeout: 2.0))
+
+        let recorderMainWindow = settingsWin.descendants(matching: .any)["shortcutRecorder_showMainWindow"]
+        XCTAssertTrue(recorderMainWindow.waitForExistence(timeout: 2.0))
+
+        let recorderTogglePet = settingsWin.descendants(matching: .any)["shortcutRecorder_toggleDesktopPet"]
+        XCTAssertTrue(recorderTogglePet.waitForExistence(timeout: 2.0))
+
+        let recorderToggleMode = settingsWin.descendants(matching: .any)["shortcutRecorder_togglePetMode"]
+        XCTAssertTrue(recorderToggleMode.waitForExistence(timeout: 2.0))
+
+        settingsWin.typeKey("w", modifierFlags: .command)
     }
 
     func testQuietStartupWithPetEnabledAndVisible() throws {
