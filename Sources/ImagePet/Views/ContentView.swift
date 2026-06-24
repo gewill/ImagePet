@@ -115,7 +115,10 @@ struct ContentView: View {
                     HeaderView(store: store)
                     DropZoneView(isTargeted: store.isDropTargeted, hasJobs: !store.jobs.isEmpty)
                     JobListView(store: store)
+                        .layoutPriority(1)
                     SummaryView(store: store)
+                        .frame(height: 96)
+                        .layoutPriority(-1)
                 }
             }
             .padding(20)
@@ -1069,17 +1072,18 @@ private struct SummaryView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
+        VStack(alignment: .leading, spacing: 6) {
             ViewThatFits(in: .horizontal) {
                 horizontalContent
                 verticalContent
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             SummaryControlsView(store: store)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(12)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(10)
         .softNativeCard(radius: 10, tint: SoftNativeStyle.elevated)
     }
 
@@ -1143,7 +1147,8 @@ private struct SummaryMetric: View {
                 .accessibilityIdentifier("summaryMetricValue_\(title)")
                 .accessibilityLabel(value)
         }
-        .padding(10)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .frame(minWidth: 112, maxWidth: .infinity, alignment: .leading)
         .background(SoftNativeStyle.surface.opacity(0.70), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(
@@ -1157,14 +1162,10 @@ private struct SummaryControlsView: View {
     @ObservedObject var store: ImagePetStore
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) {
-                buttons
-            }
-            VStack(alignment: .trailing, spacing: 6) {
-                buttons
-            }
+        HStack(spacing: 8) {
+            buttons
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     @ViewBuilder
