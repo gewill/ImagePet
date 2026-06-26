@@ -7,6 +7,7 @@ import {
   EyeOff,
   FileImage,
   FolderOpen,
+  GitBranch,
   LockKeyhole,
   MousePointer2,
   Move,
@@ -161,6 +162,7 @@ function App() {
 
   const appStoreHref = metadataLink(links.macAppStore, "#download");
   const privacyHref = metadataLink(links.privacyPolicy, "#privacy");
+  const sourceHref = metadataLink(links.sourceCode, "https://github.com/gewill/ImagePet");
   const supportHref = (() => {
     if (!links.support) return "mailto:";
     if (links.support.includes("github.com") && links.support.includes("/issues")) {
@@ -365,11 +367,26 @@ function App() {
         </div>
 
         <div className="support-panel" id="support">
-          <h2>{locale.website.support.title}</h2>
-          <p>{locale.website.support.summary}</p>
-          <a className="support-link" href={supportHref} target="_blank" rel="noreferrer">
-            Open Support Issues on GitHub
-          </a>
+          <div>
+            <h2>{locale.website.support.title}</h2>
+            <p>{locale.website.support.summary}</p>
+          </div>
+          <div className="support-actions">
+            <a className="support-link" href={supportHref} target="_blank" rel="noreferrer">
+              Open Support Issues on GitHub
+            </a>
+            <a className="support-link secondary" href={sourceHref} target="_blank" rel="noreferrer">
+              {locale.website.openSource.linkLabel}
+            </a>
+          </div>
+        </div>
+
+        <div className="open-source-panel">
+          <GitBranch size={24} strokeWidth={1.8} aria-hidden="true" />
+          <div>
+            <h2>{locale.website.openSource.title}</h2>
+            <p>{locale.website.openSource.summary}</p>
+          </div>
         </div>
       </section>
 
@@ -401,7 +418,7 @@ function App() {
           <a href={appStoreHref} aria-disabled={!links.macAppStore}>
             App Store
           </a>
-          <a href="https://github.com/gewill/ImagePet" target="_blank" rel="noreferrer">
+          <a href={sourceHref} target="_blank" rel="noreferrer">
             GitHub
           </a>
         </div>

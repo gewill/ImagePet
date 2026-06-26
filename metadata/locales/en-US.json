@@ -97,6 +97,11 @@
       "title": "ImagePet Support",
       "summary": "For support, include your macOS version, ImagePet version, input format, selected output format, and a short description of what happened. Do not send private images unless you intentionally choose to."
     },
+    "openSource": {
+      "title": "Open source and independently maintained.",
+      "summary": "ImagePet source code is available on GitHub. Mac App Store purchases support ongoing development and provide a signed, sandboxed app with automatic updates.",
+      "linkLabel": "View Source on GitHub"
+    },
     "privacy": {
       "title": "ImagePet Privacy",
       "summary": "ImagePet is designed around local image processing. Selected images stay on the Mac unless you separately choose to share them through your own tools."
