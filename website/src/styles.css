@@ -1483,6 +1483,69 @@ a {
   }
 }
 
+/* Docs TOC — right sidebar */
+.docs-toc {
+  position: sticky;
+  top: 96px;
+}
+
+.docs-toc-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 30px rgba(52, 76, 64, 0.06);
+  padding: 16px;
+}
+
+.docs-toc-card h4 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+.docs-toc-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.docs-toc-link {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 520;
+  color: var(--muted);
+  line-height: 1.4;
+  padding: 3px 0;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  padding-left: 10px;
+  transition: all 120ms ease;
+}
+
+.docs-toc-link:hover {
+  color: var(--ink);
+  border-left-color: var(--line);
+}
+
+.docs-toc-link.active {
+  color: var(--mint-dark);
+  font-weight: 660;
+  border-left-color: var(--mint);
+}
+
+@media (max-width: 1024px) {
+  .docs-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .docs-toc {
+    display: none;
+  }
+}
+
 /* Docs Pages Styles — sidebar + content layout */
 .docs-shell {
   width: min(1200px, calc(100% - 40px));
@@ -1492,8 +1555,8 @@ a {
 
 .docs-layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 40px;
+  grid-template-columns: 240px minmax(0, 1fr) 180px;
+  gap: 32px;
   align-items: start;
 }
 

@@ -605,6 +605,73 @@ function Sidebar({
   );
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null> }) {
+  const [headings, setHeadings] = React.useState<{ id: string; text: string }[]>([]);
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const el = articleRef.current;
+    if (!el) return;
+
+    const h3s = Array.from(el.querySelectorAll("h3"));
+    const items = h3s.map((h3) => {
+      if (!h3.id) {
+        h3.id = slugify(h3.textContent ?? "");
+      }
+      return { id: h3.id, text: h3.textContent ?? "" };
+    });
+    setHeadings(items);
+
+    if (items.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) {
+          setActiveId(visible[0].target.id);
+        }
+      },
+      { threshold: 0.3, rootMargin: "-80px 0px -60% 0px" }
+    );
+
+    h3s.forEach((h3) => observer.observe(h3));
+    return () => observer.disconnect();
+  }, [articleRef]);
+
+  if (headings.length === 0) return null;
+
+  return (
+    <aside className="docs-toc">
+      <div className="docs-toc-card">
+        <h4>On this page</h4>
+        <nav>
+          {headings.map((h) => (
+            <a
+              key={h.id}
+              href={`#${h.id}`}
+              className={`docs-toc-link${activeId === h.id ? " active" : ""}`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              {h.text}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
+
 export function DocsPage({
   onBack,
   activePetIndex,
@@ -616,6 +683,7 @@ export function DocsPage({
   appName
 }: DocsPageProps) {
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
+  const articleRef = React.useRef<HTMLElement | null>(null);
 
   const activeData = activeSection
     ? docSections.find((s) => s.id === activeSection)
@@ -641,7 +709,7 @@ export function DocsPage({
 
           <main className="docs-content">
             {activeData ? (
-              <article className="docs-article-card docs-prose">
+              <article className="docs-article-card docs-prose" ref={articleRef}>
                 <h1>{activeData.title}</h1>
                 {activeData.content}
               </article>
@@ -660,6 +728,8 @@ export function DocsPage({
               </article>
             )}
           </main>
+
+          {activeData && <DocToc articleRef={articleRef} />}
         </div>
       </div>
 
