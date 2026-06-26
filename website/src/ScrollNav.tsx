@@ -4,7 +4,7 @@ const sections = [
   { id: "features", label: "Features" },
   { id: "desktop-pet", label: "Desktop Pet" },
   { id: "privacy", label: "Privacy" },
-  { id: "support", label: "Support" }
+  { id: "open-source", label: "Open Source" }
 ];
 
 export function ScrollNav() {

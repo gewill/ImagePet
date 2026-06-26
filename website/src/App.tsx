@@ -497,7 +497,7 @@ function App() {
           </div>
         </div>
 
-        <div className="open-source-panel">
+        <div className="open-source-panel" id="open-source">
           <GitBranch size={24} strokeWidth={1.8} aria-hidden="true" />
           <div>
             <h2>{locale.website.openSource.title}</h2>
