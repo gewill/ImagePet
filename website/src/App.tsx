@@ -34,12 +34,9 @@ const heroScreenshot = {
 };
 
 const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "Desktop Pet", href: "#desktop-pet" },
+  { label: "Home", href: "/" },
   { label: "Docs", href: "/en/docs" },
-  { label: "Changelog", href: "/en/changelog" },
-  { label: "Privacy", href: "#privacy" },
-  { label: "Support", href: "#support" }
+  { label: "Changelog", href: "/en/changelog" }
 ];
 
 const workflowSteps = [
