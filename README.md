@@ -132,8 +132,10 @@ com.apple.security.files.user-selected.read-write = true
 
 ```bash
 imagepet \
-  --preset balanced \
-  --output /path/to/output \
+  -p balanced \
+  -f jpeg \
+  -m 1920 \
+  -o /path/to/output \
   /path/to/a.heic /path/to/b.png /path/to/c.jpg
 ```
 
@@ -163,11 +165,14 @@ CLI 不复用：
 
 CLI 行为：
 
-- `--preset high|balanced|small`，默认 `balanced`。
-- `--quality <1...100>` 可用于自定义质量。
-- `--format jpg|png|heic|webp|original` 可选择输出格式。
-- `--output <directory>` 可指定输出目录。
-- 支持多个输入文件。
+- `-p high|balanced|small` 设置压缩预设，默认 `balanced`。
+- `-q <1...100>` 可用于自定义质量；不要和非默认 `-p` 同时使用。
+- `-f original|jpeg|png|heic|webp` 可选择输出格式，默认 `original`。
+- `-m none|1024|1920|2048|3840` 可限制长边尺寸，默认 `none`。
+- `-o <directory>` 可指定输出目录；目录必须已存在。
+- `--keep-metadata` 保留 EXIF/GPS metadata；默认剥离 metadata。
+- `--overwrite` 写回原文件夹并允许替换原文件；不要和 `-o` 同时使用。
+- 支持多个输入文件或目录。
 - 并发仍限制为 `2`，和 GUI MVP 保持一致。
 - 每个文件失败不影响整个批次。
 - 输出 per-file 结果和最终总计。
