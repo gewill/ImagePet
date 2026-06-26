@@ -22,6 +22,7 @@ import appMetadata from "../../metadata/app.json";
 import locale from "../../metadata/locales/en-US.json";
 import { TermsPage, PrivacyPage } from "./LegalPages";
 import { DocsPage } from "./DocsPages";
+import { SiteHeader } from "./SiteHeader";
 
 const app = appMetadata.product;
 const links = appMetadata.links;
@@ -243,35 +244,45 @@ function App() {
     return links.support;
   })();
 
+  const sharedProps = {
+    navItems,
+    appStoreHref,
+    hasMacAppStore: !!links.macAppStore,
+    appName: app.name
+  };
+
   if (path === "/en/terms" || path === "/en/terms/") {
     return (
-      <TermsPage 
-        activePetIndex={activePetIndex} 
-        setActivePetIndex={setActivePetIndex} 
+      <TermsPage
+        onBack={navigateTo}
+        activePetIndex={activePetIndex}
+        setActivePetIndex={setActivePetIndex}
         petThemes={petThemes}
-        onBack={() => navigateTo("/")}
+        {...sharedProps}
       />
     );
   }
 
   if (path === "/en/privacy" || path === "/en/privacy/") {
     return (
-      <PrivacyPage 
-        activePetIndex={activePetIndex} 
-        setActivePetIndex={setActivePetIndex} 
+      <PrivacyPage
+        onBack={navigateTo}
+        activePetIndex={activePetIndex}
+        setActivePetIndex={setActivePetIndex}
         petThemes={petThemes}
-        onBack={() => navigateTo("/")}
+        {...sharedProps}
       />
     );
   }
 
   if (path === "/en/docs" || path === "/en/docs/") {
     return (
-      <DocsPage 
-        activePetIndex={activePetIndex} 
-        setActivePetIndex={setActivePetIndex} 
+      <DocsPage
+        onBack={navigateTo}
+        activePetIndex={activePetIndex}
+        setActivePetIndex={setActivePetIndex}
         petThemes={petThemes}
-        onBack={() => navigateTo("/")}
+        {...sharedProps}
       />
     );
   }
@@ -279,10 +290,12 @@ function App() {
   if (path === "/en/changelog" || path === "/en/changelog/") {
     return (
       <main className="site-shell changelog-page">
+        <SiteHeader
+          currentPath="/en/changelog"
+          navigateTo={navigateTo}
+          {...sharedProps}
+        />
         <div className="legal-page-container changelog-page-container">
-          <button className="legal-back-btn" onClick={() => navigateTo("/")}>
-            ← Back to Home
-          </button>
           <section className="changelog-page-card" aria-labelledby="changelog-page-title">
             <div className="legal-page-header">
               <h1 id="changelog-page-title">{locale.website.changelog.title}</h1>
@@ -291,48 +304,36 @@ function App() {
             <ChangelogContent />
           </section>
         </div>
+
+        <div
+          className="floating-desktop-pet"
+          onClick={() => setActivePetIndex((prev) => (prev + 1) % petThemes.length)}
+        >
+          <div className="floating-pet-tooltip">
+            <strong>Desktop Pet: {petThemes[activePetIndex].name}</strong>
+            <span>{petThemes[activePetIndex].description}</span>
+            <span className="tooltip-hint">Click to switch theme</span>
+          </div>
+          <div className="floating-pet-card">
+            <img
+              src={petThemes[activePetIndex].image}
+              alt={`ImagePet desktop pet ${petThemes[activePetIndex].name} theme`}
+              key={activePetIndex}
+              className="floating-pet-img"
+            />
+          </div>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="site-shell">
-      <header className="site-header" aria-label="Primary navigation">
-        <a className="brand" href="#top" aria-label="ImagePet home">
-          <img src="/imagepet-icon.png" alt="" className="brand-icon" />
-          <span>{app.name}</span>
-        </a>
-        <nav className="nav-links">
-          {navItems.map((item) => (
-            <a
-              href={item.href}
-              key={item.label}
-              onClick={(event) => {
-                if (item.href.startsWith("/")) {
-                  event.preventDefault();
-                  navigateTo(item.href);
-                }
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-        <a
-          className="header-cta"
-          href={appStoreHref}
-          aria-disabled={!links.macAppStore}
-          onClick={(event) => {
-            if (!links.macAppStore) {
-              event.preventDefault();
-              document.getElementById("download")?.scrollIntoView({ behavior: "smooth" });
-            }
-          }}
-        >
-          <Download size={16} aria-hidden="true" />
-          Download
-        </a>
-      </header>
+      <SiteHeader
+        currentPath="/"
+        navigateTo={navigateTo}
+        {...sharedProps}
+      />
 
       <section className="hero-section" id="top">
         <div className="hero-copy">
@@ -515,8 +516,8 @@ function App() {
           <span>{app.name}</span>
         </a>
         <div className="footer-links">
-          <a 
-            href="/en/terms" 
+          <a
+            href="/en/terms"
             onClick={(e) => {
               e.preventDefault();
               navigateTo("/en/terms");
@@ -524,8 +525,8 @@ function App() {
           >
             Terms
           </a>
-          <a 
-            href="/en/privacy" 
+          <a
+            href="/en/privacy"
             onClick={(e) => {
               e.preventDefault();
               navigateTo("/en/privacy");
@@ -533,7 +534,7 @@ function App() {
           >
             Privacy
           </a>
-          <a 
+          <a
             href="/en/docs"
             onClick={(e) => {
               e.preventDefault();
@@ -542,7 +543,7 @@ function App() {
           >
             Docs
           </a>
-          <a 
+          <a
             href="/en/changelog"
             onClick={(e) => {
               e.preventDefault();
@@ -562,7 +563,7 @@ function App() {
       </footer>
 
       {/* Floating Interactive Desktop Pet Mini */}
-      <div 
+      <div
         className="floating-desktop-pet"
         onClick={() => setActivePetIndex((prev) => (prev + 1) % petThemes.length)}
       >
@@ -572,9 +573,9 @@ function App() {
           <span className="tooltip-hint">Click to switch theme</span>
         </div>
         <div className="floating-pet-card">
-          <img 
-            src={petThemes[activePetIndex].image} 
-            alt={`ImagePet desktop pet ${petThemes[activePetIndex].name} theme`} 
+          <img
+            src={petThemes[activePetIndex].image}
+            alt={`ImagePet desktop pet ${petThemes[activePetIndex].name} theme`}
             key={activePetIndex}
             className="floating-pet-img"
           />

@@ -1,10 +1,15 @@
 import React from "react";
+import { SiteHeader } from "./SiteHeader";
 
 interface DocsPageProps {
-  onBack: () => void;
+  onBack: (path: string) => void;
   activePetIndex: number;
   setActivePetIndex: React.Dispatch<React.SetStateAction<number>>;
   petThemes: Array<{ name: string; description: string; image: string }>;
+  navItems: Array<{ label: string; href: string }>;
+  appStoreHref: string;
+  hasMacAppStore: boolean;
+  appName: string;
 }
 
 interface DocSection {
@@ -600,7 +605,16 @@ function Sidebar({
   );
 }
 
-export function DocsPage({ onBack, activePetIndex, setActivePetIndex, petThemes }: DocsPageProps) {
+export function DocsPage({
+  onBack,
+  activePetIndex,
+  setActivePetIndex,
+  petThemes,
+  navItems,
+  appStoreHref,
+  hasMacAppStore,
+  appName
+}: DocsPageProps) {
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const activeData = activeSection
@@ -608,39 +622,45 @@ export function DocsPage({ onBack, activePetIndex, setActivePetIndex, petThemes 
     : null;
 
   return (
-    <div className="docs-shell">
-      <button className="docs-back-btn" onClick={onBack}>
-        ← Back to Home
-      </button>
+    <main className="site-shell">
+      <SiteHeader
+        currentPath="/en/docs"
+        navigateTo={onBack}
+        navItems={navItems}
+        appStoreHref={appStoreHref}
+        hasMacAppStore={hasMacAppStore}
+        appName={appName}
+      />
+      <div className="docs-shell">
+        <div className="docs-layout">
+          <Sidebar
+            sections={docSections}
+            activeId={activeSection}
+            onSelect={(id) => setActiveSection(id)}
+          />
 
-      <div className="docs-layout">
-        <Sidebar
-          sections={docSections}
-          activeId={activeSection}
-          onSelect={(id) => setActiveSection(id)}
-        />
-
-        <main className="docs-content">
-          {activeData ? (
-            <article className="docs-article-card docs-prose">
-              <h1>{activeData.title}</h1>
-              {activeData.content}
-            </article>
-          ) : (
-            <article className="docs-article-card docs-prose">
-              <h1>Documentation</h1>
-              <div className="docs-intro-box">
-                <p>
-                  Learn how to install, configure, and use ImagePet for local image compression
-                  on macOS.
+          <main className="docs-content">
+            {activeData ? (
+              <article className="docs-article-card docs-prose">
+                <h1>{activeData.title}</h1>
+                {activeData.content}
+              </article>
+            ) : (
+              <article className="docs-article-card docs-prose">
+                <h1>Documentation</h1>
+                <div className="docs-intro-box">
+                  <p>
+                    Learn how to install, configure, and use ImagePet for local image compression
+                    on macOS.
+                  </p>
+                </div>
+                <p className="docs-index-hint">
+                  Select a topic from the sidebar to get started.
                 </p>
-              </div>
-              <p className="docs-index-hint">
-                Select a topic from the sidebar to get started.
-              </p>
-            </article>
-          )}
-        </main>
+              </article>
+            )}
+          </main>
+        </div>
       </div>
 
       <div
@@ -662,6 +682,6 @@ export function DocsPage({ onBack, activePetIndex, setActivePetIndex, petThemes 
           />
         </div>
       </div>
-    </div>
+    </main>
   );
 }
