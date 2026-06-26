@@ -21,6 +21,7 @@ import {
 import appMetadata from "../../metadata/app.json";
 import locale from "../../metadata/locales/en-US.json";
 import { TermsPage, PrivacyPage } from "./LegalPages";
+import { DocsPage } from "./DocsPages";
 
 const app = appMetadata.product;
 const links = appMetadata.links;
@@ -34,6 +35,7 @@ const heroScreenshot = {
 const navItems = [
   { label: "Features", href: "#features" },
   { label: "Desktop Pet", href: "#desktop-pet" },
+  { label: "Docs", href: "/en/docs" },
   { label: "Changelog", href: "/en/changelog" },
   { label: "Privacy", href: "#privacy" },
   { label: "Support", href: "#support" }
@@ -255,6 +257,17 @@ function App() {
   if (path === "/en/privacy" || path === "/en/privacy/") {
     return (
       <PrivacyPage 
+        activePetIndex={activePetIndex} 
+        setActivePetIndex={setActivePetIndex} 
+        petThemes={petThemes}
+        onBack={() => navigateTo("/")}
+      />
+    );
+  }
+
+  if (path === "/en/docs" || path === "/en/docs/") {
+    return (
+      <DocsPage 
         activePetIndex={activePetIndex} 
         setActivePetIndex={setActivePetIndex} 
         petThemes={petThemes}
@@ -520,7 +533,16 @@ function App() {
           >
             Privacy
           </a>
-          <a
+          <a 
+            href="/en/docs"
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo("/en/docs");
+            }}
+          >
+            Docs
+          </a>
+          <a 
             href="/en/changelog"
             onClick={(e) => {
               e.preventDefault();
