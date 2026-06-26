@@ -1309,6 +1309,10 @@ a {
       box-shadow 160ms ease;
   }
 
+  .scroll-nav-dot {
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
   .primary-button:hover,
   .secondary-button:hover,
   .header-cta:hover,
@@ -1409,6 +1413,73 @@ a {
   }
   .legal-page-header h1 {
     font-size: 28px;
+  }
+}
+
+/* Scroll Nav — floating progress dots */
+.scroll-nav {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.scroll-nav-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  pointer-events: auto;
+}
+
+.scroll-nav-track::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 50%;
+  width: 1px;
+  background: var(--line);
+  transform: translateX(-50%);
+}
+
+.scroll-nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--page);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-nav-dot:hover {
+  border-color: var(--mint);
+  transform: scale(1.25);
+}
+
+.scroll-nav-dot.active {
+  background: var(--mint-dark);
+  border-color: var(--mint-dark);
+  box-shadow: 0 0 0 3px rgba(28, 122, 97, 0.18);
+}
+
+@media (max-width: 860px) {
+  .scroll-nav {
+    right: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .scroll-nav {
+    display: none;
   }
 }
 

@@ -23,6 +23,7 @@ import locale from "../../metadata/locales/en-US.json";
 import { TermsPage, PrivacyPage } from "./LegalPages";
 import { DocsPage } from "./DocsPages";
 import { SiteHeader } from "./SiteHeader";
+import { ScrollNav } from "./ScrollNav";
 
 const app = appMetadata.product;
 const links = appMetadata.links;
@@ -331,6 +332,8 @@ function App() {
         navigateTo={navigateTo}
         {...sharedProps}
       />
+
+      <ScrollNav />
 
       <section className="hero-section" id="top">
         <div className="hero-copy">
