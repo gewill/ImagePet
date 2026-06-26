@@ -48,13 +48,21 @@ struct BuiltInPetTheme: Identifiable, Equatable {
         defaultFPS: 11
     )
 
+    private static let clownfish = BuiltInPetTheme(
+        id: "Clownfish",
+        displayName: "Clownfish",
+        description: "A glossy clownfish with bold stripes and cheerful bubbly motion.",
+        defaultFPS: 10
+    )
+
     private static let fallbackThemes: [BuiltInPetTheme] = [
         dog,
         pufferfish,
         squirrel,
         hamster,
         cat,
-        rabbit
+        rabbit,
+        clownfish
     ]
 
     static let all: [BuiltInPetTheme] = fallbackThemes.map { fallbackTheme in

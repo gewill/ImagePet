@@ -29,7 +29,8 @@ final class BuiltInPetThemeAssetTests: XCTestCase {
         "Squirrel",
         "Hamster",
         "Cat",
-        "Rabbit"
+        "Rabbit",
+        "Clownfish"
     ]
 
     private let animationSpecs: [(name: String, frames: Int, mode: String)] = [

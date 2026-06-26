@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "created_date": "2026-06-26",
+  "updated_date": "2026-06-27",
+  "theme_dir": "Sources/ImagePet/Resources/Clownfish",
+  "theme_id": "Clownfish",
+  "total_bytes": 2938997,
+  "errors": [],
+  "warnings": [],
+  "outputs": {
+    "contact_sheet": "docs/theme-qa/v0.16/Clownfish/contact-sheet.png",
+    "preview_dir": "docs/theme-qa/v0.16/Clownfish/previews"
+  }
+}

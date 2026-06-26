@@ -208,7 +208,7 @@ private enum HelpContent {
                         "Choose a pet theme in Settings → Desktop Pet."
                     ],
                     bullets: [
-                        "Dog, Pufferfish, Squirrel, Hamster, Cat, and Rabbit themes are available.",
+                        "Dog, Pufferfish, Squirrel, Hamster, Cat, Rabbit, and Clownfish themes are available.",
                         "Hover the mini pet and drag the bottom-right resize handle to adjust size within the supported range.",
                         "Each theme uses its own default animation pacing.",
                         "Enable Idle Variants lets the pet yawn or stretch during inactivity.",

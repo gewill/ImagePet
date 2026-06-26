@@ -1,6 +1,6 @@
 # V0.16 Desktop Pet Theme Visual QA
 
-更新日期：2026-06-20
+更新日期：2026-06-27
 
 ## 范围
 
@@ -12,6 +12,7 @@
 - `Hamster`
 - `Cat`
 - `Rabbit`
+- `Clownfish`
 
 每个主题覆盖 9 个运行时状态：
 
@@ -56,6 +57,7 @@
 | Hamster | Pass | 0 | 0 | 1007595 bytes |
 | Cat | Pass | 0 | 0 | 998256 bytes |
 | Rabbit | Pass | 0 | 0 | 779384 bytes |
+| Clownfish | Pass | 0 | 0 | 2938997 bytes |
 
 ## 模型视觉验收记录
 
@@ -67,6 +69,7 @@
 | Hamster | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | Cat | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | Rabbit | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| Clownfish | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 
 ## 备注
 

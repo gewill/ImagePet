@@ -14,7 +14,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 - `Add Images` 菜单/按钮输入入口
 - 桌面宠物小窗第一版
 - 桌面 Pet UI、动效和轻量交互优化
-- 桌面 Pet 内置主题切换为 Dog / Pufferfish / Squirrel / Hamster / Cat / Rabbit，并新增 mini 自由缩放与主题默认 fps
+- 桌面 Pet 内置主题切换为 Dog / Pufferfish / Squirrel / Hamster / Cat / Rabbit / Clownfish，并新增 mini 自由缩放与主题默认 fps
 - V0.3 输出格式、保存位置、覆盖确认、尺寸限制和元数据剥离选项
 - V0.9 WebP 与自定义压缩质量
 - V0.10 Advanced JPEG (mozjpeg) 并行双引擎
@@ -94,7 +94,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 桌面 Pet 第一版 | 已实现 | `DesktopPetWindowController` + `DesktopPetView`，可通过主界面或菜单显示/隐藏、返回主窗口并跟随状态变化 | 手工验证窗口拖动、跨 Space 和状态同步 |
 | 桌面 Pet UI / 动效 / 交互优化 | 已实现 | Pet 小窗扩展到 `192x176`，增加状态色、状态徽章、主动作按钮、处理中进度条、拖拽高亮、hover 反馈和 Reduce Motion 分支 | 手工验证 Light/Dark、Reduce Motion、拖拽追加和 VoiceOver 读出 |
 | 桌面 Pet Mini / Full 双态实现 | 已实现 | `docs/PRD_v0.5_desktop_pet_dual_state.md` 明确 Mini 只显示 Pet、Full 负责解释和操作、阻塞状态自动展开 | 自动化 UI 测试与单元测试已完全覆盖 |
-| 桌面 Pet 内置主题扩展 | 已实现 | 内置主题已切换为 `Dog`、`Pufferfish`、`Squirrel`、`Hamster`、`Cat`、`Rabbit`；设置页主题卡、Help 文案、主题默认 fps 与资源规格测试已同步 | 继续把静态占位帧逐步替换为每个角色的正式动画序列 |
+| 桌面 Pet 内置主题扩展 | 已实现 | 内置主题已切换为 `Dog`、`Pufferfish`、`Squirrel`、`Hamster`、`Cat`、`Rabbit`、`Clownfish`；设置页主题卡、Help 文案、主题默认 fps 与资源规格测试已同步 | 继续把静态占位帧逐步替换为每个角色的正式动画序列 |
 | 桌面 Pet 自由缩放 | 已实现 | 参考 Codex pet 的小桌宠可读范围，限制 mini Pet 视觉尺寸在 `64-256 px`；设置页不再提供尺寸 segment，用户仅在 mini 状态 hover Pet 后可拖拽右下角缩放手柄自由调整尺寸；full 面板保持固定尺寸；运行时和静态主题预览共用透明 padding 裁剪 | 手工验证不同屏幕与多 Space 下的尺寸切换、可见区域约束和主题预览观感 |
 | 静默桌面 Pet 常驻与内置主题扩展规划 | 已规划 | `docs/PRD_v0.6_desktop_pet_animations.md` 与 `docs/PRD_v0.7_desktop_pet_expansion.md` 明确内置动画集、Launch at Login 静默启动、既有 Pet 直接拖拽验收、至少 1 套新增内置主题；自定义导入延后 | 进入 v0.7 技术设计评审 |
 | 非覆盖模式不覆盖原文件 | 已实现 | `OutputNameAllocator` + 单测覆盖冲突和后缀清洗 | 覆盖同名真实文件场景 |
