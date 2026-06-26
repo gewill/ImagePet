@@ -1,5 +1,11 @@
 # ImagePet
 
+> **Recommended for most users**: Get ImagePet from the [Mac App Store](https://apps.apple.com/app/id6780180225) for a signed, sandboxed app with automatic updates. This repository keeps the source code open for review, learning, issues, and contributions.
+>
+> **普通用户建议**：优先从 [Mac App Store](https://apps.apple.com/app/id6780180225) 购买和安装 ImagePet，获得已签名、沙盒化、可自动更新的成品 App。本仓库保持源码开放，便于审阅、学习、反馈问题和参与贡献。
+
+![ImagePet screenshot showing drag-and-drop compression workflow](screenshots/asc/mac/en-US/02-drop-to-compress.png)
+
 > **TL;DR**: ImagePet is a local-first macOS batch image compressor with an interactive desktop pet progress companion. It supports JPG, PNG, HEIC, and WebP, featuring Finder extensions, Shortcuts actions, and background folder watching—all processed 100% locally on your Mac.
 >
 > ImagePet 是一个基于 macOS 的本地批处理图片压缩工具，带有一个有趣的桌面宠物进度伴侣。支持 JPG、PNG、HEIC 和 WebP 格式，并集成了 Finder 快捷动作、快捷指令（Shortcuts）以及后台文件夹监控——所有图片处理均 100% 在本地完成，无需上传。
