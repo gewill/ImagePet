@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gewill/Swift-WebP.git",
       "state" : {
-        "revision" : "a85311f3d768a0ecbf4390d27d35071c840f6d77",
-        "version" : "0.7.0"
+        "revision" : "4f127d4fdbc102676895b4d3b06c78fa1d4c118c",
+        "version" : "0.7.1"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gewill/webp-spm.git",
       "state" : {
-        "revision" : "c5d21d16f5d7cca8fd635869410644be9dd96522",
-        "version" : "1.6.0"
+        "revision" : "942873b31aba6e7793ede689cc6b933c80ccabf6",
+        "version" : "1.6.1"
       }
     }
   ],

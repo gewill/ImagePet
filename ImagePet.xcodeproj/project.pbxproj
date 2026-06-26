@@ -170,7 +170,7 @@
 		65286F00477023AC73A1D3B6 /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
 		6F8F586A1135EAED6910EB32 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Sources/ImagePet/Resources; sourceTree = SOURCE_ROOT; };
 		7A93444765F4DF14ABA2386D /* PetAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetAnimation.swift; sourceTree = "<group>"; };
-		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; includeInIndex = 0; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		80CD202A0398235BDC6020B8 /* ImagePetCLI */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; path = ImagePetCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FD78B2591A703F59ECE6F7 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		92A0E344263EE215722E53D3 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
 		9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerTests.swift; sourceTree = "<group>"; };
@@ -1119,7 +1119,7 @@
 			repositoryURL = "https://github.com/gewill/Swift-WebP.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.7.0;
+				version = 0.7.1;
 			};
 		};
 		862892458DC2FCCEC778AB32 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {

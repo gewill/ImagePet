@@ -13,7 +13,7 @@ settings:
 packages:
   SwiftWebP:
     url: https://github.com/gewill/Swift-WebP.git
-    exactVersion: 0.7.0
+    exactVersion: 0.7.1
   mozjpeg.swift:
     url: https://github.com/awxkee/mozjpeg.swift.git
     exactVersion: 1.1.3
