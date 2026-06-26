@@ -12,7 +12,7 @@
       "ImagePet also includes macOS-native workflow helpers: Finder Quick Action / Services support, Shortcuts integration, Folder Watching for authorized local folders, optional local notifications for background work, and a small desktop pet that reflects compression progress.",
       "Privacy is simple: ImagePet processes images locally and does not upload your files. It does not require an account, cloud sync, or online service to compress images."
     ],
-    "whatsNew": "Initial Mac App Store release.",
+    "whatsNew": "ImagePet 1.1 polishes everyday batch compression with queue thumbnails, clearer task controls, a dedicated Settings window, improved WebP handling, and the new Clownfish desktop pet theme.",
     "keywords": [
       "image compression",
       "compress photos",
@@ -85,7 +85,7 @@
       {
         "id": "desktop-pet",
         "heading": "A desktop pet that keeps progress visible",
-        "body": "ImagePet can keep a small companion on your desktop, reflect compression state, and make long-running batch work easier to notice."
+        "body": "ImagePet can keep a small companion on your desktop, reflect compression state, and make long-running batch work easier to notice, with seven built-in themes."
       },
       {
         "id": "privacy",
@@ -110,6 +110,7 @@
             "Added per-file task control for canceling and removing queued work.",
             "Added queue thumbnails and clearer completed, failed, and attention-needed states.",
             "Moved settings into a dedicated window with clearer shortcut and notification controls.",
+            "Added the Clownfish desktop pet theme with bubbly sleep and eating animations.",
             "Improved WebP output handling using Apple ImageIO and UTType capability checks.",
             "Updated the website screenshot and public metadata for the v1.1 Mac App Store build."
           ]

@@ -106,7 +106,7 @@ const petDetails = [
   },
   {
     title: "Built-in themes",
-    body: "Choose Dog, Cat, Rabbit, Hamster, Squirrel, or Pufferfish.",
+    body: "Choose Dog, Cat, Rabbit, Hamster, Squirrel, Pufferfish, or Clownfish.",
     icon: Palette
   }
 ];
@@ -141,6 +141,11 @@ const petThemes = [
     name: "Rabbit",
     description: "Light springy movement",
     image: "/pets/rabbit.png"
+  },
+  {
+    name: "Clownfish",
+    description: "Bright bubbly motion",
+    image: "/pets/clownfish.png"
   }
 ];
 
@@ -437,7 +442,7 @@ function App() {
             {desktopPetSection?.body ??
               "ImagePet can keep a small companion on your desktop, reflect compression state, and make local batch work easier to notice."}
           </p>
-          <div className="pet-count">6 built-in desktop pets</div>
+          <div className="pet-count">{petThemes.length} built-in desktop pets</div>
         </div>
         <div className="desktop-pet-stage" aria-label="Desktop pet feature preview">
           <div className="desktop-pet-window">

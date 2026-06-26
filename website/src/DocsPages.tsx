@@ -194,11 +194,16 @@ const docSections: DocSection[] = [
             <img src="/pets/rabbit.png" alt="Rabbit pet theme" />
             <strong>Rabbit</strong>
           </div>
+          <div className="docs-pet-card">
+            <img src="/pets/clownfish.png" alt="Clownfish pet theme" />
+            <strong>Clownfish</strong>
+          </div>
         </div>
 
         <ul>
           <li>
-            Six themes are available: Dog, Pufferfish, Squirrel, Hamster, Cat, and Rabbit.
+            Seven themes are available: Dog, Pufferfish, Squirrel, Hamster, Cat, Rabbit, and
+            Clownfish.
           </li>
           <li>
             Hover the mini pet and drag the bottom-right resize handle to adjust size within
