@@ -97,6 +97,38 @@
       "title": "ImagePet Support",
       "summary": "For support, include your macOS version, ImagePet version, input format, selected output format, and a short description of what happened. Do not send private images unless you intentionally choose to."
     },
+    "changelog": {
+      "title": "Changelog",
+      "summary": "Recent public ImagePet releases and user-facing changes.",
+      "entries": [
+        {
+          "version": "1.1",
+          "date": "June 2026",
+          "title": "Batch workflow polish",
+          "summary": "Improves queue control, visual feedback, settings, and WebP handling for everyday local compression.",
+          "changes": [
+            "Added per-file task control for canceling and removing queued work.",
+            "Added queue thumbnails and clearer completed, failed, and attention-needed states.",
+            "Moved settings into a dedicated window with clearer shortcut and notification controls.",
+            "Improved WebP output handling using Apple ImageIO and UTType capability checks.",
+            "Updated the website screenshot and public metadata for the v1.1 Mac App Store build."
+          ]
+        },
+        {
+          "version": "1.0",
+          "date": "June 2026",
+          "title": "Initial Mac App Store release",
+          "summary": "Launches ImagePet as a local-first macOS image compression utility.",
+          "changes": [
+            "Compress JPG, PNG, HEIC, and WebP images locally on Mac.",
+            "Output as Original, JPEG, PNG, HEIC, or WebP when encoder support is available.",
+            "Use presets, max-edge resizing, metadata stripping, and safe output naming.",
+            "Integrates Finder Quick Action, Shortcuts, folder watching, and local notifications.",
+            "Includes built-in desktop pet themes that reflect compression progress."
+          ]
+        }
+      ]
+    },
     "openSource": {
       "title": "Open source and independently maintained.",
       "summary": "ImagePet source code is available on GitHub. Mac App Store purchases support ongoing development and provide a signed, sandboxed app with automatic updates.",

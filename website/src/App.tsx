@@ -34,6 +34,7 @@ const heroScreenshot = {
 const navItems = [
   { label: "Features", href: "#features" },
   { label: "Desktop Pet", href: "#desktop-pet" },
+  { label: "Changelog", href: "/en/changelog" },
   { label: "Privacy", href: "#privacy" },
   { label: "Support", href: "#support" }
 ];
@@ -142,8 +143,34 @@ const petThemes = [
   }
 ];
 
+const changelogEntries = locale.website.changelog.entries;
+
 function metadataLink(value: string | null, fallback: string) {
   return value ?? fallback;
+}
+
+function ChangelogContent() {
+  return (
+    <div className="changelog-list">
+      {changelogEntries.map((entry, index) => (
+        <article className={index === 0 ? "changelog-entry latest" : "changelog-entry"} key={entry.version}>
+          <div className="changelog-meta">
+            <span>v{entry.version}</span>
+            <time>{entry.date}</time>
+          </div>
+          <div className="changelog-body">
+            <h3>{entry.title}</h3>
+            <p>{entry.summary}</p>
+            <ul>
+              {entry.changes.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
 }
 
 function App() {
@@ -236,6 +263,25 @@ function App() {
     );
   }
 
+  if (path === "/en/changelog" || path === "/en/changelog/") {
+    return (
+      <main className="site-shell changelog-page">
+        <div className="legal-page-container changelog-page-container">
+          <button className="legal-back-btn" onClick={() => navigateTo("/")}>
+            ← Back to Home
+          </button>
+          <section className="changelog-page-card" aria-labelledby="changelog-page-title">
+            <div className="legal-page-header">
+              <h1 id="changelog-page-title">{locale.website.changelog.title}</h1>
+              <p className="legal-last-updated">{locale.website.changelog.summary}</p>
+            </div>
+            <ChangelogContent />
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="site-shell">
       <header className="site-header" aria-label="Primary navigation">
@@ -245,7 +291,16 @@ function App() {
         </a>
         <nav className="nav-links">
           {navItems.map((item) => (
-            <a href={item.href} key={item.label}>
+            <a
+              href={item.href}
+              key={item.label}
+              onClick={(event) => {
+                if (item.href.startsWith("/")) {
+                  event.preventDefault();
+                  navigateTo(item.href);
+                }
+              }}
+            >
               {item.label}
             </a>
           ))}
@@ -464,6 +519,15 @@ function App() {
             }}
           >
             Privacy
+          </a>
+          <a
+            href="/en/changelog"
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo("/en/changelog");
+            }}
+          >
+            Changelog
           </a>
           <a href="#support">Support</a>
           <a href={appStoreHref} aria-disabled={!links.macAppStore}>

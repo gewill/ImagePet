@@ -31,6 +31,13 @@
       "minimumContent": "metadata/locales/en-US.json#/appStoreConnect/supportPageMinimumContent"
     },
     {
+      "id": "changelog",
+      "path": "/en/changelog",
+      "title": "metadata/locales/en-US.json#/website/changelog/title",
+      "description": "metadata/locales/en-US.json#/website/changelog/summary",
+      "copy": "metadata/locales/en-US.json#/website/changelog"
+    },
+    {
       "id": "privacy",
       "path": "/privacy",
       "title": "metadata/locales/en-US.json#/website/privacy/title",
