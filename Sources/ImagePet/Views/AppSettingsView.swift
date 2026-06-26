@@ -527,7 +527,7 @@ private struct HelpAboutSection: View {
     var body: some View {
         SettingsSectionHeader(
             title: "Help & About",
-            subtitle: "Reference, version, and notices.",
+            subtitle: "Reference, source, version, and notices.",
             systemImage: "questionmark.circle"
         )
 
@@ -541,7 +541,25 @@ private struct HelpAboutSection: View {
         VStack(alignment: .leading, spacing: 10) {
             SettingSummaryRow(title: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
             SettingSummaryRow(title: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown")
-            SettingSummaryRow(title: "Privacy", value: "Local processing, no uploads")
+            SettingSummaryRow(title: "Privacy", value: "Local image processing")
+
+            HStack(alignment: .top) {
+                Text("Open Source")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 150, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("ImagePet is open source. Your Mac App Store purchase supports ongoing development and provides a signed, sandboxed app with automatic updates.")
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Link(destination: URL(string: "https://github.com/gewill/ImagePet")!) {
+                        Label("View Source on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                    .font(.callout)
+                    .accessibilityIdentifier("aboutSourceCodeLink")
+                }
+            }
+            .font(.callout)
             
             HStack(alignment: .firstTextBaseline) {
                 Text("Third-party notices")
