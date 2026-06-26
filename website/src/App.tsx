@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-  AppWindow,
   Bell,
   ChevronRight,
   Download,
   EyeOff,
-  FileImage,
   FolderOpen,
   GitBranch,
+  Github,
   LockKeyhole,
+  Maximize2,
   MousePointer2,
   Move,
   Palette,
   PawPrint,
   ShieldCheck,
-  Sparkles,
-  WandSparkles
+  WandSparkles,
+  X
 } from "lucide-react";
 
 import appMetadata from "../../metadata/app.json";
@@ -26,6 +26,10 @@ const app = appMetadata.product;
 const links = appMetadata.links;
 const home = locale.website.home;
 const desktopPetSection = locale.website.sections.find((section) => section.id === "desktop-pet");
+const heroScreenshot = {
+  src: "/Screenshot-v1.1.jpg",
+  alt: "ImagePet 1.1 compression window showing a completed image batch and desktop pet controls."
+};
 
 const navItems = [
   { label: "Features", href: "#features" },
@@ -82,7 +86,7 @@ const helperItems = [
 
 const privacyItems = [
   { label: "No account", icon: EyeOff },
-  { label: "No cloud upload", icon: ShieldCheck },
+  { label: "Local processing", icon: ShieldCheck },
   { label: "No tracking", icon: LockKeyhole },
   { label: "User-selected folders", icon: FolderOpen }
 ];
@@ -145,6 +149,9 @@ function metadataLink(value: string | null, fallback: string) {
 function App() {
   const [activePetIndex, setActivePetIndex] = useState(0);
   const [path, setPath] = useState(window.location.pathname);
+  const [isScreenshotPreviewOpen, setIsScreenshotPreviewOpen] = useState(false);
+  const screenshotButtonRef = useRef<HTMLButtonElement>(null);
+  const lightboxCloseButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -154,6 +161,34 @@ function App() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  useEffect(() => {
+    if (!isScreenshotPreviewOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsScreenshotPreviewOpen(false);
+        return;
+      }
+
+      if (event.key === "Tab") {
+        event.preventDefault();
+        lightboxCloseButtonRef.current?.focus();
+      }
+    };
+
+    document.body.classList.add("lightbox-open");
+    window.addEventListener("keydown", handleKeyDown);
+    lightboxCloseButtonRef.current?.focus();
+
+    return () => {
+      document.body.classList.remove("lightbox-open");
+      window.removeEventListener("keydown", handleKeyDown);
+      screenshotButtonRef.current?.focus();
+    };
+  }, [isScreenshotPreviewOpen]);
+
   const navigateTo = (newPath: string) => {
     window.history.pushState({}, "", newPath);
     setPath(newPath);
@@ -161,7 +196,6 @@ function App() {
   };
 
   const appStoreHref = metadataLink(links.macAppStore, "#download");
-  const privacyHref = metadataLink(links.privacyPolicy, "#privacy");
   const sourceHref = metadataLink(links.sourceCode, "https://github.com/gewill/ImagePet");
   const supportHref = (() => {
     if (!links.support) return "mailto:";
@@ -250,20 +284,36 @@ function App() {
               <Download size={18} aria-hidden="true" />
               {home.primaryCtaLabel}
             </a>
-            <a className="secondary-button" href={privacyHref}>
+            <a className="secondary-button" href={sourceHref} target="_blank" rel="noreferrer">
               {home.secondaryCtaLabel}
               <ChevronRight size={17} aria-hidden="true" />
             </a>
           </div>
-          {!links.macAppStore && (
-            <p className="availability-note">
-              Mac App Store link will be added after the first approved release.
-            </p>
-          )}
+          <p className="availability-note">
+            Available on the Mac App Store · macOS 13+ · v{app.marketingVersion}
+          </p>
         </div>
 
-        <div className="hero-visual" aria-label="ImagePet app workflow preview">
-          <ProductMockup />
+        <div className="hero-visual" aria-label="ImagePet app screenshot preview">
+          <button
+            className="screenshot-frame"
+            type="button"
+            ref={screenshotButtonRef}
+            onClick={() => setIsScreenshotPreviewOpen(true)}
+            aria-label="Open ImagePet screenshot preview"
+          >
+            <img
+              src={heroScreenshot.src}
+              alt={heroScreenshot.alt}
+              width="2412"
+              height="1556"
+              decoding="async"
+              fetchPriority="high"
+            />
+            <span className="screenshot-zoom-badge" aria-hidden="true">
+              <Maximize2 size={16} />
+            </span>
+          </button>
         </div>
       </section>
 
@@ -375,9 +425,6 @@ function App() {
             <a className="support-link" href={supportHref} target="_blank" rel="noreferrer">
               Open Support Issues on GitHub
             </a>
-            <a className="support-link secondary" href={sourceHref} target="_blank" rel="noreferrer">
-              {locale.website.openSource.linkLabel}
-            </a>
           </div>
         </div>
 
@@ -386,6 +433,10 @@ function App() {
           <div>
             <h2>{locale.website.openSource.title}</h2>
             <p>{locale.website.openSource.summary}</p>
+            <a className="open-source-link" href={sourceHref} target="_blank" rel="noreferrer">
+              <Github size={18} strokeWidth={2.1} aria-hidden="true" />
+              {locale.website.openSource.linkLabel}
+            </a>
           </div>
         </div>
       </section>
@@ -443,60 +494,36 @@ function App() {
           />
         </div>
       </div>
+
+      {isScreenshotPreviewOpen ? (
+        <div
+          className="screenshot-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="ImagePet screenshot preview"
+          onClick={() => setIsScreenshotPreviewOpen(false)}
+        >
+          <button
+            className="lightbox-close"
+            type="button"
+            ref={lightboxCloseButtonRef}
+            aria-label="Close screenshot preview"
+            onClick={() => setIsScreenshotPreviewOpen(false)}
+          >
+            <X size={22} aria-hidden="true" />
+          </button>
+          <img
+            src={heroScreenshot.src}
+            alt={heroScreenshot.alt}
+            width="2412"
+            height="1556"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      ) : null}
     </main>
   );
 }
 
-function ProductMockup() {
-  return (
-    <div className="product-window">
-      <div className="window-toolbar">
-        <div className="traffic-lights" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="toolbar-title">
-          <AppWindow size={15} aria-hidden="true" />
-          Compression Queue
-        </div>
-      </div>
-      <div className="mockup-body">
-        <div className="drop-zone">
-          <Sparkles size={26} strokeWidth={1.8} aria-hidden="true" />
-          <strong>Drop images here</strong>
-          <span>Compress locally to smaller files</span>
-        </div>
-        <div className="queue-list">
-          <QueueRow name="vacation.heic" format="HEIC to JPEG" state="Saved 64%" />
-          <QueueRow name="studio.png" format="PNG to WebP" state="Saved 48%" />
-          <QueueRow name="banner.jpg" format="JPEG optimized" state="Ready" />
-        </div>
-        <div className="pet-companion" aria-label="Desktop pet progress companion">
-          <img src="/desktop-pet-dog.png" alt="" />
-          <div>
-            <strong>Desktop Pet is watching</strong>
-            <span>2 files compressed</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function QueueRow({ name, format, state }: { name: string; format: string; state: string }) {
-  return (
-    <div className="queue-row">
-      <div className="file-thumb">
-        <FileImage size={18} aria-hidden="true" />
-      </div>
-      <div>
-        <strong>{name}</strong>
-        <span>{format}</span>
-      </div>
-      <em>{state}</em>
-    </div>
-  );
-}
 
 export default App;

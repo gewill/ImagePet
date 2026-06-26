@@ -64,13 +64,13 @@
       "heroTitle": "ImagePet",
       "heroSubtitle": "Local image compression for Mac, with a small desktop pet that keeps progress visible.",
       "primaryCtaLabel": "Download on the Mac App Store",
-      "secondaryCtaLabel": "Read privacy notes"
+      "secondaryCtaLabel": "View Source on GitHub"
     },
     "sections": [
       {
         "id": "local-first",
         "heading": "Local-first compression",
-        "body": "Drop supported images into ImagePet and compress them on your Mac without account setup, cloud upload, or an online service."
+        "body": "Drop supported images into ImagePet, choose the output you need, and keep batch cleanup moving in a focused Mac utility."
       },
       {
         "id": "batch-workflow",
@@ -85,7 +85,7 @@
       {
         "id": "desktop-pet",
         "heading": "A desktop pet that keeps progress visible",
-        "body": "ImagePet can keep a small companion on your desktop, reflect compression state, and make local batch work easier to notice without opening a cloud dashboard."
+        "body": "ImagePet can keep a small companion on your desktop, reflect compression state, and make long-running batch work easier to notice."
       },
       {
         "id": "privacy",
