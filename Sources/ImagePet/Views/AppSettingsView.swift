@@ -538,6 +538,11 @@ private struct HelpAboutSection: View {
         }
         .accessibilityIdentifier("openHelpButton")
 
+        Link(destination: URL(string: "https://imagepet.gewill.org/en/docs")!) {
+            Label("Open Online Documentation", systemImage: "doc.badge.arrow.upright")
+        }
+        .accessibilityIdentifier("openOnlineDocsLink")
+
         VStack(alignment: .leading, spacing: 10) {
             SettingSummaryRow(title: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
             SettingSummaryRow(title: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown")

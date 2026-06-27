@@ -97,9 +97,8 @@ struct ImagePetApp: App {
                 }
                 .keyboardShortcut("/", modifiers: [.command, .shift])
 
-                Button("Keyboard Shortcuts...") {
-                    store.showSettings(.keyboardShortcuts)
-                }
+                Link("Online Documentation...", destination: URL(string: "https://imagepet.gewill.org/en/docs")!)
+                    .keyboardShortcut("D", modifiers: [.command, .shift])
             }
         }
 
