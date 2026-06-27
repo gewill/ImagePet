@@ -1,6 +1,6 @@
-# ImagePet CLI v1.0 独立发布与 Homebrew 指南
+# ImagePet CLI v1.1 独立发布与 Homebrew 指南
 
-本指南记录 `imagepet` 命令行工具作为独立无沙盒版本分发时的 v1.0 发布流程。GitHub Releases 使用签名/公证后的 ZIP 产物；Homebrew Tap 使用同一个 GitHub Release asset。
+本指南记录 `imagepet` 命令行工具作为独立无沙盒版本分发时的 v1.1 发布流程。GitHub Releases 使用签名/公证后的 ZIP 产物；Homebrew Tap 使用同一个 GitHub Release asset。
 
 ---
 
@@ -39,12 +39,18 @@
 SKIP_CODESIGN=1 SKIP_NOTARIZATION=1 ./script/release_cli.sh
 ```
 
+脚本默认要求 worktree clean，确保 manifest 里的 `gitCommit` 对应实际发布源码。仅本地试包且明确接受 dirty manifest 时，才使用：
+
+```bash
+ALLOW_DIRTY=1 SKIP_CODESIGN=1 SKIP_NOTARIZATION=1 ./script/release_cli.sh
+```
+
 脚本会生成：
 
 ```text
-dist/cli/v1.0/imagepet-cli-v1.0-macos-<arch>.zip
-dist/cli/v1.0/imagepet-cli-v1.0-macos-<arch>.zip.sha256
-dist/cli/v1.0/imagepet-cli-v1.0-manifest.json
+dist/cli/v1.1/imagepet-cli-v1.1-macos-<arch>.zip
+dist/cli/v1.1/imagepet-cli-v1.1-macos-<arch>.zip.sha256
+dist/cli/v1.1/imagepet-cli-v1.1-manifest.json
 ```
 
 `dist/` 已被 `.gitignore` 排除，不要把本地构建产物提交进仓库。
@@ -54,7 +60,7 @@ dist/cli/v1.0/imagepet-cli-v1.0-manifest.json
 正式发布时运行：
 
 ```bash
-RELEASE_VERSION=v1.0 \
+RELEASE_VERSION=v1.1 \
 NOTARY_PROFILE="imagepet-notary-profile" \
 ./script/release_cli.sh
 ```
@@ -63,7 +69,7 @@ NOTARY_PROFILE="imagepet-notary-profile" \
 
 ```bash
 CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
-RELEASE_VERSION=v1.0 \
+RELEASE_VERSION=v1.1 \
 NOTARY_PROFILE="imagepet-notary-profile" \
 ./script/release_cli.sh
 ```
@@ -81,17 +87,17 @@ codesign --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" image
 ```bash
 imagepet --version
 codesign --verify --strict --verbose=2 imagepet
-spctl -a -vvv -t install imagepet-cli-v1.0-macos-<arch>.zip
+spctl -a -vvv -t install imagepet-cli-v1.1-macos-<arch>.zip
 ```
 
 ### GitHub Release 上传项
 
-v1.0 tag 创建后，将以下产物上传到 GitHub Release：
+v1.1 tag 创建后，将以下产物上传到 GitHub Release：
 
 ```text
-imagepet-cli-v1.0-macos-<arch>.zip
-imagepet-cli-v1.0-macos-<arch>.zip.sha256
-imagepet-cli-v1.0-manifest.json
+imagepet-cli-v1.1-macos-<arch>.zip
+imagepet-cli-v1.1-macos-<arch>.zip.sha256
+imagepet-cli-v1.1-manifest.json
 ```
 
 ---
@@ -130,17 +136,17 @@ NOTARY_TEAM_ID="YOUR_TEAM_ID" \
 
 ## 4. Homebrew Tap
 
-Homebrew v1.0 使用 GitHub Release 里的二进制 ZIP。当前 arm64 产物为：
+Homebrew v1.1 使用 GitHub Release 里的二进制 ZIP。当前 arm64 产物为：
 
 ```text
-imagepet-cli-v1.0-macos-arm64.zip
-sha256: 74d5eab54048481ef6e376735fc5952ab0d77eb0c2a757ef057b39875fc0ae94
+imagepet-cli-v1.1-macos-arm64.zip
+sha256: 52ce5c2071b1f54f7c2ad91559b327ac192b0aec14e09910d83b5db62b7f6dcf
 ```
 
 对应的下载 URL 是：
 
 ```bash
-https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli-v1.0-macos-arm64.zip
+https://github.com/gewill/ImagePet/releases/download/v1.1/imagepet-cli-v1.1-macos-arm64.zip
 ```
 
 发布流程：
@@ -148,25 +154,25 @@ https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli-v1.0-maco
 1. 先把 CLI 产物上传到 GitHub Release：
 
 ```bash
-gh release upload v1.0 \
-  dist/cli/v1.0/imagepet-cli-v1.0-macos-arm64.zip \
-  dist/cli/v1.0/imagepet-cli-v1.0-macos-arm64.zip.sha256 \
-  dist/cli/v1.0/imagepet-cli-v1.0-manifest.json \
+gh release upload v1.1 \
+  dist/cli/v1.1/imagepet-cli-v1.1-macos-arm64.zip \
+  dist/cli/v1.1/imagepet-cli-v1.1-macos-arm64.zip.sha256 \
+  dist/cli/v1.1/imagepet-cli-v1.1-manifest.json \
   --clobber
 ```
 
 2. 确认 asset URL 可访问：
 
 ```bash
-curl -L -o /tmp/imagepet-cli-v1.0-macos-arm64.zip \
-  https://github.com/gewill/ImagePet/releases/download/v1.0/imagepet-cli-v1.0-macos-arm64.zip
-shasum -a 256 /tmp/imagepet-cli-v1.0-macos-arm64.zip
+curl -L -o /tmp/imagepet-cli-v1.1-macos-arm64.zip \
+  https://github.com/gewill/ImagePet/releases/download/v1.1/imagepet-cli-v1.1-macos-arm64.zip
+shasum -a 256 /tmp/imagepet-cli-v1.1-macos-arm64.zip
 ```
 
 输出必须等于：
 
 ```text
-74d5eab54048481ef6e376735fc5952ab0d77eb0c2a757ef057b39875fc0ae94
+52ce5c2071b1f54f7c2ad91559b327ac192b0aec14e09910d83b5db62b7f6dcf
 ```
 
 3. 如果本机还没有 tap，创建 tap：
@@ -216,7 +222,7 @@ brew audit --strict "$(brew --repo gewill/tap)/Formula/imagepet.rb"
 cd "$(brew --repo gewill/tap)"
 
 git add Formula/imagepet.rb
-git commit -m "feat(imagepet): add v1.0 formula"
+git commit -m "feat(imagepet): update v1.1 formula"
 
 gh repo create gewill/homebrew-tap --public --source=. --remote=origin --push
 ```

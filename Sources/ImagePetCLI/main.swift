@@ -22,7 +22,7 @@ struct ImagePetCLI: ParsableCommand {
         commandName: "imagepet",
         abstract: "ImagePet: A fast local image compressor.",
         discussion: "Specify one or more image files or directories. The tool will compress them locally.",
-        version: "1.0"
+        version: "1.1"
     )
 
     @Argument(help: "Input image files or directories.")

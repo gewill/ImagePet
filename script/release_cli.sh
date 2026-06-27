@@ -28,9 +28,10 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 PRODUCT_NAME="imagepet"
-RELEASE_VERSION="${RELEASE_VERSION:-v1.0}"
+RELEASE_VERSION="${RELEASE_VERSION:-v1.1}"
 SKIP_CODESIGN="${SKIP_CODESIGN:-0}"
 SKIP_NOTARIZATION="${SKIP_NOTARIZATION:-0}"
+ALLOW_DIRTY="${ALLOW_DIRTY:-0}"
 DIST_DIR="${DIST_DIR:-$PROJECT_DIR/dist/cli/$RELEASE_VERSION}"
 WORK_DIR="$DIST_DIR/work"
 ARCH_NAME="$(uname -m)"
@@ -38,6 +39,14 @@ ARCHIVE_NAME="${PRODUCT_NAME}-cli-${RELEASE_VERSION}-macos-${ARCH_NAME}.zip"
 ARCHIVE_PATH="$DIST_DIR/$ARCHIVE_NAME"
 SHA_PATH="$ARCHIVE_PATH.sha256"
 MANIFEST_PATH="$DIST_DIR/${PRODUCT_NAME}-cli-${RELEASE_VERSION}-manifest.json"
+
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1 && [[ "$ALLOW_DIRTY" != "1" ]]; then
+  if [[ -n "$(git status --porcelain)" ]]; then
+    echo "❌ Error: 工作区有未提交改动。请先提交后再生成正式 CLI release manifest。"
+    echo "本地试包可显式设置: ALLOW_DIRTY=1"
+    exit 1
+  fi
+fi
 
 rm -rf "$WORK_DIR"
 mkdir -p "$WORK_DIR"
