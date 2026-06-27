@@ -2,7 +2,7 @@ class Imagepet < Formula
   desc "Local-first macOS batch image compressor"
   homepage "https://imagepet.gewill.org/"
   url "https://github.com/gewill/ImagePet/releases/download/v1.1/imagepet-cli-v1.1-macos-arm64.zip"
-  sha256 "52ce5c2071b1f54f7c2ad91559b327ac192b0aec14e09910d83b5db62b7f6dcf"
+  sha256 "073ad3d82f2d8a266743389bd86797bece8d8ae677901079f52d35b03be45362"
   license "MIT"
 
   depends_on macos: :ventura

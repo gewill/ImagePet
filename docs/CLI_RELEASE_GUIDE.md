@@ -140,7 +140,7 @@ Homebrew v1.1 使用 GitHub Release 里的二进制 ZIP。当前 arm64 产物为
 
 ```text
 imagepet-cli-v1.1-macos-arm64.zip
-sha256: 52ce5c2071b1f54f7c2ad91559b327ac192b0aec14e09910d83b5db62b7f6dcf
+sha256: 073ad3d82f2d8a266743389bd86797bece8d8ae677901079f52d35b03be45362
 ```
 
 对应的下载 URL 是：
@@ -172,7 +172,7 @@ shasum -a 256 /tmp/imagepet-cli-v1.1-macos-arm64.zip
 输出必须等于：
 
 ```text
-52ce5c2071b1f54f7c2ad91559b327ac192b0aec14e09910d83b5db62b7f6dcf
+073ad3d82f2d8a266743389bd86797bece8d8ae677901079f52d35b03be45362
 ```
 
 3. 如果本机还没有 tap，创建 tap：
