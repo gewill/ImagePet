@@ -10,6 +10,34 @@ enum LaunchMode: String, Codable {
     case reopen
 }
 
+enum LaunchAtLoginController {
+    static var isEnabled: Bool {
+        if #available(macOS 13.0, *) {
+            return SMAppService.mainApp.status == .enabled
+        }
+        return false
+    }
+
+    static var wasLaunchedAtLogin: Bool {
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        return event?.eventID == kAEOpenApplication
+            && event?.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
+    }
+
+    static func setEnabled(_ isEnabled: Bool) throws {
+        guard #available(macOS 13.0, *) else { return }
+
+        let service = SMAppService.mainApp
+        if isEnabled {
+            if service.status == .enabled { return }
+            try service.register()
+        } else {
+            if service.status == .notRegistered { return }
+            try service.unregister()
+        }
+    }
+}
+
 @MainActor
 final class ImagePetStore: ObservableObject {
     @Published var jobs: [ImageJob] = [] {
@@ -195,8 +223,8 @@ final class ImagePetStore: ObservableObject {
     @Published var launchMode: LaunchMode = .normal
     @Published var launchAtLoginEnabled = false {
         didSet {
-            defaults.set(launchAtLoginEnabled, forKey: launchAtLoginKey)
-            updateLaunchAtLogin()
+            guard !isInitializing, !isSyncingLaunchAtLoginState else { return }
+            updateLaunchAtLogin(to: launchAtLoginEnabled)
         }
     }
     @Published var launchAtLoginError: String? = nil
@@ -219,6 +247,7 @@ final class ImagePetStore: ObservableObject {
     static var shared: ImagePetStore?
 
     private var isInitializing = true
+    private var isSyncingLaunchAtLoginState = false
     private var idleTimerTask: Task<Void, Never>?
     private var issuesTimer: Timer?
     private var doneTimer: Timer?
@@ -265,7 +294,6 @@ final class ImagePetStore: ObservableObject {
     private let legacyPetSizeTierKey = "ImagePet.petSizeTier"
 
     // PRD v0.7 Keys
-    private let launchAtLoginKey = "ImagePet.launchAtLogin"
     private let desktopPetEnabledKey = "ImagePet.desktopPetEnabled"
     private let petViewModeKey = "ImagePet.petViewMode"
     private let isParametersExpandedKey = "ImagePet.isParametersExpanded"
@@ -320,9 +348,7 @@ final class ImagePetStore: ObservableObject {
            let envMode = LaunchMode(rawValue: envModeString) {
             self.launchMode = envMode
         } else {
-            let isBackgroundLaunch = !NSApplication.shared.isActive
-            let launchAtLogin = defaults.bool(forKey: launchAtLoginKey)
-            if isBackgroundLaunch && launchAtLogin && !isRestorationTesting && !isUITesting {
+            if LaunchAtLoginController.wasLaunchedAtLogin && !isRestorationTesting && !isUITesting {
                 self.launchMode = .loginItem
             } else {
                 self.launchMode = .normal
@@ -419,13 +445,7 @@ final class ImagePetStore: ObservableObject {
                 self.petSize = migratedSize
             }
 
-            if defaults.object(forKey: launchAtLoginKey) != nil {
-                self.launchAtLoginEnabled = defaults.bool(forKey: launchAtLoginKey)
-            } else {
-                if #available(macOS 13.0, *) {
-                    self.launchAtLoginEnabled = (SMAppService.mainApp.status == .enabled)
-                }
-            }
+            self.launchAtLoginEnabled = LaunchAtLoginController.isEnabled
 
             if let savedMode = defaults.string(forKey: petViewModeKey), let mode = DesktopPetViewMode(rawValue: savedMode) {
                 self.petViewMode = mode
@@ -548,6 +568,7 @@ final class ImagePetStore: ObservableObject {
     }
 
     func showSettings(_ section: SettingsSection) {
+        refreshLaunchAtLoginStatus()
         selectedSettingsSection = section
         if let openSettingsWindow {
             openSettingsWindow()
@@ -1539,37 +1560,29 @@ final class ImagePetStore: ObservableObject {
         doneVisuallyDismissed = false
     }
 
-    private func updateLaunchAtLogin() {
+    func refreshLaunchAtLoginStatus(clearError: Bool = true) {
+        isSyncingLaunchAtLoginState = true
+        launchAtLoginEnabled = LaunchAtLoginController.isEnabled
+        isSyncingLaunchAtLoginState = false
+        if clearError {
+            launchAtLoginError = nil
+        }
+    }
+
+    private func updateLaunchAtLogin(to isEnabled: Bool) {
         if ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1" {
             return
         }
-        if #available(macOS 13.0, *) {
-            let service = SMAppService.mainApp
-            if launchAtLoginEnabled {
-                if service.status == .enabled { return }
-                do {
-                    launchAtLoginError = nil
-                    try service.register()
-                } catch {
-                    launchAtLoginError = "Failed to enable launch at login: \(error.localizedDescription)"
-                    launchAtLoginEnabled = false
-                    #if DEBUG
-                    print("[ImagePetStore] Error registering launch service: \(error)")
-                    #endif
-                }
-            } else {
-                if service.status == .notRegistered { return }
-                do {
-                    launchAtLoginError = nil
-                    try service.unregister()
-                } catch {
-                    launchAtLoginError = "Failed to disable launch at login: \(error.localizedDescription)"
-                    launchAtLoginEnabled = true
-                    #if DEBUG
-                    print("[ImagePetStore] Error unregistering launch service: \(error)")
-                    #endif
-                }
-            }
+        do {
+            launchAtLoginError = nil
+            try LaunchAtLoginController.setEnabled(isEnabled)
+            refreshLaunchAtLoginStatus()
+        } catch {
+            launchAtLoginError = "Failed to \(isEnabled ? "enable" : "disable") launch at login: \(error.localizedDescription)"
+            refreshLaunchAtLoginStatus(clearError: false)
+            #if DEBUG
+            print("[ImagePetStore] Error updating launch service: \(error)")
+            #endif
         }
     }
 }

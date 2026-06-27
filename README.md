@@ -1,5 +1,11 @@
 # ImagePet
 
+> **Recommended for most users**: Get ImagePet from the [Mac App Store](https://apps.apple.com/app/id6780180225) for a signed, sandboxed app with automatic updates. This repository keeps the source code open for review, learning, issues, and contributions.
+>
+> **普通用户建议**：优先从 [Mac App Store](https://apps.apple.com/app/id6780180225) 购买和安装 ImagePet，获得已签名、沙盒化、可自动更新的成品 App。本仓库保持源码开放，便于审阅、学习、反馈问题和参与贡献。
+
+![ImagePet screenshot showing drag-and-drop compression workflow](screenshots/asc/mac/en-US/02-drop-to-compress.png)
+
 > **TL;DR**: ImagePet is a local-first macOS batch image compressor with an interactive desktop pet progress companion. It supports JPG, PNG, HEIC, and WebP, featuring Finder extensions, Shortcuts actions, and background folder watching—all processed 100% locally on your Mac.
 >
 > ImagePet 是一个基于 macOS 的本地批处理图片压缩工具，带有一个有趣的桌面宠物进度伴侣。支持 JPG、PNG、HEIC 和 WebP 格式，并集成了 Finder 快捷动作、快捷指令（Shortcuts）以及后台文件夹监控——所有图片处理均 100% 在本地完成，无需上传。
@@ -126,8 +132,10 @@ com.apple.security.files.user-selected.read-write = true
 
 ```bash
 imagepet \
-  --preset balanced \
-  --output /path/to/output \
+  -p balanced \
+  -f jpeg \
+  -m 1920 \
+  -o /path/to/output \
   /path/to/a.heic /path/to/b.png /path/to/c.jpg
 ```
 
@@ -157,11 +165,14 @@ CLI 不复用：
 
 CLI 行为：
 
-- `--preset high|balanced|small`，默认 `balanced`。
-- `--quality <1...100>` 可用于自定义质量。
-- `--format jpg|png|heic|webp|original` 可选择输出格式。
-- `--output <directory>` 可指定输出目录。
-- 支持多个输入文件。
+- `-p high|balanced|small` 设置压缩预设，默认 `balanced`。
+- `-q <1...100>` 可用于自定义质量；不要和非默认 `-p` 同时使用。
+- `-f original|jpeg|png|heic|webp` 可选择输出格式，默认 `original`。
+- `-m none|1024|1920|2048|3840` 可限制长边尺寸，默认 `none`。
+- `-o <directory>` 可指定输出目录；目录必须已存在。
+- `--keep-metadata` 保留 EXIF/GPS metadata；默认剥离 metadata。
+- `--overwrite` 写回原文件夹并允许替换原文件；不要和 `-o` 同时使用。
+- 支持多个输入文件或目录。
 - 并发仍限制为 `2`，和 GUI MVP 保持一致。
 - 每个文件失败不影响整个批次。
 - 输出 per-file 结果和最终总计。
