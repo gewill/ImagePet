@@ -5,8 +5,8 @@ class Imagepet < Formula
   sha256 "073ad3d82f2d8a266743389bd86797bece8d8ae677901079f52d35b03be45362"
   license "MIT"
 
-  depends_on macos: :ventura
   depends_on arch: :arm64
+  depends_on macos: :ventura
 
   def install
     bin.install "imagepet"
