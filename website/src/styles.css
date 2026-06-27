@@ -241,6 +241,25 @@ a {
   font-size: 14px !important;
   line-height: 1.45 !important;
   font-weight: 680;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 100px;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
 .hero-visual {
