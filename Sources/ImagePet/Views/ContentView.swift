@@ -43,6 +43,7 @@ struct ContentView: View {
                             VStack(spacing: 12) {
                                 ControlsView(store: store)
                             }
+                            .padding(.horizontal, 18)
                         }
 
                         HStack {
