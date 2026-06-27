@@ -616,11 +616,29 @@ a {
   text-align: center;
 }
 
+.pet-theme-card.featured {
+  grid-column: 1 / -1;
+  min-height: 116px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  place-items: center start;
+  align-content: center;
+  gap: 18px;
+  padding: 16px 22px;
+  text-align: left;
+  background:
+    radial-gradient(circle at 8% 48%, rgba(239, 127, 97, 0.18), transparent 34%),
+    rgba(255, 255, 255, 0.86);
+}
+
 .pet-theme-card img {
   width: min(100%, 92px);
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 14px 14px rgba(40, 72, 58, 0.18));
+}
+
+.pet-theme-card.featured img {
+  width: 104px;
 }
 
 .pet-theme-card strong,
@@ -640,6 +658,10 @@ a {
   font-size: 12px;
   line-height: 1.28;
   font-weight: 600;
+}
+
+.pet-theme-card.featured span {
+  max-width: 20ch;
 }
 
 /* Floating Interactive Desktop Pet Mini */
@@ -1254,8 +1276,18 @@ a {
     min-height: 144px;
   }
 
+  .pet-theme-card.featured {
+    min-height: 132px;
+    grid-template-columns: 96px minmax(0, 1fr);
+    padding: 16px;
+  }
+
   .pet-theme-card img {
     width: min(100%, 78px);
+  }
+
+  .pet-theme-card.featured img {
+    width: 92px;
   }
 
   .pet-detail-list article {
@@ -1536,6 +1568,11 @@ a {
   border-left-color: var(--mint);
 }
 
+.docs-article-card,
+.docs-prose h3 {
+  scroll-margin-top: 92px;
+}
+
 @media (max-width: 1024px) {
   .docs-layout {
     grid-template-columns: 220px minmax(0, 1fr);
@@ -1765,7 +1802,7 @@ a {
 /* Docs pet theme grid */
 .docs-pet-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin: 16px 0 20px;
 }
@@ -1774,11 +1811,18 @@ a {
   display: grid;
   place-items: center;
   gap: 8px;
+  min-height: 130px;
   padding: 16px 10px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.78);
   text-align: center;
+}
+
+.docs-pet-card.new-theme {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(239, 127, 97, 0.13), transparent 42%),
+    rgba(255, 255, 255, 0.84);
 }
 
 .docs-pet-card img {
@@ -1792,6 +1836,19 @@ a {
   font-size: 14px;
   font-weight: 800;
   color: var(--ink);
+}
+
+.docs-pet-card span {
+  margin-top: -4px;
+  color: var(--coral-dark);
+  font-size: 11px;
+  font-weight: 760;
+}
+
+@media (max-width: 900px) {
+  .docs-pet-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 600px) {

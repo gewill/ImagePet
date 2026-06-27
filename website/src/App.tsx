@@ -452,10 +452,15 @@ function App() {
             </div>
             <div className="pet-showcase-grid">
               {petThemes.map((theme) => (
-                <article key={theme.name} className="pet-theme-card">
+                <article
+                  key={theme.name}
+                  className={theme.name === "Clownfish" ? "pet-theme-card featured" : "pet-theme-card"}
+                >
                   <img src={theme.image} alt={`ImagePet desktop pet ${theme.name} theme`} />
-                  <strong>{theme.name}</strong>
-                  <span>{theme.description}</span>
+                  <div>
+                    <strong>{theme.name}</strong>
+                    <span>{theme.description}</span>
+                  </div>
                 </article>
               ))}
             </div>

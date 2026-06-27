@@ -194,9 +194,10 @@ const docSections: DocSection[] = [
             <img src="/pets/rabbit.png" alt="Rabbit pet theme" />
             <strong>Rabbit</strong>
           </div>
-          <div className="docs-pet-card">
+          <div className="docs-pet-card new-theme">
             <img src="/pets/clownfish.png" alt="Clownfish pet theme" />
             <strong>Clownfish</strong>
+            <span>New in 1.1</span>
           </div>
         </div>
 
@@ -618,7 +619,13 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null> }) {
+function DocToc({
+  articleRef,
+  activeSection
+}: {
+  articleRef: React.RefObject<HTMLElement | null>;
+  activeSection: string;
+}) {
   const [headings, setHeadings] = React.useState<{ id: string; text: string }[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
@@ -626,16 +633,20 @@ function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null
     const el = articleRef.current;
     if (!el) return;
 
+    const overviewId = `${activeSection}-overview`;
+    el.id = overviewId;
+
     const h3s = Array.from(el.querySelectorAll("h3"));
-    const items = h3s.map((h3) => {
-      if (!h3.id) {
-        h3.id = slugify(h3.textContent ?? "");
-      }
+    const items = h3s.map((h3, index) => {
+      const slug = slugify(h3.textContent ?? "") || `section-${index + 1}`;
+      h3.id = `${activeSection}-${slug}`;
       return { id: h3.id, text: h3.textContent ?? "" };
     });
-    setHeadings(items);
+    const tocItems = items.length > 0 ? items : [{ id: overviewId, text: "Overview" }];
+    setHeadings(tocItems);
+    setActiveId(tocItems[0]?.id ?? null);
 
-    if (items.length === 0) return;
+    const observedTargets = items.length > 0 ? h3s : [el];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -647,9 +658,9 @@ function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null
       { threshold: 0.3, rootMargin: "-80px 0px -60% 0px" }
     );
 
-    h3s.forEach((h3) => observer.observe(h3));
+    observedTargets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
-  }, [articleRef]);
+  }, [articleRef, activeSection]);
 
   if (headings.length === 0) return null;
 
@@ -657,7 +668,7 @@ function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null
     <aside className="docs-toc">
       <div className="docs-toc-card">
         <h4>On this page</h4>
-        <nav>
+        <nav className="docs-toc-nav" aria-label="On this page">
           {headings.map((h) => (
             <a
               key={h.id}
@@ -665,7 +676,13 @@ function DocToc({ articleRef }: { articleRef: React.RefObject<HTMLElement | null
               className={`docs-toc-link${activeId === h.id ? " active" : ""}`}
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+                const target = document.getElementById(h.id);
+                if (!target) return;
+                window.history.replaceState(null, "", `#${h.id}`);
+                target.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                });
               }}
             >
               {h.text}
@@ -734,7 +751,7 @@ export function DocsPage({
             )}
           </main>
 
-          {activeData && <DocToc articleRef={articleRef} />}
+          {activeData && <DocToc articleRef={articleRef} activeSection={activeData.id} />}
         </div>
       </div>
 

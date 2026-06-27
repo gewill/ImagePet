@@ -10,6 +10,7 @@ xcuserdata/
 *.xcuserstate
 *.tsbuildinfo
 website/tmp-qa/
+docs/website-audit/
 docs/theme-qa/v*/_contact-sheets-overview.png
 docs/theme-qa/v*/_motion-preview-samples.png
 docs/theme-qa/v*/*/previews/*
