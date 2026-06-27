@@ -111,8 +111,7 @@
             "Added queue thumbnails and clearer completed, failed, and attention-needed states.",
             "Moved settings into a dedicated window with clearer shortcut and notification controls.",
             "Added the Clownfish desktop pet theme with bubbly sleep and eating animations.",
-            "Improved WebP output handling using Apple ImageIO and UTType capability checks.",
-            "Updated the website screenshot and public metadata for the v1.1 Mac App Store build."
+            "Improved WebP output handling using Apple ImageIO and UTType capability checks."
           ]
         },
         {
