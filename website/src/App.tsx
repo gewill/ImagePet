@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Download,
   EyeOff,
+  FileImage,
   FolderOpen,
   GitBranch,
   Github,
@@ -38,6 +39,29 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Docs", href: "/en/docs" },
   { label: "Changelog", href: "/en/changelog" }
+];
+
+const formatCards = [
+  {
+    label: "JPEG",
+    detail: ".jpg, .jpeg"
+  },
+  {
+    label: "PNG",
+    detail: ".png"
+  },
+  {
+    label: "HEIC",
+    detail: ".heic"
+  },
+  {
+    label: "WebP",
+    detail: ".webp"
+  },
+  {
+    label: "Original",
+    detail: "output mode"
+  }
 ];
 
 const workflowSteps = [
@@ -392,10 +416,19 @@ function App() {
       </section>
 
       <section className="format-strip" aria-label="Supported formats">
-        <span>Inputs</span>
-        <strong>{appMetadata.capabilities.inputFormats.join(" / ")}</strong>
-        <span>Outputs</span>
-        <strong>{appMetadata.capabilities.outputFormats.join(" / ")}</strong>
+        <div className="format-strip-heading">
+          <span>Supported formats</span>
+          <strong>Image formats ImagePet handles locally</strong>
+        </div>
+        <div className="format-card-row">
+          {formatCards.map((item) => (
+            <div className="format-card" key={item.label}>
+              <FileImage size={24} strokeWidth={1.75} aria-hidden="true" />
+              <strong>{item.label}</strong>
+              <span>{item.detail}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="workflow-section" id="features">
@@ -407,7 +440,7 @@ function App() {
           {workflowSteps.map((item, index) => (
             <article className="workflow-step" key={item.title}>
               <div className="workflow-illustration">
-                <img src={item.image} alt="" loading="lazy" />
+                <img src={item.image} alt="" />
                 <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
               </div>
               <h3>{item.title}</h3>
