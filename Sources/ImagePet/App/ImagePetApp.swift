@@ -130,6 +130,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.servicesProvider = self
 
         if let store = ImagePetStore.shared {
+            store.restorePersistedTheme()
+
             let isUITesting = ProcessInfo.processInfo.environment["IS_UI_TESTING"] == "1"
             if store.launchMode == .loginItem {
                 windowUpdateObserver = NotificationCenter.default.addObserver(

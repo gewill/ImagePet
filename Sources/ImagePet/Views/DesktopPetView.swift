@@ -131,6 +131,7 @@ struct DesktopPetView: View {
                 }
             }
             .onAppear {
+                animator.updateTheme(themeName: store.selectedThemeName)
                 animator.enableIdleVariants = store.enableIdleVariants
                 animator.energySavingMode = store.energySavingMode
                 animator.isPaused = !store.isDesktopPetVisible || reduceMotion

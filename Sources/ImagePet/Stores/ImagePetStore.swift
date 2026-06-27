@@ -326,7 +326,6 @@ final class ImagePetStore: ObservableObject {
         self.enableHoverFeedback = true
         self.enableSuccessSound = true
         self.energySavingMode = false
-        self.selectedThemeName = BuiltInPetTheme.fallback.id
         self.petSize = DesktopPetSizeMetrics.defaultPetSize
 
         self.isDesktopPetEnabled = true
@@ -434,9 +433,6 @@ final class ImagePetStore: ObservableObject {
             }
             if defaults.object(forKey: energySavingModeKey) != nil {
                 self.energySavingMode = defaults.bool(forKey: energySavingModeKey)
-            }
-            if let theme = defaults.string(forKey: selectedThemeNameKey) {
-                self.selectedThemeName = BuiltInPetTheme.resolvedTheme(named: theme).id
             }
             if defaults.object(forKey: petSizeKey) != nil {
                 self.petSize = DesktopPetSizeMetrics.clamped(defaults.double(forKey: petSizeKey))
@@ -1092,7 +1088,17 @@ final class ImagePetStore: ObservableObject {
         resetPetIdleTimer()
     }
 
+    func restorePersistedTheme() {
+        if let theme = defaults.string(forKey: selectedThemeNameKey) {
+            let resolved = BuiltInPetTheme.resolvedTheme(named: theme).id
+            if resolved != selectedThemeName {
+                selectedThemeName = resolved
+            }
+        }
+    }
+
     func attachDesktopPetControllerIfNeeded() {
+        restorePersistedTheme()
         if desktopPetWindowController == nil {
             desktopPetWindowController = DesktopPetWindowController(store: self)
         }
