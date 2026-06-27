@@ -106,7 +106,7 @@ def generate(
 
     if clean:
         remove_tree(output_dir / "app-info")
-        remove_tree(output_dir / "version" / version)
+        remove_tree(output_dir / "version")
 
     app_info = {
         "name": fields["name"],
@@ -157,14 +157,22 @@ def main() -> int:
     )
     parser.add_argument(
         "--include-whats-new",
+        dest="include_whats_new",
         action="store_true",
-        help="Include whatsNew in version metadata. Omit it for first-version ASC states where Apple locks this field.",
+        help="Include whatsNew in version metadata. This is the default for update releases.",
+    )
+    parser.add_argument(
+        "--omit-whats-new",
+        dest="include_whats_new",
+        action="store_false",
+        help="Omit whatsNew for ASC states where Apple temporarily locks this field.",
     )
     parser.add_argument(
         "--no-clean",
         action="store_true",
         help="Do not remove the output directory before writing.",
     )
+    parser.set_defaults(include_whats_new=True)
     args = parser.parse_args()
 
     repo_root = args.repo_root.resolve()

@@ -1,15 +1,15 @@
-# ASC V1.0 Metadata 提交计划
+# ASC V1.1 Metadata 提交计划
 
-本文档用于规划 ImagePet V1.0 的 App Store Connect metadata 提交流程。提交流程使用 `asc metadata` 的 canonical JSON 工作流。
+本文档用于规划 ImagePet V1.1 的 App Store Connect metadata 提交流程。提交流程使用 `asc metadata` 的 canonical JSON 工作流。
 
 ## 目标
 
-只提交与 App Store Connect 中选定二进制完全一致的 V1.0 Mac App Store metadata。
+只提交与 App Store Connect 中选定二进制完全一致的 V1.1 Mac App Store metadata。
 
 当前版本号口径：
 
-- Xcode / bundle marketing version：`1.0`
-- App Store Connect app store version：`1.0`
+- Xcode / bundle marketing version：`1.1`
+- App Store Connect app store version：`1.1`
 
 ## 当前源文件
 
@@ -20,9 +20,9 @@
 
 ## 提交前阻断检查
 
-上传前必须确认 metadata 宣称的能力与提交的 V1.0 二进制一致。
+上传前必须确认 metadata 宣称的能力与提交的 V1.1 二进制一致。
 
-V1.0 metadata 可以声明 WebP 支持，但文案必须准确表达当前能力边界：
+V1.1 metadata 可以声明 WebP 支持，但文案必须准确表达当前能力边界：
 
 - 支持 JPG / JPEG / PNG / HEIC / WebP 输入。
 - 支持 Original / JPEG / PNG / HEIC / WebP 输出，具体可用性受本机 encoder capability 保护。
@@ -42,13 +42,13 @@ V1.0 metadata 可以声明 WebP 支持，但文案必须准确表达当前能力
 
 ```text
 .codex/asc-metadata/app-info/en-US.json
-.codex/asc-metadata/version/1.0/en-US.json
+.codex/asc-metadata/version/1.1/en-US.json
 ```
 
 如果 ASC 后台版本号变化，可以临时覆盖：
 
 ```bash
-./script/prepare_asc_metadata.py --asc-version "1.0"
+./script/prepare_asc_metadata.py --asc-version "1.1"
 ```
 
 如果字段超过 ASC 限制，脚本会在本地失败：
@@ -60,16 +60,16 @@ V1.0 metadata 可以声明 WebP 支持，但文案必须准确表达当前能力
 - what's new：4000
 - promotional text：170
 
-V1.0 首版提交默认不生成 `whatsNew` 字段。ASC 在某些首版或版本状态下会拒绝编辑该字段，并返回：
+V1.1 更新版本默认生成 `whatsNew` 字段。ASC 在某些版本状态下可能临时拒绝编辑该字段，并返回：
 
 ```text
 Attribute 'whatsNew' cannot be edited at this time
 ```
 
-后续更新版本如果 ASC 允许编辑 What's New，再显式加入：
+如果目标 ASC 版本临时锁定 What's New，再显式省略：
 
 ```bash
-./script/prepare_asc_metadata.py --include-whats-new
+./script/prepare_asc_metadata.py --omit-whats-new
 ```
 
 ## ASC Dry Run 流程
@@ -85,7 +85,7 @@ asc versions list --app "6780180225" --platform MAC_OS --output table
 应用本地变更前，先拉取当前 ASC 状态用于对比：
 
 ```bash
-asc metadata pull --app "6780180225" --version "1.0" --platform MAC_OS --dir ".codex/asc-metadata-current"
+asc metadata pull --app "6780180225" --version "1.1" --platform MAC_OS --dir ".codex/asc-metadata-current"
 ```
 
 校验本地生成的 metadata：
@@ -97,13 +97,13 @@ asc metadata validate --dir ".codex/asc-metadata" --output table
 预览远端变更，不写入 ASC：
 
 ```bash
-asc metadata push --app "6780180225" --version "1.0" --platform MAC_OS --dir ".codex/asc-metadata" --dry-run --output table
+asc metadata push --app "6780180225" --version "1.1" --platform MAC_OS --dir ".codex/asc-metadata" --dry-run --output table
 ```
 
 确认 dry run 计划无误后再实际写入：
 
 ```bash
-asc metadata push --app "6780180225" --version "1.0" --platform MAC_OS --dir ".codex/asc-metadata"
+asc metadata push --app "6780180225" --version "1.1" --platform MAC_OS --dir ".codex/asc-metadata"
 ```
 
 ## `asc metadata` 之外的字段

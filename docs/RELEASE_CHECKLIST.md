@@ -100,8 +100,8 @@ This document contains the manual acceptance criteria for validating a Release C
 
 - **Test Case 6.1: Version & Build Identity**
   1. Launch the release candidate build.
-  2. Verify the app reports version **1.1** and build **2** in user-visible version surfaces, if present.
-  3. Verify the app bundle `Info.plist` reports `CFBundleShortVersionString = 1.1` and `CFBundleVersion = 2`.
+  2. Verify the app reports version **1.1** and build **11** in user-visible version surfaces, if present.
+  3. Verify the app bundle `Info.plist` reports `CFBundleShortVersionString = 1.1` and `CFBundleVersion = 11`.
   4. Verify App Store Connect metadata is prepared for version **1.1**, not a v1.0/v0.13 submission.
 
 - **Test Case 6.2: Batch Cancellation**

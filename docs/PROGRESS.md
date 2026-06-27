@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。V1.1 任务控制、队列缩略图、主窗口队列管理、独立设置窗口、通知总开关、设置分区快捷键，以及 Apple 官方 ImageIO / UTType WebP 路线 spike 已实现并进入 RC 验收。当前版本号已推进到 `1.1` / build `2`；`swift test`、完整 `xcodebuild ... test` 和 `./script/build_and_run.sh --verify` 均已通过。下一步是完成真实批量图片、WebP 输出打开、MAS/release-like sandbox 和 App Store Connect 提交前手工验收。
+MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V0.11 App 完整性、V0.12 系统级集成，以及 V0.13 本地通知与发布完整性闭环已经实现。V0.14 Soft Native 主窗口重设计已进入 DesignSpike 实现阶段，完成主窗口视觉重构、Desktop Pet 配色同步、窄屏控制项 2x2 响应式布局，以及主窗口激活稳定性修正。V0.15 Release Candidate 与 Mac App Store 上线准备已完成 PRD 规划；Xcode Cloud 已部署，提交 `build*` 开头的分支会自动触发打包，打包路径基本跑通。App Store Connect 与官网共享的结构化 metadata 源已建立在 `metadata/`，静态官网已建立在 `website/` 并可面向 Cloudflare Pages 构建。V0.16 桌面 Pet 主题生产与验证管线已落地 `theme.json` 包契约、离线 validator、contact sheet / preview QA 输出、主题规格更新、manifest-backed runtime metadata 加载，以及 bundled themes 模型视觉验收记录；仍不在 app 内引入 AI 生成。V1.1 任务控制、队列缩略图、主窗口队列管理、独立设置窗口、通知总开关、设置分区快捷键，以及 Apple 官方 ImageIO / UTType WebP 路线 spike 已实现并进入 RC 验收。当前版本号已推进到 `1.1` / build `11`；ASC `1.1` app store version 已创建并上传 metadata / `whatsNew`，ASC 已有一个 valid 的 `1.1` build `10` 作为现状参考，当前 RC 分支下一次 Xcode Cloud 构建应使用 build `11`。`swift test`、`xcodebuild ... test -skip-testing:ImagePetUITests`、`./script/build_and_run.sh --verify` 和 ASC metadata 校验已通过；完整 `xcodebuild ... test` 当前阻塞在本机 UI automation mode 初始化超时。下一步是等待/触发 build `11`、在 ASC attach build、完成真实批量图片、WebP 输出打开、MAS/release-like sandbox 和 App Store Connect 提交前手工验收。
 
 已完成：
 
@@ -112,7 +112,7 @@ MVP 工程骨架、核心压缩 workflow、桌面 Pet、WebP / Advanced JPEG、V
 | 快捷指令 (Shortcuts) 集成 | 已实现 | `AppIntents` 编写 `CompressImagesIntent` 并注册 `ImagePetShortcuts` | 真实 Shortcuts app 内搜索动作和传参验证 |
 | 本地通知与发布完整性闭环 | 已实现，本机验证通过 | 整合 `CompressionBatchSummary` 摘要模型、`LocalNotificationManager` 包含防抖合并、防骚扰限频与 Shortcuts/Folder Watching 静默成功策略、历史纪录持久化、设置页面通知控制项及 Debug UI、独立 `RELEASE_CHECKLIST.md` | 手工触发不同入口压缩检查通知展示与通知动作的 Finder 唤起 |
 | Soft Native 主窗口重设计 | DesignSpike 已实现 | `DESIGN.md` + `docs/SoftNative.html` + `docs/PRD_v0.14_soft_native_main_window_redesign.md`；主窗口使用 Soft Native token、紧凑 header、响应式控制项、列表和 summary 视觉重构；Desktop Pet 配色同步 | `swift test`、`git diff --check`、`./script/build_and_run.sh --verify` 已通过；仍需手工视觉验收 |
-| Release Candidate 与上线准备 | v1.1 RC 验收中 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引；当前 `marketingVersion=1.1`、`buildNumber=2` | 执行真实图片、WebP 打开、MAS sandbox、ASC metadata 与截图验收 |
+| Release Candidate 与上线准备 | v1.1 RC 验收中 | `docs/PRD_v0.15_release_candidate_and_distribution.md` 已定义 RC 冻结、Xcode Cloud / ASC build、App Store Connect metadata、发布说明、反馈入口和回滚策略；`metadata/` 已建立 ASC 与网站共享 metadata 源，`website/` 已建立 Cloudflare Pages 友好的静态官网，`docs/APP_STORE_METADATA.md` 已改为 ASC 字段索引；当前 `marketingVersion=1.1`、`buildNumber=11`，ASC `1.1` version 已创建并上传 `whatsNew`，ASC 已有 valid 的 `1.1` build `10` 可作为现状参考 | 触发/等待 build `11`，在 ASC attach build，执行真实图片、WebP 打开、MAS sandbox、ASC metadata 与截图验收 |
 | 桌面 Pet 主题生产与验证管线 | 基础能力已实现，本机验证通过 | `docs/PRD_v0.16_desktop_pet_theme_authoring_pipeline.md` 已定义 `theme.json` 包契约、离线 authoring run、validator、contact sheet / preview QA、visual QA 与 manifest-backed runtime 方向；当前可选内置主题已补齐 `theme.json`，`script/validate_pet_theme.py` 可离线生成 review JSON、contact sheet 与 GIF preview，运行时主题 metadata 由 manifest 优先加载并保留 fallback；`docs/theme-qa/v0.16/` 已记录 bundled themes 的 contact sheet、preview 和模型视觉验收 | 后续 PRD 再决定是否加入自定义主题导入；未来新增或替换主题时重新生成 visual QA |
 
 ## 已验证
@@ -132,12 +132,27 @@ xcodebuild -project ImagePet.xcodeproj \
   -configuration Debug \
   -derivedDataPath DerivedData \
   -destination 'platform=macOS' \
-  test
+  test \
+  -skip-testing:ImagePetUITests
 结果：通过
-测试数：36 (17 ImagePetTests + 19 UI Tests)
+测试数：17 ImagePetTests
 任务控制与缩略图验证：通过（6 tests）
 通知设置验证：通过（8 tests）
-UI suite：通过（19 tests，245.356 秒）
+备注：完整 `xcodebuild ... test` 当前在本机 UI test runner 启用 automation mode 时超时，未进入 `ImagePetUITests` 业务用例。
+```
+
+```text
+./script/build_and_run.sh --verify
+结果：通过
+Debug build：成功
+签名与 sandbox entitlement smoke：通过
+```
+
+```text
+python3 script/prepare_asc_metadata.py --asc-version 1.1
+asc metadata validate --dir .codex/asc-metadata --output table
+结果：通过
+ASC metadata：v1.1 / whatsNew included
 ```
 
 KeyboardShortcuts dependency spike：
