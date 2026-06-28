@@ -388,8 +388,7 @@ function App() {
             </a>
           </div>
           <p className="availability-note">
-            Available on the Mac App Store · macOS 13+ · v1.0
-            <span className="review-badge">v1.1 In Review</span>
+            Available on the Mac App Store · {app.minimumOS}+ · v{app.marketingVersion}
           </p>
         </div>
 
