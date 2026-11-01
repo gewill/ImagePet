@@ -888,6 +888,12 @@ final class ImagePetStore: ObservableObject {
         }
     }
 
+    func comparisonAccessDirectory(for job: ImageJob) -> URL? {
+        guard let output = job.outputURL else { return nil }
+        let parent = output.deletingLastPathComponent()
+        return bookmarkStore.restoreMulti(for: parent) ?? job.designatedOutputDirectory ?? outputDirectory
+    }
+
     func revealInFinder(for job: ImageJob) {
         var targetURL: URL?
         
@@ -1384,6 +1390,8 @@ final class ImagePetStore: ObservableObject {
             )
             updateJob(job.id) { updated in
                 updated.outputURL = result.outputURL
+                // Retain the actual granted destination for result viewing after settings change.
+                updated.designatedOutputDirectory = restoredBookmarkURL ?? targetOutputDir
                 updated.originalSize = result.originalSize
                 updated.compressedSize = result.compressedSize
                 updated.status = .done

@@ -43,6 +43,9 @@ struct ImagePetCLI: ParsableCommand {
     @Option(name: .customShort("m"), help: "Max dimension limit (none, 1024, 1920, 2048, 3840). Default: none.")
     var maxDim: MaxDimensionLimit = .none
 
+    @Flag(help: "Use only ImageIO for PNG output (baseline and troubleshooting).")
+    var pngImageioOnly: Bool = false
+
     @Flag(help: "Keep image EXIF/GPS metadata (default is to strip).")
     var keepMetadata: Bool = false
 
@@ -102,7 +105,7 @@ struct ImagePetCLI: ParsableCommand {
         print("Found \(files.count) image file(s) to process.")
 
         // 2. Set up compressor
-        let compressor = ImageCompressor()
+        let compressor = ImageCompressor(pngOptimizationEnabled: !pngImageioOnly)
 
         // Determine quality setting
         let targetQuality: CompressionQuality

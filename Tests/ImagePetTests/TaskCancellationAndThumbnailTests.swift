@@ -6,18 +6,32 @@ import Foundation
 
 final class TaskCancellationAndThumbnailTests: XCTestCase {
 
-    var testImageURL: URL {
-        let fm = FileManager.default
-        let root = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // Tests/ImagePetTests/
-            .deletingLastPathComponent() // Tests/
-            .deletingLastPathComponent() // root/
-        let fixtureURL = root.appendingPathComponent("TestImages/Apple/originals/iphone-17-pro-flower.jpg")
-        if fm.fileExists(atPath: fixtureURL.path) {
-            return fixtureURL
+    private var fixtureDirectory: URL!
+    private var testImageURL: URL { fixtureDirectory.appendingPathComponent("fixture.jpg") }
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        fixtureDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: fixtureDirectory, withIntermediateDirectories: true)
+        let space = try XCTUnwrap(CGColorSpace(name: CGColorSpace.sRGB))
+        let context = try XCTUnwrap(CGContext(data: nil, width: 512, height: 256, bitsPerComponent: 8,
+                                            bytesPerRow: 512 * 4, space: space,
+                                            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        for x in 0..<512 {
+            context.setFillColor(CGColor(red: CGFloat(x % 17) / 16, green: CGFloat(x % 23) / 22,
+                                        blue: CGFloat(x % 31) / 30, alpha: 1))
+            context.fill(CGRect(x: x, y: 0, width: 1, height: 256))
         }
-        XCTFail("Could not locate iphone-17-pro-flower.jpg test fixture at \(fixtureURL.path)")
-        return URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("flower.jpg")
+        let image = try XCTUnwrap(context.makeImage())
+        let destination = try XCTUnwrap(CGImageDestinationCreateWithURL(testImageURL as CFURL, "public.jpeg" as CFString, 1, nil))
+        CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: 1.0] as CFDictionary)
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+    }
+
+    override func tearDownWithError() throws {
+        if let fixtureDirectory { try FileManager.default.removeItem(at: fixtureDirectory) }
+        fixtureDirectory = nil
+        try super.tearDownWithError()
     }
 
     func testThumbnailGeneratorDecodesSuccessfully() async {

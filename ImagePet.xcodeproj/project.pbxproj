@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B33F60BAEF0F4D109482C002 /* ComparisonImageLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109482C001 /* ComparisonImageLoaderTests.swift */; };
+		B33F60BAEF0F4D109482B003 /* ImageComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109482A003 /* ImageComparisonView.swift */; };
+		B33F60BAEF0F4D109482B002 /* ImageComparisonCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109482A002 /* ImageComparisonCanvas.swift */; };
+		B33F60BAEF0F4D109482B001 /* ComparisonBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109482A001 /* ComparisonBackground.swift */; };
+		B33F60BAEF0F4D109482B000 /* ComparisonImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109482A000 /* ComparisonImageLoader.swift */; };
+		B33F60BAEF0F4D109481AA02 /* LosslessPNGOptimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33F60BAEF0F4D109481AA01 /* LosslessPNGOptimizer.swift */; };
 		03C392A927037DB8E056A0FD /* EncoderCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */; };
 		0833A37D66B17440D43822C3 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65286F00477023AC73A1D3B6 /* AppNavigation.swift */; };
 		0C8B8BD4329341ACAC76547C /* ImagePetCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC07DB095E2131274F3BBDAA /* ImagePetCore.framework */; };
@@ -136,6 +142,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B33F60BAEF0F4D109482C001 /* ComparisonImageLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonImageLoaderTests.swift; sourceTree = "<group>"; };
+		B33F60BAEF0F4D109482A003 /* ImageComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageComparisonView.swift; sourceTree = "<group>"; };
+		B33F60BAEF0F4D109482A002 /* ImageComparisonCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageComparisonCanvas.swift; sourceTree = "<group>"; };
+		B33F60BAEF0F4D109482A001 /* ComparisonBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonBackground.swift; sourceTree = "<group>"; };
+		B33F60BAEF0F4D109482A000 /* ComparisonImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonImageLoader.swift; sourceTree = "<group>"; };
+		B33F60BAEF0F4D109481AA01 /* LosslessPNGOptimizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LosslessPNGOptimizer.swift; sourceTree = "<group>"; };
 		029178F82948933AB5279570 /* FileSizeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeFormatting.swift; sourceTree = "<group>"; };
 		05A775F6539AF723DFC8D3D1 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		065B0EA400C85876918262F7 /* AppleWebPEncodingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleWebPEncodingEngine.swift; sourceTree = "<group>"; };
@@ -332,6 +344,7 @@
 				AEDE7C87B4DA93B9D2470D4B /* ShortcutsIntent.swift */,
 				2AECB6DEE9038FD3CECDFBD3 /* SoundManager.swift */,
 				17074DAB0E7D992BBEDFEF28 /* ThemeCache.swift */,
+				B33F60BAEF0F4D109482A000 /* ComparisonImageLoader.swift */,
 				4DBDAD2E7B5450460DC73586 /* ThumbnailGenerator.swift */,
 			);
 			path = Services;
@@ -355,6 +368,7 @@
 				61BE824B3D33F8BD491B121B /* LocalNotificationManagerTests.swift */,
 				37C451AC6AE440D62C0D0FDE /* SoundManager.swift */,
 				9A42BE317AC2E3CFE48ACFE7 /* SoundManagerTests.swift */,
+				B33F60BAEF0F4D109482C001 /* ComparisonImageLoaderTests.swift */,
 				088D18251705E0CE2C8959AB /* TaskCancellationAndThumbnailTests.swift */,
 			);
 			path = ImagePetTests;
@@ -382,6 +396,9 @@
 			isa = PBXGroup;
 			children = (
 				59D6D9C6C992578DE4DC36E4 /* AppSettingsView.swift */,
+				B33F60BAEF0F4D109482A001 /* ComparisonBackground.swift */,
+				B33F60BAEF0F4D109482A002 /* ImageComparisonCanvas.swift */,
+				B33F60BAEF0F4D109482A003 /* ImageComparisonView.swift */,
 				60F9729CED642EBCF472BAC1 /* ContentView.swift */,
 				1D9191053620D5B490484B6B /* DesktopPetPresenter.swift */,
 				2845AD061C173BB07CE9F82B /* DesktopPetView.swift */,
@@ -411,6 +428,7 @@
 				463A9B12B098CEDA557F6100 /* CompressionError.swift */,
 				A284265C1FCFDD270A9FE5DF /* EncoderCapabilities.swift */,
 				F23678BFAD16795886D53796 /* ImageCompressor.swift */,
+				B33F60BAEF0F4D109481AA01 /* LosslessPNGOptimizer.swift */,
 				CFF8AF7B27658DBE4D17CEDC /* MozJPEGEncodingEngine.swift */,
 				45EDC42C0537186A983DB825 /* OutputNameAllocator.swift */,
 				B23D899C8F00DE09B979F8F9 /* SupportedImageFormat.swift */,
@@ -611,6 +629,9 @@
 				468BDB0185A3FB1706EBCCD3 /* AppSettingsView.swift in Sources */,
 				20C1CC3A21BA81F6F38999B1 /* BuiltInPetTheme.swift in Sources */,
 				6E1D8DF5CF4B366725F9F100 /* CompressionBatchSummary.swift in Sources */,
+				B33F60BAEF0F4D109482B001 /* ComparisonBackground.swift in Sources */,
+				B33F60BAEF0F4D109482B002 /* ImageComparisonCanvas.swift in Sources */,
+				B33F60BAEF0F4D109482B003 /* ImageComparisonView.swift in Sources */,
 				77CC910A278D3499DD2CA0E2 /* ContentView.swift in Sources */,
 				BED18C74D4E3FAC6C1736678 /* DesktopPetPresenter.swift in Sources */,
 				9E3987C9586C4E31283B8972 /* DesktopPetSizeTier.swift in Sources */,
@@ -635,6 +656,7 @@
 				B9291BBC674E159A9CD2D1A1 /* SoftNativeStyle.swift in Sources */,
 				48AD2E4E5F0363A4C12FE75B /* SoundManager.swift in Sources */,
 				E7E5AB4442E1198A58898A5A /* ThemeCache.swift in Sources */,
+				B33F60BAEF0F4D109482B000 /* ComparisonImageLoader.swift in Sources */,
 				8CDC2C5108A1492273CCE9C3 /* ThumbnailGenerator.swift in Sources */,
 				CD91D779AA53B0993ABD2E52 /* ThumbnailSize.swift in Sources */,
 			);
@@ -651,6 +673,7 @@
 				639B8A8E4B062FBA59EC5B0B /* LocalNotificationManagerTests.swift in Sources */,
 				63F9DEED2087EFB6448C2257 /* SoundManager.swift in Sources */,
 				C317480A514502ED823DA1DB /* SoundManagerTests.swift in Sources */,
+				B33F60BAEF0F4D109482C002 /* ComparisonImageLoaderTests.swift in Sources */,
 				9042C491DAF21E625E08A75A /* TaskCancellationAndThumbnailTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -683,6 +706,7 @@
 				03C392A927037DB8E056A0FD /* EncoderCapabilities.swift in Sources */,
 				60E30EA5590352744B7ED864 /* ImageCompressor.swift in Sources */,
 				6B5F0F8C4B4B8BB4E3FF08A6 /* ImageJob.swift in Sources */,
+				B33F60BAEF0F4D109481AA02 /* LosslessPNGOptimizer.swift in Sources */,
 				39D8473A58EBDD037557FD17 /* MozJPEGEncodingEngine.swift in Sources */,
 				84DF67E7F26FB52ADF4008D2 /* OutputNameAllocator.swift in Sources */,
 				20A5D16C2BAB1FB997F4ED62 /* SupportedImageFormat.swift in Sources */,
