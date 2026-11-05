@@ -2,6 +2,8 @@
 
 2026-11-01：评测基线、结果对比、PNG 无损优化已实现并完成本地验收。WebP 多候选择优、自动感知质量搜索继续暂缓。本记录覆盖实现与本地验收；提交及 PR 状态以 GitHub 为准，不包含合并或发布。
 
+2026-11-05：前三项通过完整 CI 后已随 [PR #1](https://github.com/gewill/ImagePet/pull/1) Squash 合并。后两阶段离线实验也已完成：[WebP 有限候选](WEBP_CANDIDATE_EXPERIMENT.md) 和 [JPEG/WebP 自动质量搜索、PNG 有损量化](QUALITY_SEARCH_EXPERIMENT.md)。本轮均未通过产品纳入门槛，保留复现脚本和结果，默认编码行为不变；没有部署。
+
 ## 实现范围
 
 - **评测基线**：`script/benchmark/` 提供带来源／许可／SHA-256 的固定清单，区分调参和留出数据；冻结可执行文件与源码快照；逐图独立进程及双任务批量各重复三次，记录端到端耗时、`wait4` 生命周期峰值 RSS、JSON/CSV 和分类报告。未变小的文件按原大小计入，失败不能从统计中消失。

@@ -1,0 +1,5161 @@
+{
+  "decision": "Screening only; no product adoption. Fresh holdout and human acceptance not performed after failed gates.",
+  "cli_source": "abd637e4755736557741ffd9c911e409de7ff771 Core/CLI copy plus WebP spike; IMAGEPET_WEBP_LOSSLESS_PRESET removed, so production encoding paths used.",
+  "runs": {
+    "evaluation": {
+      "environment": {
+        "cli_sha256": "7241305993c27d76ffa550b52de130b73c833e59b1632730cb73b62096ecbba1",
+        "normalizer_sha256": "22676ba45b8b511542040ab792aa89b6dbdc7bbbca5a502515922c2477489319",
+        "script_sha256": "99a30b15b24f01871d9e9138c14ebbbde641aab7f38f94e21a637742b6ca6fb3",
+        "manifest_sha256": "6dfbece78b665196ca3ca9b3b9b342e7ef0873a5b6e3ab15185222e2ac381930",
+        "plan_sha256": "e3e854f775472fd0f0b29af46720557d8098438ea6679a408b0d11672908d6a0",
+        "pillow": "11.3.0",
+        "python": "3.9.6 (default, Aug 25 2026, 21:26:21) \n[Clang 21.0.0 (clang-2100.3.34.2)]",
+        "load_average": [
+          4.01708984375,
+          10.392578125,
+          19.1767578125
+        ],
+        "note": "Screening only; 3 first eligible images per category, all tuning; child wait4 peak RSS."
+      },
+      "plan": {
+        "phase": "offline screening, all samples tuning; fresh holdout and human review required for adoption",
+        "jpeg": {
+          "encoder": "ImagePet CLI advanced mozjpeg, original Core snapshot abd637e",
+          "qualities": [
+            80,
+            70,
+            75
+          ],
+          "maximum_encodes": 3,
+          "threshold": "SSIM >= max(0.98, baseline SSIM - 0.002)",
+          "categories": [
+            "photos",
+            "text",
+            "gradient",
+            "palette"
+          ],
+          "alpha": "exclude nonopaque inputs",
+          "pixel_limit": 1000000
+        },
+        "png": {
+          "quantizer": "Pillow FASTOCTREE, no dithering; exploration only, not pngdeer's quantizer",
+          "colors": [
+            64,
+            128,
+            256
+          ],
+          "maximum_encodes": 3,
+          "threshold": "minimum black/white background SSIM >= 0.995",
+          "categories": [
+            "photos",
+            "photos-alpha",
+            "icons",
+            "illustrations",
+            "text",
+            "gradient",
+            "alpha"
+          ],
+          "pixel_limit": 1000000
+        },
+        "metrics": "full-size ImageIO oriented sRGB premultiplied RGBA; existing SSIM proxy, not SSIMULACRA2; not visual acceptance",
+        "timing": "encoding and scoring both counted; SSIM subprocess RSS measured independently, not hidden in compression timing; repeat each candidate 3 times",
+        "adoption_gates": {
+          "real_asset_extra_savings": ">=5% in this screening and a fresh holdout",
+          "additional_search_seconds_p95": "<=0.5 s",
+          "peak_rss": "<=256 MiB per worker",
+          "human_review": "required: text, gradients, edges, transparency; no new automatic lossy PNG without opt-in"
+        },
+        "fallback": "retain current q80 result/original if no smaller candidate passes; original retained when baseline not smaller",
+        "scope": "No production dependencies or product defaults change; a failed gate stops adoption of this candidate, not all possible future algorithms.",
+        "selection": "First 3 eligible PNG inputs per category in frozen manifest order; <=1MP; JPEG excludes nonopaque. All tuning."
+      }
+    },
+    "evaluation-webp": {
+      "environment": {
+        "cli_sha256": "7241305993c27d76ffa550b52de130b73c833e59b1632730cb73b62096ecbba1",
+        "normalizer_sha256": "22676ba45b8b511542040ab792aa89b6dbdc7bbbca5a502515922c2477489319",
+        "script_sha256": "c3c206c0efd644497bc5415d2456a6670ddd643b682cef359a4e03c7e814a0a1",
+        "manifest_sha256": "6dfbece78b665196ca3ca9b3b9b342e7ef0873a5b6e3ab15185222e2ac381930",
+        "plan_sha256": "b58c715716b1b41365365a81a598b39bb39e2a0e57665895d17681371e4a9ac5",
+        "pillow": "11.3.0",
+        "python": "3.9.6 (default, Aug 25 2026, 21:26:21) \n[Clang 21.0.0 (clang-2100.3.34.2)]",
+        "load_average": [
+          5.95458984375,
+          10.22119140625,
+          16.8837890625
+        ],
+        "note": "Screening only; 3 first eligible images per category, all tuning; child wait4 peak RSS."
+      },
+      "plan": {
+        "phase": "offline screening, all samples tuning; fresh holdout and human review required for adoption",
+        "jpeg": {
+          "encoder": "ImagePet CLI advanced mozjpeg, original Core snapshot abd637e",
+          "qualities": [
+            80,
+            70,
+            75
+          ],
+          "maximum_encodes": 3,
+          "threshold": "SSIM >= max(0.98, baseline SSIM - 0.002)",
+          "categories": [
+            "photos",
+            "text",
+            "gradient",
+            "palette"
+          ],
+          "alpha": "exclude nonopaque inputs",
+          "pixel_limit": 1000000
+        },
+        "png": {
+          "quantizer": "Pillow FASTOCTREE, no dithering; exploration only, not pngdeer's quantizer",
+          "colors": [
+            64,
+            128,
+            256
+          ],
+          "maximum_encodes": 3,
+          "threshold": "minimum black/white background SSIM >= 0.995",
+          "categories": [
+            "photos",
+            "photos-alpha",
+            "icons",
+            "illustrations",
+            "text",
+            "gradient",
+            "alpha"
+          ],
+          "pixel_limit": 1000000
+        },
+        "metrics": "full-size ImageIO oriented sRGB premultiplied RGBA; existing SSIM proxy, not SSIMULACRA2; not visual acceptance",
+        "timing": "encoding and scoring both counted; SSIM subprocess RSS measured independently, not hidden in compression timing; repeat each candidate 3 times",
+        "adoption_gates": {
+          "real_asset_extra_savings": ">=5% in this screening and a fresh holdout",
+          "additional_search_seconds_p95": "<=0.5 s",
+          "peak_rss": "<=256 MiB per worker",
+          "human_review": "required: text, gradients, edges, transparency; no new automatic lossy PNG without opt-in"
+        },
+        "fallback": "retain current q80 result/original if no smaller candidate passes; original retained when baseline not smaller",
+        "scope": "No production dependencies or product defaults change; a failed gate stops adoption of this candidate, not all possible future algorithms.",
+        "selection": "For WebP: first 3 eligible PNGs per category, <=1MP, alpha allowed; frozen before WebP quality screening. All tuning.",
+        "webp": {
+          "encoder": "ImagePet CLI Swift-WebP picture",
+          "qualities": [
+            80,
+            70,
+            75
+          ],
+          "maximum_encodes": 3,
+          "threshold": "SSIM >= max(0.98, baseline SSIM - 0.002)",
+          "categories": [
+            "photos",
+            "text",
+            "gradient",
+            "alpha"
+          ],
+          "alpha": "include alpha, score on black and white",
+          "pixel_limit": 1000000
+        }
+      }
+    }
+  },
+  "formats": {
+    "jpeg": {
+      "images": 12,
+      "baseline_effective_bytes": 508090,
+      "score_selected_effective_bytes": 503684,
+      "extra_reduction": 0.008671692023066835,
+      "real_images": 3,
+      "real_extra_reduction": 0.0,
+      "smaller_score_selected_count": 3,
+      "additional_seconds_p50": 1.8974748525000091,
+      "additional_seconds_p95": 2.261062291000002,
+      "maximum_worker_peak_rss_bytes": 187809792,
+      "encoding_and_score_repetitions": 108
+    },
+    "webp": {
+      "images": 12,
+      "baseline_effective_bytes": 483976,
+      "score_selected_effective_bytes": 455568,
+      "extra_reduction": 0.05869712547729644,
+      "real_images": 3,
+      "real_extra_reduction": 0.0,
+      "smaller_score_selected_count": 9,
+      "additional_seconds_p50": 1.9860643119999857,
+      "additional_seconds_p95": 2.3748921250000095,
+      "maximum_worker_peak_rss_bytes": 188448768,
+      "encoding_and_score_repetitions": 108
+    },
+    "png": {
+      "images": 21,
+      "baseline_effective_bytes": 9879961,
+      "score_selected_effective_bytes": 9407443,
+      "extra_reduction": 0.04782589728846098,
+      "real_images": 12,
+      "real_extra_reduction": 0.03025989311731836,
+      "smaller_score_selected_count": 4,
+      "additional_seconds_p50": 2.5756560419999914,
+      "additional_seconds_p95": 3.1335685430000098,
+      "maximum_worker_peak_rss_bytes": 214024192,
+      "encoding_and_score_repetitions": 252
+    }
+  },
+  "images": [
+    {
+      "experiment": "jpeg",
+      "sha256": "a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim01.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 85042,
+      "baseline_bytes": 85042,
+      "additional_seconds": [
+        2.3836569600000015,
+        1.5601061660000006,
+        1.6574549169999986
+      ],
+      "name": "kodim01.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 85042,
+          "output_sha256": "9be56b84c82385c7b2c792e9e6da26f7eab393818b6d43fe4b75dde984691c46",
+          "scores": {
+            "ssim": 0.929682818444439,
+            "black_background_ssim": 0.929682818444439,
+            "white_background_ssim": 0.929682818444439,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.7168015,
+            0.14144441699999977,
+            0.148806333
+          ],
+          "score_seconds": [
+            1.263684792,
+            0.42696158299999976,
+            0.49506016699999966
+          ],
+          "peak_rss_bytes": [
+            112214016,
+            111329280,
+            111656960
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 64676,
+          "output_sha256": "a245133bf99c8b811fff842c1970b4dc563bb789c0c3da49de70ee56a4ab42b8",
+          "scores": {
+            "ssim": 0.9006214438510032,
+            "black_background_ssim": 0.9006214438510032,
+            "white_background_ssim": 0.9006214438510032,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12868237500000035,
+            0.13413933300000025,
+            0.13451991599999946
+          ],
+          "score_seconds": [
+            0.4259372920000004,
+            0.4279061250000007,
+            0.4524885000000003
+          ],
+          "peak_rss_bytes": [
+            111509504,
+            111607808,
+            111362048
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 72721,
+          "output_sha256": "5c4ffea5a440d19003fd4751309fa3e70f7f8abd9c552655dd6927e31e580866",
+          "scores": {
+            "ssim": 0.9139244222419158,
+            "black_background_ssim": 0.9139244222419158,
+            "white_background_ssim": 0.9139244222419158,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14028858400000033,
+            0.13780512499999986,
+            0.13332766699999965
+          ],
+          "score_seconds": [
+            0.4250639170000001,
+            0.43329400000000007,
+            0.4420586669999995
+          ],
+          "peak_rss_bytes": [
+            111869952,
+            111509504,
+            111542272
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim03.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 41988,
+      "baseline_bytes": 41988,
+      "additional_seconds": [
+        1.5433720430000006,
+        1.5561757500000013,
+        1.5424680420000048
+      ],
+      "name": "kodim03.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 41988,
+          "output_sha256": "65461ea8e15844879a6a5265d0a6a921a5699cdee97da7173aa53bd629bb8071",
+          "scores": {
+            "ssim": 0.9443434628503558,
+            "black_background_ssim": 0.9443434628503558,
+            "white_background_ssim": 0.9443434628503558,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1308850829999999,
+            0.12785500000000027,
+            0.13206008300000072
+          ],
+          "score_seconds": [
+            0.42082337500000033,
+            0.4429848750000005,
+            0.4439117920000015
+          ],
+          "peak_rss_bytes": [
+            112656384,
+            111722496,
+            112050176
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 30960,
+          "output_sha256": "abc08b855c17aeee0d4ca18dec202f0fd3db79015eae340005500fc5ce6e99ef",
+          "scores": {
+            "ssim": 0.926706174972423,
+            "black_background_ssim": 0.926706174972423,
+            "white_background_ssim": 0.926706174972423,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11801845899999996,
+            0.12355204099999995,
+            0.12028825000000154
+          ],
+          "score_seconds": [
+            0.45469579200000076,
+            0.43230466700000036,
+            0.4341373330000007
+          ],
+          "peak_rss_bytes": [
+            112001024,
+            111312896,
+            111214592
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 35337,
+          "output_sha256": "30e9b6fd17955640890662678ef4f665241bed0c1caa62f22cf1fcf46dde26ff",
+          "scores": {
+            "ssim": 0.9352023812038398,
+            "black_background_ssim": 0.9352023812038398,
+            "white_background_ssim": 0.9352023812038398,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1228570419999997,
+            0.12312691700000045,
+            0.12368395900000095
+          ],
+          "score_seconds": [
+            0.4269773749999999,
+            0.43420725000000004,
+            0.42044670800000006
+          ],
+          "peak_rss_bytes": [
+            112689152,
+            111165440,
+            112459776
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim05.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 94821,
+      "baseline_bytes": 94821,
+      "additional_seconds": [
+        1.5809834159999987,
+        1.588508541999996,
+        1.6244396250000008
+      ],
+      "name": "kodim05.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 94821,
+          "output_sha256": "871d165c2beec76a5f3c493ff9dc682e92ecfb8f648bf9bf2087c5e55ee25ea3",
+          "scores": {
+            "ssim": 0.9436648106097643,
+            "black_background_ssim": 0.9436648106097643,
+            "white_background_ssim": 0.9436648106097643,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.144876,
+            0.1454171670000015,
+            0.1482945830000002
+          ],
+          "score_seconds": [
+            0.42655249999999967,
+            0.44512320900000013,
+            0.4237926250000008
+          ],
+          "peak_rss_bytes": [
+            111378432,
+            111919104,
+            111443968
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 73413,
+          "output_sha256": "c3218db8374e618685806249c4aee371221d08279db4fc3778e5e24e3d646647",
+          "scores": {
+            "ssim": 0.9191865340769483,
+            "black_background_ssim": 0.9191865340769483,
+            "white_background_ssim": 0.9191865340769483,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1381569159999998,
+            0.1331389999999999,
+            0.14584900000000012
+          ],
+          "score_seconds": [
+            0.43589233299999997,
+            0.4337988329999991,
+            0.44720570800000026
+          ],
+          "peak_rss_bytes": [
+            111820800,
+            112967680,
+            112836608
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 81951,
+          "output_sha256": "89420ac16b3adeb922f2e4164bca96e580590a4995ae5cede0532dec05ac756a",
+          "scores": {
+            "ssim": 0.9304707043174236,
+            "black_background_ssim": 0.9304707043174236,
+            "white_background_ssim": 0.9304707043174236,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14424770900000006,
+            0.13728766599999886,
+            0.1425257920000007
+          ],
+          "score_seconds": [
+            0.4361339579999992,
+            0.43915983399999803,
+            0.46506649999999894
+          ],
+          "peak_rss_bytes": [
+            111722496,
+            111558656,
+            111394816
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "5b49f4e5df11ba69414f8b890d9ffb922766565947f8c5d754707c2916a2136a",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9810021464570118,
+      "selected": 80,
+      "effective_bytes": 64015,
+      "baseline_bytes": 64015,
+      "additional_seconds": [
+        2.198950624000002,
+        2.226748791000002,
+        2.1988204590000073
+      ],
+      "name": "fixture-text-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 64015,
+          "output_sha256": "3ff8926b5a06a2b4fdab235b41152f9291313f8d6fad90dffc895f2bad3294ec",
+          "scores": {
+            "ssim": 0.9830021464570118,
+            "black_background_ssim": 0.9830021464570118,
+            "white_background_ssim": 0.9830021464570118,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1445136670000018,
+            0.14535620799999904,
+            0.14891270799999745
+          ],
+          "score_seconds": [
+            0.6357911670000007,
+            0.6627512080000031,
+            0.6660679160000029
+          ],
+          "peak_rss_bytes": [
+            175505408,
+            175915008,
+            175833088
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 52350,
+          "output_sha256": "31a00e0ff15810f97be4a46c7cedcda454d6d41f8972c55fbce0586aac8d99f6",
+          "scores": {
+            "ssim": 0.9724990290564649,
+            "black_background_ssim": 0.9724990290564649,
+            "white_background_ssim": 0.9724990290564649,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1314185830000021,
+            0.13573358300000038,
+            0.130998917000003
+          ],
+          "score_seconds": [
+            0.6345440409999981,
+            0.6454389999999997,
+            0.6333325840000015
+          ],
+          "peak_rss_bytes": [
+            176144384,
+            176291840,
+            176259072
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 56911,
+          "output_sha256": "96e75efc7173a2aad8015085f4e31ee0935f9239875916272e356f806e3db1e4",
+          "scores": {
+            "ssim": 0.9766577185576958,
+            "black_background_ssim": 0.9766577185576958,
+            "white_background_ssim": 0.9766577185576958,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.15037787500000022,
+            0.14413816700000126,
+            0.14100912500000007
+          ],
+          "score_seconds": [
+            0.6468189580000008,
+            0.6386868329999977,
+            0.6274119169999999
+          ],
+          "peak_rss_bytes": [
+            176275456,
+            176406528,
+            175964160
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "6a78504a280a21ec57bd04287ce88c68323fa5c7b207adb5ae4b37e2c8905619",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9821211263140144,
+      "selected": 80,
+      "effective_bytes": 62315,
+      "baseline_bytes": 62315,
+      "additional_seconds": [
+        1.8945336230000045,
+        1.8864285830000007,
+        1.8904207920000005
+      ],
+      "name": "fixture-text-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 62315,
+          "output_sha256": "9a533d3d01ee05584ae1a7da19844c57a4fe296502e9cbfe75651b828655f079",
+          "scores": {
+            "ssim": 0.9841211263140144,
+            "black_background_ssim": 0.9841211263140144,
+            "white_background_ssim": 0.9841211263140144,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1433757920000005,
+            0.14720533299999872,
+            0.14475083300000335
+          ],
+          "score_seconds": [
+            0.5472752080000021,
+            0.525878500000001,
+            0.5267895000000031
+          ],
+          "peak_rss_bytes": [
+            181010432,
+            180502528,
+            180011008
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 51626,
+          "output_sha256": "aa0bd8ad54e5a8f53dfa8f9eec66a94c74aad9cb781c81f585a92635f6a23b48",
+          "scores": {
+            "ssim": 0.9744509242141691,
+            "black_background_ssim": 0.9744509242141691,
+            "white_background_ssim": 0.9744509242141691,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14352966600000272,
+            0.1442215830000002,
+            0.14823529199999896
+          ],
+          "score_seconds": [
+            0.5314324160000012,
+            0.5511180419999988,
+            0.5432328749999975
+          ],
+          "peak_rss_bytes": [
+            180469760,
+            180011008,
+            180748288
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 56402,
+          "output_sha256": "c9b7aad589fed6e8c055ee7651dfd8399569db35a3a35bf80e8d2b47b7939ac9",
+          "scores": {
+            "ssim": 0.9804218287979598,
+            "black_background_ssim": 0.9804218287979598,
+            "white_background_ssim": 0.9804218287979598,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13897195799999906,
+            0.14210816699999995,
+            0.14623912500000102
+          ],
+          "score_seconds": [
+            0.5333243749999994,
+            0.5231022910000007,
+            0.5259239999999998
+          ],
+          "peak_rss_bytes": [
+            180355072,
+            180060160,
+            180404224
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "89f6eef54b6d249eb4494401fa777ede6b02e574b209283d289c66b8c697145d",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9823041286305271,
+      "selected": 80,
+      "effective_bytes": 63507,
+      "baseline_bytes": 63507,
+      "additional_seconds": [
+        1.9917912079999915,
+        1.9063535829999942,
+        1.9004160820000138
+      ],
+      "name": "fixture-text-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 63507,
+          "output_sha256": "b3e14c151f17b8f09b053093796c51c03576a5f5c88607c5fbba8b924fae341c",
+          "scores": {
+            "ssim": 0.9843041286305271,
+            "black_background_ssim": 0.9843041286305271,
+            "white_background_ssim": 0.9843041286305271,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14148741700000045,
+            0.1469382500000016,
+            0.1525877089999952
+          ],
+          "score_seconds": [
+            0.547412916999999,
+            0.5424056249999971,
+            0.5340171249999983
+          ],
+          "peak_rss_bytes": [
+            185253888,
+            183861248,
+            184565760
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 51297,
+          "output_sha256": "5437f3c94e9a3c317f652e4eacc3bc68e895ed1c94e45570d6a1cc2023c64dfd",
+          "scores": {
+            "ssim": 0.9747346011929783,
+            "black_background_ssim": 0.9747346011929783,
+            "white_background_ssim": 0.9747346011929783,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1415062909999989,
+            0.14037395799999786,
+            0.13895633300000299
+          ],
+          "score_seconds": [
+            0.612454041999996,
+            0.532589625,
+            0.5468463330000048
+          ],
+          "peak_rss_bytes": [
+            186155008,
+            185270272,
+            185090048
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 56691,
+          "output_sha256": "5abee17e61298a010919d3ba022d0369b54d900954746a4786246c1665b36587",
+          "scores": {
+            "ssim": 0.9784659072494933,
+            "black_background_ssim": 0.9784659072494933,
+            "white_background_ssim": 0.9784659072494933,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14702083299999913,
+            0.1467573329999965,
+            0.14397995800000274
+          ],
+          "score_seconds": [
+            0.5433971249999985,
+            0.5442270420000028,
+            0.5366163330000049
+          ],
+          "peak_rss_bytes": [
+            184991744,
+            184958976,
+            184795136
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.998,
+      "selected": 80,
+      "effective_bytes": 20600,
+      "baseline_bytes": 20600,
+      "additional_seconds": [
+        2.261062291000002,
+        2.2233548749999983,
+        2.245439250999979
+      ],
+      "name": "fixture-palette-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 20600,
+          "output_sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.17280895900000104,
+            0.16826454200000285,
+            0.17261670900000325
+          ],
+          "score_seconds": [
+            0.6497756670000001,
+            0.6302889999999977,
+            0.6408656669999999
+          ],
+          "peak_rss_bytes": [
+            175734784,
+            175996928,
+            176603136
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 20600,
+          "output_sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16821529099999566,
+            0.1712815829999954,
+            0.16563487499999496
+          ],
+          "score_seconds": [
+            0.6398365420000047,
+            0.6239113749999987,
+            0.6476910839999945
+          ],
+          "peak_rss_bytes": [
+            176226304,
+            175570944,
+            179109888
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 20600,
+          "output_sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16479395800000418,
+            0.16357762500000206,
+            0.1662417919999939
+          ],
+          "score_seconds": [
+            0.6384408329999971,
+            0.6342952920000045,
+            0.6250058329999959
+          ],
+          "peak_rss_bytes": [
+            175898624,
+            176521216,
+            176504832
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.998,
+      "selected": 80,
+      "effective_bytes": 21075,
+      "baseline_bytes": 21075,
+      "additional_seconds": [
+        1.9532147490000042,
+        1.978981499999989,
+        1.8928350419999873
+      ],
+      "name": "fixture-palette-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 21075,
+          "output_sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.17115304100000373,
+            0.1828104999999951,
+            0.17221899999999835
+          ],
+          "score_seconds": [
+            0.5385307920000031,
+            0.5445204159999975,
+            0.523826917000001
+          ],
+          "peak_rss_bytes": [
+            179519488,
+            180224000,
+            180158464
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 21075,
+          "output_sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16973683299999465,
+            0.18493612500000012,
+            0.1605659579999994
+          ],
+          "score_seconds": [
+            0.5260764160000022,
+            0.5407350839999978,
+            0.5129752079999932
+          ],
+          "peak_rss_bytes": [
+            180862976,
+            180174848,
+            179929088
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 21075,
+          "output_sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16730454200000366,
+            0.1790124169999956,
+            0.17059404199999761
+          ],
+          "score_seconds": [
+            0.5515661660000006,
+            0.5297774579999981,
+            0.5248729169999962
+          ],
+          "peak_rss_bytes": [
+            179961856,
+            180256768,
+            180633600
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.998,
+      "selected": 80,
+      "effective_bytes": 21831,
+      "baseline_bytes": 21831,
+      "additional_seconds": [
+        2.010060126000006,
+        1.954463498999992,
+        1.9822423750000056
+      ],
+      "name": "fixture-palette-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 21831,
+          "output_sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.18070470800000038,
+            0.18734412499999564,
+            0.17762520800000203
+          ],
+          "score_seconds": [
+            0.5367401670000049,
+            0.5443553329999986,
+            0.5380408330000037
+          ],
+          "peak_rss_bytes": [
+            185057280,
+            184532992,
+            184795136
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 21831,
+          "output_sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.17079395900000094,
+            0.16206379199999787,
+            0.17221899999999835
+          ],
+          "score_seconds": [
+            0.5475433330000001,
+            0.5336911249999972,
+            0.5596791669999988
+          ],
+          "peak_rss_bytes": [
+            184647680,
+            184860672,
+            184745984
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 21831,
+          "output_sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.17686408299999812,
+            0.18626058299999926,
+            0.16990408400000234
+          ],
+          "score_seconds": [
+            0.578118584000002,
+            0.5280926659999992,
+            0.5423992910000024
+          ],
+          "peak_rss_bytes": [
+            184991744,
+            184745984,
+            184795136
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "e15c806cfbcbb6db886cc8d730772e256fe4eb5d1798de827e10227b4ffa51e6",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9871877074776607,
+      "selected": 75,
+      "effective_bytes": 9159,
+      "baseline_bytes": 10564,
+      "additional_seconds": [
+        2.1719026660000083,
+        2.1686159160000003,
+        2.163971875999991
+      ],
+      "name": "fixture-gradient-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 10564,
+          "output_sha256": "50c9f68471ec3096e59abca085b4044d9bf78d86987b21a8272849ecac89b6a1",
+          "scores": {
+            "ssim": 0.9891877074776607,
+            "black_background_ssim": 0.9891877074776607,
+            "white_background_ssim": 0.9891877074776607,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.126306833000001,
+            0.12229016699999562,
+            0.12166520800000313
+          ],
+          "score_seconds": [
+            0.6516076249999969,
+            0.6342292909999969,
+            0.6477394169999968
+          ],
+          "peak_rss_bytes": [
+            176177152,
+            175931392,
+            174931968
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 8551,
+          "output_sha256": "99af8ba61a8319db72f4aabf3989f776c75990f3dc7225adf00c3ea5723c7b5b",
+          "scores": {
+            "ssim": 0.9863383753878563,
+            "black_background_ssim": 0.9863383753878563,
+            "white_background_ssim": 0.9863383753878563,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12824754100000035,
+            0.12148508399999969,
+            0.12324904199999764
+          ],
+          "score_seconds": [
+            0.6219416250000052,
+            0.651367332999996,
+            0.6341917499999994
+          ],
+          "peak_rss_bytes": [
+            175865856,
+            176226304,
+            176488448
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 9159,
+          "output_sha256": "f9a5e1890b9f623ff180d9d311f6f3284bdff8c8b80675f6471a00bb9ff0757f",
+          "scores": {
+            "ssim": 0.9893024527708411,
+            "black_background_ssim": 0.9893024527708411,
+            "white_background_ssim": 0.9893024527708411,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12986904200000282,
+            0.12780229100000184,
+            0.12653841699999901
+          ],
+          "score_seconds": [
+            0.640236833000003,
+            0.6337319170000058,
+            0.632253249999998
+          ],
+          "peak_rss_bytes": [
+            175882240,
+            176209920,
+            175685632
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "7184e81922e34a83c7c75501cfec83f8fda0e4d2166f1754555608617e8bda55",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.98753399303595,
+      "selected": 75,
+      "effective_bytes": 9534,
+      "baseline_bytes": 10971,
+      "additional_seconds": [
+        1.8163806240000184,
+        1.8473998329999972,
+        1.8252714569999995
+      ],
+      "name": "fixture-gradient-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 10971,
+          "output_sha256": "4f6fe84771a9d5bde2bb1c0671ad30932117c1cdd6045ce175216e3d518d6854",
+          "scores": {
+            "ssim": 0.98953399303595,
+            "black_background_ssim": 0.98953399303595,
+            "white_background_ssim": 0.98953399303595,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13168145800000275,
+            0.12469662499999856,
+            0.12978850000000364
+          ],
+          "score_seconds": [
+            0.5146601669999882,
+            0.5368971660000028,
+            0.5170451660000026
+          ],
+          "peak_rss_bytes": [
+            180158464,
+            180027392,
+            180240384
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 8923,
+          "output_sha256": "14583b7897e7fc96c647180b650f1b1e423624f5190370da6f5e923ffe949af5",
+          "scores": {
+            "ssim": 0.9862531504917307,
+            "black_background_ssim": 0.9862531504917307,
+            "white_background_ssim": 0.9862531504917307,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12884441600000685,
+            0.11591545800000347,
+            0.12741262499999095
+          ],
+          "score_seconds": [
+            0.5234386250000114,
+            0.5346128340000007,
+            0.5411226249999999
+          ],
+          "peak_rss_bytes": [
+            180502528,
+            180289536,
+            180371456
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 9534,
+          "output_sha256": "361fa0fe571c0803224bfd649c4745f176ab5e2a08bcf5cdc99f5d0d2b39291c",
+          "scores": {
+            "ssim": 0.9894845464154459,
+            "black_background_ssim": 0.9894845464154459,
+            "white_background_ssim": 0.9894845464154459,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12630624999999895,
+            0.12322262499999681,
+            0.11927375000000495
+          ],
+          "score_seconds": [
+            0.5231311660000131,
+            0.5367517499999934,
+            0.5204172910000011
+          ],
+          "peak_rss_bytes": [
+            180191232,
+            179896320,
+            180207616
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "jpeg",
+      "sha256": "9663e07f77de69e2a05af5be88bfa8447b1f1a693722c281d77dad05f29dda95",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9873797038015881,
+      "selected": 75,
+      "effective_bytes": 9797,
+      "baseline_bytes": 11361,
+      "additional_seconds": [
+        1.8580127930000288,
+        1.888294502000008,
+        1.849518040999996
+      ],
+      "name": "fixture-gradient-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 11361,
+          "output_sha256": "243bf3bf3b905229acff93f0a956625843859ea8b65313cbeeceb466df4d5f04",
+          "scores": {
+            "ssim": 0.9893797038015881,
+            "black_background_ssim": 0.9893797038015881,
+            "white_background_ssim": 0.9893797038015881,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12392374999998879,
+            0.1269664160000019,
+            0.1274884159999914
+          ],
+          "score_seconds": [
+            0.5336605420000069,
+            0.543284708999991,
+            0.5478779999999972
+          ],
+          "peak_rss_bytes": [
+            184909824,
+            184926208,
+            187809792
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 9141,
+          "output_sha256": "43e012fb72f197dd64f8a1df73798abe9c4344815fb8062eda5d1e9666bbeb5d",
+          "scores": {
+            "ssim": 0.9862746888855528,
+            "black_background_ssim": 0.9862746888855528,
+            "white_background_ssim": 0.9862746888855528,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12238745900000936,
+            0.12618466700000397,
+            0.12401333299999351
+          ],
+          "score_seconds": [
+            0.5416129590000054,
+            0.5427453340000028,
+            0.5254052079999951
+          ],
+          "peak_rss_bytes": [
+            184500224,
+            184664064,
+            184713216
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 9797,
+          "output_sha256": "85fcc283814840304a5281070be22dde0900f939d4d39cddbf0dd3287209003b",
+          "scores": {
+            "ssim": 0.9894488416129578,
+            "black_background_ssim": 0.9894488416129578,
+            "white_background_ssim": 0.9894488416129578,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12469699999999762,
+            0.12790745899999933,
+            0.12639958399999784
+          ],
+          "score_seconds": [
+            0.5356548330000095,
+            0.5481723330000108,
+            0.5258219160000124
+          ],
+          "peak_rss_bytes": [
+            185204736,
+            184270848,
+            184729600
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "e64d4d09858960c0b09e3c7c6568ddff14db3207bec2d9d1d41d8cbf250085f2",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F308.png)",
+      "license": "CC-BY-SA-4.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 17296,
+      "baseline_bytes": 17296,
+      "additional_seconds": [
+        1.996006166000015,
+        1.9291532930000272,
+        1.9394009589999968
+      ],
+      "name": "openmoji-1f308.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 17296,
+          "output_sha256": "e64d4d09858960c0b09e3c7c6568ddff14db3207bec2d9d1d41d8cbf250085f2",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.10962808300000404,
+            0.11713808300000039,
+            0.12032566700000302
+          ],
+          "score_seconds": [
+            0.38726616699999283,
+            0.3874914170000068,
+            0.4109578340000013
+          ],
+          "peak_rss_bytes": [
+            110247936,
+            110411776,
+            111378432
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 11276,
+          "output_sha256": "e63217585779db0188d610e8a001a25e91a84aa1ff1bd22d76f56f4b9f7fbfa6",
+          "scores": {
+            "ssim": 0.9838067198472414,
+            "black_background_ssim": 0.9995900746805222,
+            "white_background_ssim": 0.9838067198472414,
+            "alpha_max_difference": 28
+          },
+          "encode_seconds": [
+            0.120381375000008,
+            0.12069300000000283,
+            0.11781775000000039
+          ],
+          "score_seconds": [
+            0.3961326670000034,
+            0.4076901670000126,
+            0.3874595000000056
+          ],
+          "peak_rss_bytes": [
+            110526464,
+            110575616,
+            110542848
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 11665,
+          "output_sha256": "db03c01de3f8ee31ad96907c6b245751132008b24a13ea3a620938b042f20217",
+          "scores": {
+            "ssim": 0.9839862676821931,
+            "black_background_ssim": 0.9997667560560745,
+            "white_background_ssim": 0.9839862676821931,
+            "alpha_max_difference": 28
+          },
+          "encode_seconds": [
+            0.12159654100000239,
+            0.11687995900000203,
+            0.12113354100000606
+          ],
+          "score_seconds": [
+            0.4294714159999984,
+            0.38745337500000687,
+            0.3922648749999951
+          ],
+          "peak_rss_bytes": [
+            110493696,
+            110428160,
+            110755840
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 12051,
+          "output_sha256": "9ccba0926bdfdc3d6bcae3fce28e53bc7b324e3ce4c39df469112d43f5dd94db",
+          "scores": {
+            "ssim": 0.9839862676821931,
+            "black_background_ssim": 0.9997667560560745,
+            "white_background_ssim": 0.9839862676821931,
+            "alpha_max_difference": 28
+          },
+          "encode_seconds": [
+            0.12299679200000924,
+            0.12335608300000445,
+            0.12103449999999327
+          ],
+          "score_seconds": [
+            0.4181612080000008,
+            0.3855892919999917,
+            0.38873295899999505
+          ],
+          "peak_rss_bytes": [
+            110395392,
+            110706688,
+            110608384
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "2bdb12b98b6c72a9e51ac1f57346e98f3e26826f68ad2714b720c6637862c9f1",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F30D.png)",
+      "license": "CC-BY-SA-4.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 16904,
+      "baseline_bytes": 16904,
+      "additional_seconds": [
+        1.9433500829999986,
+        1.9719842910000125,
+        1.914886124999967
+      ],
+      "name": "openmoji-1f30d.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 16904,
+          "output_sha256": "2bdb12b98b6c72a9e51ac1f57346e98f3e26826f68ad2714b720c6637862c9f1",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.10814308300000164,
+            0.11235574999999187,
+            0.11677862499999492
+          ],
+          "score_seconds": [
+            0.39614566600000956,
+            0.41800183300000526,
+            0.38513379200000486
+          ],
+          "peak_rss_bytes": [
+            110739456,
+            110231552,
+            111132672
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 10512,
+          "output_sha256": "cc5ab4036b1c46591859e0afe0e9493bc01ee8152c461c9223a275b309e701ce",
+          "scores": {
+            "ssim": 0.9890149175909482,
+            "black_background_ssim": 0.9998812311519033,
+            "white_background_ssim": 0.9890149175909482,
+            "alpha_max_difference": 30
+          },
+          "encode_seconds": [
+            0.12457570799999473,
+            0.12080766699999401,
+            0.12227495799999133
+          ],
+          "score_seconds": [
+            0.3911794579999963,
+            0.396761957999999,
+            0.39305908299999714
+          ],
+          "peak_rss_bytes": [
+            109772800,
+            110231552,
+            110837760
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 10831,
+          "output_sha256": "ced1ba4f47337af65fca86372586a07f3f8e5222d6d5bef4adf846c521ec8c1c",
+          "scores": {
+            "ssim": 0.9890149175909482,
+            "black_background_ssim": 0.9998812311519033,
+            "white_background_ssim": 0.9890149175909482,
+            "alpha_max_difference": 30
+          },
+          "encode_seconds": [
+            0.12247366699999418,
+            0.12042762500000492,
+            0.12383212499999274
+          ],
+          "score_seconds": [
+            0.39581900000000303,
+            0.404452708000008,
+            0.38478237500000034
+          ],
+          "peak_rss_bytes": [
+            110297088,
+            113229824,
+            110460928
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 11217,
+          "output_sha256": "cab94fec063bbe63bf8f6518ea11159b7621dde0a14e1cca033154a4342f1e53",
+          "scores": {
+            "ssim": 0.9890149175909482,
+            "black_background_ssim": 0.9998812311519033,
+            "white_background_ssim": 0.9890149175909482,
+            "alpha_max_difference": 30
+          },
+          "encode_seconds": [
+            0.12351695899999982,
+            0.12395724999998947,
+            0.1185038749999876
+          ],
+          "score_seconds": [
+            0.38963962500000093,
+            0.3875752500000118,
+            0.3872999169999929
+          ],
+          "peak_rss_bytes": [
+            110575616,
+            110526464,
+            110772224
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "8534c1bec8bde9d9641656508ab9476ad46acac394bd2de25bc0e6eeca4f5a72",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F34E.png)",
+      "license": "CC-BY-SA-4.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 9919,
+      "baseline_bytes": 9919,
+      "additional_seconds": [
+        1.9396807509999832,
+        1.9138967489999885,
+        1.9466984159999754
+      ],
+      "name": "openmoji-1f34e.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 9919,
+          "output_sha256": "8534c1bec8bde9d9641656508ab9476ad46acac394bd2de25bc0e6eeca4f5a72",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.10980316600000606,
+            0.10927841699999874,
+            0.11083337499999857
+          ],
+          "score_seconds": [
+            0.383500583,
+            0.3936159999999944,
+            0.4003219999999885
+          ],
+          "peak_rss_bytes": [
+            111181824,
+            111542272,
+            110739456
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 6949,
+          "output_sha256": "3c175d46009e2bf16b173630268b3980a500bf031c6bc1d5149c79dd07d56638",
+          "scores": {
+            "ssim": 0.994082405189152,
+            "black_background_ssim": 0.9989714859944295,
+            "white_background_ssim": 0.994082405189152,
+            "alpha_max_difference": 46
+          },
+          "encode_seconds": [
+            0.11998158299999773,
+            0.11819408300000589,
+            0.11869433299999343
+          ],
+          "score_seconds": [
+            0.3891474999999929,
+            0.3759810829999992,
+            0.39677729099999226
+          ],
+          "peak_rss_bytes": [
+            113328128,
+            110575616,
+            111083520
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 6816,
+          "output_sha256": "25947676c942d5d8ddd0d7817ce019e4abf033ad4e46273e659f7aacb0528c26",
+          "scores": {
+            "ssim": 0.9941921194493374,
+            "black_background_ssim": 0.9993568082693952,
+            "white_background_ssim": 0.9941921194493374,
+            "alpha_max_difference": 29
+          },
+          "encode_seconds": [
+            0.12068533400000092,
+            0.12024395799998899,
+            0.12190654199999074
+          ],
+          "score_seconds": [
+            0.3832574589999922,
+            0.3908972919999911,
+            0.38739162500000646
+          ],
+          "peak_rss_bytes": [
+            111034368,
+            110297088,
+            110116864
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 7202,
+          "output_sha256": "c306d6624efdd4c221eff11757594dd4b40216791585960f5240137f2e770989",
+          "scores": {
+            "ssim": 0.9941921194493374,
+            "black_background_ssim": 0.9993568082693952,
+            "white_background_ssim": 0.9941921194493374,
+            "alpha_max_difference": 29
+          },
+          "encode_seconds": [
+            0.12600062499998899,
+            0.11827808300000697,
+            0.1216885840000117
+          ],
+          "score_seconds": [
+            0.41710766700001045,
+            0.3966862500000019,
+            0.3999180409999923
+          ],
+          "peak_rss_bytes": [
+            110575616,
+            110264320,
+            110559232
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim01.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 736501,
+      "baseline_bytes": 736501,
+      "additional_seconds": [
+        2.1501107910000172,
+        2.194839082999991,
+        2.1720812490000014
+      ],
+      "name": "kodim01.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 736501,
+          "output_sha256": "a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1251440420000023,
+            0.1303055420000021,
+            0.13210866699999713
+          ],
+          "score_seconds": [
+            0.4323173750000109,
+            0.4662128340000038,
+            0.4278721660000002
+          ],
+          "peak_rss_bytes": [
+            111280128,
+            111165440,
+            111099904
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 160537,
+          "output_sha256": "4237005d471ce37d12ab0be0f2282b2e14f46ce2a980ef8fa59ef9ce28ddc0af",
+          "scores": {
+            "ssim": 0.9581452709114923,
+            "black_background_ssim": 0.9581452709114923,
+            "white_background_ssim": 0.9581452709114923,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1402490830000005,
+            0.1395696670000035,
+            0.14501008399999193
+          ],
+          "score_seconds": [
+            0.4295142499999969,
+            0.4543349159999934,
+            0.41473645800000725
+          ],
+          "peak_rss_bytes": [
+            111116288,
+            113016832,
+            110985216
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 161600,
+          "output_sha256": "0b46544d465fb44c9680c5cd83dafb8261d0dfdda56d9ed5dc34cb7a03ffbe67",
+          "scores": {
+            "ssim": 0.9594386445648814,
+            "black_background_ssim": 0.9594386445648814,
+            "white_background_ssim": 0.9594386445648814,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14135245800000007,
+            0.13916320799999937,
+            0.1456557080000067
+          ],
+          "score_seconds": [
+            0.4255056669999959,
+            0.433454832999999,
+            0.439988624999998
+          ],
+          "peak_rss_bytes": [
+            111706112,
+            111607808,
+            111804416
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 161986,
+          "output_sha256": "cddde0c9d2770dd228ce7deabc004642f05f15a71f21f6f4e5f1ec364e025897",
+          "scores": {
+            "ssim": 0.9594386445648814,
+            "black_background_ssim": 0.9594386445648814,
+            "white_background_ssim": 0.9594386445648814,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14371641600000373,
+            0.14132062499999165,
+            0.14457795799999928
+          ],
+          "score_seconds": [
+            0.43745554200000925,
+            0.42078300000000013,
+            0.454240249999998
+          ],
+          "peak_rss_bytes": [
+            111263744,
+            110919680,
+            111624192
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim03.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 502888,
+      "baseline_bytes": 502888,
+      "additional_seconds": [
+        2.197066666999987,
+        2.1733315410000245,
+        2.161527208999985
+      ],
+      "name": "kodim03.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 502888,
+          "output_sha256": "e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11252908299999831,
+            0.12163662499999361,
+            0.1149926249999993
+          ],
+          "score_seconds": [
+            0.44674358299999994,
+            0.44808454100000006,
+            0.443514792000002
+          ],
+          "peak_rss_bytes": [
+            111099904,
+            112672768,
+            112132096
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 76852,
+          "output_sha256": "29be1294d81c5bc7133ea27b4fe7cb26fd051edce489a3ba0180e5e7335a2b8b",
+          "scores": {
+            "ssim": 0.8584742260893714,
+            "black_background_ssim": 0.8584742260893714,
+            "white_background_ssim": 0.8584742260893714,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14682033300000796,
+            0.14108075000000042,
+            0.14414979199999323
+          ],
+          "score_seconds": [
+            0.4350624169999975,
+            0.4327213330000035,
+            0.4293865409999995
+          ],
+          "peak_rss_bytes": [
+            111312896,
+            111230976,
+            111214592
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 88269,
+          "output_sha256": "ec1046e3cb2bfa651f258606f62b8d02ee27562bb30b8f24be580b49f7ffe007",
+          "scores": {
+            "ssim": 0.9005017829559098,
+            "black_background_ssim": 0.9005017829559098,
+            "white_background_ssim": 0.9005017829559098,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1449399999999912,
+            0.14151670900000113,
+            0.14579241699999557
+          ],
+          "score_seconds": [
+            0.4402868330000018,
+            0.4271913750000067,
+            0.423855875000001
+          ],
+          "peak_rss_bytes": [
+            111919104,
+            111443968,
+            111165440
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 92043,
+          "output_sha256": "e19bcfa8f2d44c8bed09147efa2fe4d8db8baf6d289acada8161fb6f30fe71da",
+          "scores": {
+            "ssim": 0.9087670346442174,
+            "black_background_ssim": 0.9087670346442174,
+            "white_background_ssim": 0.9087670346442174,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14081558399999494,
+            0.14673391700000593,
+            0.1446909579999982
+          ],
+          "score_seconds": [
+            0.44239791699999387,
+            0.43600291600000673,
+            0.43013683399999536
+          ],
+          "peak_rss_bytes": [
+            111886336,
+            111558656,
+            111738880
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim05.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 785610,
+      "baseline_bytes": 785610,
+      "additional_seconds": [
+        2.098380000000006,
+        2.1309912079999975,
+        2.1720757070000047
+      ],
+      "name": "kodim05.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 785610,
+          "output_sha256": "10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1287372910000073,
+            0.13068325000000414,
+            0.12468645799999933
+          ],
+          "score_seconds": [
+            0.4290259579999969,
+            0.44660812499999736,
+            0.43349574999999163
+          ],
+          "peak_rss_bytes": [
+            113377280,
+            111673344,
+            111198208
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 158052,
+          "output_sha256": "a1dcb881aef7f996a711b13e5da60db03c6b3661fc8fb65d4b75f8317d133e7a",
+          "scores": {
+            "ssim": 0.8929020165575215,
+            "black_background_ssim": 0.8929020165575215,
+            "white_background_ssim": 0.8929020165575215,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13405529199999933,
+            0.13536824999999908,
+            0.14022270799999603
+          ],
+          "score_seconds": [
+            0.4248693750000001,
+            0.42966158400000154,
+            0.43220070800001054
+          ],
+          "peak_rss_bytes": [
+            113098752,
+            111263744,
+            110968832
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 179109,
+          "output_sha256": "e8a688e9bd22ac5d07073bae466519102b7af1a089a17a76612ef57f283ec57e",
+          "scores": {
+            "ssim": 0.9274462272859201,
+            "black_background_ssim": 0.9274462272859201,
+            "white_background_ssim": 0.9274462272859201,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13195270800000003,
+            0.13467179100000237,
+            0.13766816599999743
+          ],
+          "score_seconds": [
+            0.42034595799999863,
+            0.4264904999999999,
+            0.45915258300000517
+          ],
+          "peak_rss_bytes": [
+            110903296,
+            111869952,
+            111230976
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 185348,
+          "output_sha256": "629eb5f0783cd561696dd491ff68766e476b02368adce4ddc6a83c8c4e1384b3",
+          "scores": {
+            "ssim": 0.9353078218204098,
+            "black_background_ssim": 0.9353078218204098,
+            "white_background_ssim": 0.9353078218204098,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13635450000001015,
+            0.13830512500000225,
+            0.13281400000001042
+          ],
+          "score_seconds": [
+            0.4217762090000008,
+            0.41988583299999505,
+            0.4365217919999935
+          ],
+          "peak_rss_bytes": [
+            111116288,
+            111280128,
+            111607808
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "e56359a83af72e5b9cec2393c0e774341d02f2945c0f8d3d3f02e573bb644a98",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bicycle_diagram-es.svg)",
+      "license": "CC BY-SA 3.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": 128,
+      "effective_bytes": 63103,
+      "baseline_bytes": 273122,
+      "additional_seconds": [
+        3.1335685430000098,
+        3.140578124000001,
+        3.1144807499999985
+      ],
+      "name": "bicycle-diagram-es.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 273122,
+          "output_sha256": "e56359a83af72e5b9cec2393c0e774341d02f2945c0f8d3d3f02e573bb644a98",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11750125000000367,
+            0.11048858299999154,
+            0.11762754199999392
+          ],
+          "score_seconds": [
+            0.6785116249999987,
+            0.6543186250000019,
+            0.6798927919999898
+          ],
+          "peak_rss_bytes": [
+            203882496,
+            204308480,
+            204849152
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 45132,
+          "output_sha256": "c437fb4bf8c3537ba80902473330d33a89eded1688ee83f8b624e646c422e105",
+          "scores": {
+            "ssim": 0.9289389555276856,
+            "black_background_ssim": 0.9289389555276856,
+            "white_background_ssim": 0.9885701822394544,
+            "alpha_max_difference": 255
+          },
+          "encode_seconds": [
+            0.1596801250000084,
+            0.15173099999999806,
+            0.15337270799999203
+          ],
+          "score_seconds": [
+            0.6536004170000069,
+            0.6797011250000082,
+            0.6567310420000041
+          ],
+          "peak_rss_bytes": [
+            204734464,
+            204455936,
+            204832768
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 63103,
+          "output_sha256": "8ae75681d1d46e4ade2defdce725b93416c5e08ce3ca720a2095c36ddbf3465d",
+          "scores": {
+            "ssim": 0.996458094894702,
+            "black_background_ssim": 0.996458094894702,
+            "white_background_ssim": 0.9969268380929837,
+            "alpha_max_difference": 60
+          },
+          "encode_seconds": [
+            0.15745958399999438,
+            0.15291075000000376,
+            0.15026291700000627
+          ],
+          "score_seconds": [
+            0.6588182090000032,
+            0.6781272079999923,
+            0.652047084000003
+          ],
+          "peak_rss_bytes": [
+            204849152,
+            204816384,
+            204865536
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 66656,
+          "output_sha256": "e6b0b231bde34f2ac6822932247031a8e2aab83d40499f483a34c8a0bde5f982",
+          "scores": {
+            "ssim": 0.9978866282417173,
+            "black_background_ssim": 0.9978866282417173,
+            "white_background_ssim": 0.9979189314212471,
+            "alpha_max_difference": 57
+          },
+          "encode_seconds": [
+            0.15185237499999005,
+            0.15443258300000196,
+            0.1616106660000014
+          ],
+          "score_seconds": [
+            0.6736462080000081,
+            0.6693568329999948,
+            0.6605635410000019
+          ],
+          "peak_rss_bytes": [
+            204619776,
+            204931072,
+            204505088
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "56f533f9729a14d5e908f3b65882563b9d79897ce55a079b8c93ad5237d94972",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:1979_Pontiac_Firebird_Esprit_illustration,_colour_on_transparent.png)",
+      "license": "CC0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 363545,
+      "baseline_bytes": 363545,
+      "additional_seconds": [
+        2.5346432099999845,
+        2.449167793000001,
+        2.4735414579999997
+      ],
+      "name": "1979-pontiac-firebird-esprit-illustration-colour-o.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 363545,
+          "output_sha256": "b85b62546a009a39a5721bbb3bbd1e18dae8e39e723a2622d59b01a330dd93c3",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11810120799999879,
+            0.1227090000000004,
+            0.11777741599999558
+          ],
+          "score_seconds": [
+            0.5455523749999998,
+            0.5105911250000048,
+            0.5104408329999899
+          ],
+          "peak_rss_bytes": [
+            172441600,
+            172474368,
+            172425216
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 70465,
+          "output_sha256": "8ddc42ec95283c43201f7010a6248d2b7c94ba82ab0d5d7d5e65dc84395d0c6f",
+          "scores": {
+            "ssim": 0.9887189105688794,
+            "black_background_ssim": 0.9888859278973424,
+            "white_background_ssim": 0.9887189105688794,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14598254199999872,
+            0.13605595899998946,
+            0.1388408340000069
+          ],
+          "score_seconds": [
+            0.5309710000000081,
+            0.5036211250000093,
+            0.5158967500000244
+          ],
+          "peak_rss_bytes": [
+            172261376,
+            172638208,
+            172490752
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 74492,
+          "output_sha256": "fed12b556938191a321e525b9b63ce333719ce94119209d92a9ffa1b6f03cb1b",
+          "scores": {
+            "ssim": 0.9905502189011915,
+            "black_background_ssim": 0.9906983092817973,
+            "white_background_ssim": 0.9905502189011915,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13831295899998963,
+            0.14382324999999696,
+            0.14017720900000086
+          ],
+          "score_seconds": [
+            0.5070900000000051,
+            0.5085595000000183,
+            0.5026714579999805
+          ],
+          "peak_rss_bytes": [
+            172867584,
+            172179456,
+            172408832
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 74117,
+          "output_sha256": "27ed3782b74c38ae56e9a7c3ac6d72078dbfbcfeef9bec4457b128f2114b6d3b",
+          "scores": {
+            "ssim": 0.9905578410480967,
+            "black_background_ssim": 0.9907060641328646,
+            "white_background_ssim": 0.9905578410480967,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13848895900000002,
+            0.13843137499998193,
+            0.1423294159999955
+          ],
+          "score_seconds": [
+            0.5282453749999831,
+            0.5080854590000001,
+            0.5231849580000016
+          ],
+          "peak_rss_bytes": [
+            172326912,
+            172408832,
+            171786240
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "5b49f4e5df11ba69414f8b890d9ffb922766565947f8c5d754707c2916a2136a",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": 64,
+      "effective_bytes": 33565,
+      "baseline_bytes": 121339,
+      "additional_seconds": [
+        3.0205192909999994,
+        2.952406749000005,
+        2.9876300000000526
+      ],
+      "name": "fixture-text-0.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 121339,
+          "output_sha256": "0f579b8ab4593fc49fb750802184eb27489c333fc5238a391bff2c95861cb32d",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11828650000001062,
+            0.1343584999999905,
+            0.12415624999999864
+          ],
+          "score_seconds": [
+            0.6688720829999966,
+            0.6336382910000111,
+            0.6321704169999975
+          ],
+          "peak_rss_bytes": [
+            176717824,
+            176078848,
+            175734784
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 33565,
+          "output_sha256": "38ba974f36d9052bd834743c70f907ab72171beb9f4a9ac6d7be587b4639ef32",
+          "scores": {
+            "ssim": 0.9995942135594351,
+            "black_background_ssim": 0.9995942135594351,
+            "white_background_ssim": 0.9995942135594351,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13632837500000505,
+            0.13671987499998295,
+            0.13441412500000638
+          ],
+          "score_seconds": [
+            0.6535000419999903,
+            0.6443060830000036,
+            0.6753717500000107
+          ],
+          "peak_rss_bytes": [
+            175996928,
+            176308224,
+            177078272
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 33884,
+          "output_sha256": "88cec0df5f11c1eda3ebe94e61c9e5061087a0dc90be8addfe5831d9e998821f",
+          "scores": {
+            "ssim": 0.9995942135594351,
+            "black_background_ssim": 0.9995942135594351,
+            "white_background_ssim": 0.9995942135594351,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1365138330000093,
+            0.13531720799997515,
+            0.13903570800002285
+          ],
+          "score_seconds": [
+            0.6598067500000013,
+            0.6286794590000113,
+            0.637615583000013
+          ],
+          "peak_rss_bytes": [
+            174997504,
+            176160768,
+            175210496
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 34270,
+          "output_sha256": "0abcd7f38b95a6e4019ff1f5b269523979aaaf05725398fb70e336a4f8348285",
+          "scores": {
+            "ssim": 0.9995942135594351,
+            "black_background_ssim": 0.9995942135594351,
+            "white_background_ssim": 0.9995942135594351,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13651170800000045,
+            0.1336836250000033,
+            0.13951562500000136
+          ],
+          "score_seconds": [
+            0.6289864999999963,
+            0.6400622080000176,
+            0.6295067920000008
+          ],
+          "peak_rss_bytes": [
+            176242688,
+            176242688,
+            174997504
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "6a78504a280a21ec57bd04287ce88c68323fa5c7b207adb5ae4b37e2c8905619",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": 64,
+      "effective_bytes": 33252,
+      "baseline_bytes": 119899,
+      "additional_seconds": [
+        2.494254165000058,
+        2.633544833000002,
+        2.4982635430000073
+      ],
+      "name": "fixture-text-1.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 119899,
+          "output_sha256": "813c0c7e273b617180d5ea0c9ce6f3f94540ce13935eac3da08016d04b7fc70c",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12415429099999642,
+            0.11738441599999305,
+            0.12077041599999916
+          ],
+          "score_seconds": [
+            0.5272745419999865,
+            0.5823521249999999,
+            0.5113488340000174
+          ],
+          "peak_rss_bytes": [
+            179896320,
+            179470336,
+            180731904
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 33252,
+          "output_sha256": "6668954188240eb3fcdbb3b5e3d2e9546daa162817166e11e63041189837de41",
+          "scores": {
+            "ssim": 0.999610772769976,
+            "black_background_ssim": 0.999610772769976,
+            "white_background_ssim": 0.999610772769976,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1364860000000192,
+            0.13583962499998847,
+            0.13721966699998234
+          ],
+          "score_seconds": [
+            0.521732916000019,
+            0.539510708000023,
+            0.5237893329999963
+          ],
+          "peak_rss_bytes": [
+            180174848,
+            180666368,
+            180371456
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 33571,
+          "output_sha256": "995499b746b84d3b5342544cd927b6adac6c1b7557a64189827da5648f5e8ecb",
+          "scores": {
+            "ssim": 0.999610772769976,
+            "black_background_ssim": 0.999610772769976,
+            "white_background_ssim": 0.999610772769976,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1365172910000183,
+            0.13666462500000875,
+            0.13623400000000174
+          ],
+          "score_seconds": [
+            0.5147332909999989,
+            0.5500492500000007,
+            0.5273951249999982
+          ],
+          "peak_rss_bytes": [
+            180011008,
+            180322304,
+            179388416
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 33957,
+          "output_sha256": "0a0532d37f1b5ead5f48d1cca18a173fc0edbdbeba40df7ff94f0b40454aba70",
+          "scores": {
+            "ssim": 0.999610772769976,
+            "black_background_ssim": 0.999610772769976,
+            "white_background_ssim": 0.999610772769976,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13421691700000338,
+            0.14009674999999788,
+            0.13681579199999305
+          ],
+          "score_seconds": [
+            0.5232932080000126,
+            0.5490317499999833,
+            0.5254607920000183
+          ],
+          "peak_rss_bytes": [
+            180420608,
+            180338688,
+            180125696
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "89f6eef54b6d249eb4494401fa777ede6b02e574b209283d289c66b8c697145d",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": 64,
+      "effective_bytes": 33779,
+      "baseline_bytes": 121857,
+      "additional_seconds": [
+        2.5471539150000524,
+        2.6475250839999944,
+        2.608585332999951
+      ],
+      "name": "fixture-text-2.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 121857,
+          "output_sha256": "f886857536383773409b9b4fa77b5d41a09adb7dfe4a9a1fb9085521830c9b97",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1239499579999972,
+            0.12240320800000859,
+            0.12411329099998625
+          ],
+          "score_seconds": [
+            0.5371725830000003,
+            0.5480974170000081,
+            0.5489845829999922
+          ],
+          "peak_rss_bytes": [
+            184795136,
+            184631296,
+            185139200
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 33779,
+          "output_sha256": "5276fa741150c33cdfd7c44e7a50dada5ae12c2ddedb5055e1e988dd08f736c9",
+          "scores": {
+            "ssim": 0.9996197325978389,
+            "black_background_ssim": 0.9996197325978389,
+            "white_background_ssim": 0.9996197325978389,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14100895800001467,
+            0.13954083299998388,
+            0.1397157079999829
+          ],
+          "score_seconds": [
+            0.5369894160000115,
+            0.5676500829999895,
+            0.546084124999993
+          ],
+          "peak_rss_bytes": [
+            184680448,
+            184745984,
+            184434688
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 34098,
+          "output_sha256": "0a0b457c748bbdc0b485288b76a679927d47bd379e510eed6912067cd9c6ffb9",
+          "scores": {
+            "ssim": 0.9996197325978389,
+            "black_background_ssim": 0.9996197325978389,
+            "white_background_ssim": 0.9996197325978389,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13571254199999316,
+            0.137948042000005,
+            0.13921079200000008
+          ],
+          "score_seconds": [
+            0.5266003750000152,
+            0.5457123749999937,
+            0.5554798329999926
+          ],
+          "peak_rss_bytes": [
+            184975360,
+            184664064,
+            185368576
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 34484,
+          "output_sha256": "a1fb64ff07b9a869751150f63bd240beed7cf3533e17957c460b8a3f97dbe831",
+          "scores": {
+            "ssim": 0.9996197325978389,
+            "black_background_ssim": 0.9996197325978389,
+            "white_background_ssim": 0.9996197325978389,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13594483299999638,
+            0.14157129200000895,
+            0.1367562499999906
+          ],
+          "score_seconds": [
+            0.5337252080000212,
+            0.5670050420000052,
+            0.5423540419999995
+          ],
+          "peak_rss_bytes": [
+            184713216,
+            184762368,
+            184434688
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "e15c806cfbcbb6db886cc8d730772e256fe4eb5d1798de827e10227b4ffa51e6",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 733136,
+      "baseline_bytes": 733136,
+      "additional_seconds": [
+        2.985256122999999,
+        2.9579257910000365,
+        3.037383999000042
+      ],
+      "name": "fixture-gradient-0.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 733136,
+          "output_sha256": "e15c806cfbcbb6db886cc8d730772e256fe4eb5d1798de827e10227b4ffa51e6",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1295399159999988,
+            0.13254879100000494,
+            0.1293816670000183
+          ],
+          "score_seconds": [
+            0.6379147910000142,
+            0.6542252079999855,
+            0.6379058750000013
+          ],
+          "peak_rss_bytes": [
+            175734784,
+            176652288,
+            175833088
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 25777,
+          "output_sha256": "5f4dd4e2767aa592429258315a2bb69619c816f50325cd4c5fe7311d86599a55",
+          "scores": {
+            "ssim": 0.9657028419131691,
+            "black_background_ssim": 0.9657028419131691,
+            "white_background_ssim": 0.9657028419131691,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14424533299998643,
+            0.13700554100000772,
+            0.14038679100002582
+          ],
+          "score_seconds": [
+            0.6434207080000078,
+            0.6363580840000225,
+            0.6293690830000003
+          ],
+          "peak_rss_bytes": [
+            176439296,
+            176259072,
+            176062464
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 26096,
+          "output_sha256": "576c5f00e46104435635ddd54089727624bceba83049e58884a9b23843646d8c",
+          "scores": {
+            "ssim": 0.9657028419131691,
+            "black_background_ssim": 0.9657028419131691,
+            "white_background_ssim": 0.9657028419131691,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14140012499998988,
+            0.1352847089999898,
+            0.1359516670000005
+          ],
+          "score_seconds": [
+            0.63353833299999,
+            0.6222790000000202,
+            0.6337367910000182
+          ],
+          "peak_rss_bytes": [
+            176504832,
+            175636480,
+            176078848
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 26482,
+          "output_sha256": "da7af91f292f053947ed497663eb21ad1f1fd58f49554020c17991ce26d08169",
+          "scores": {
+            "ssim": 0.9657028419131691,
+            "black_background_ssim": 0.9657028419131691,
+            "white_background_ssim": 0.9657028419131691,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1400853750000124,
+            0.1364477079999915,
+            0.137459750000005
+          ],
+          "score_seconds": [
+            0.6446514579999985,
+            0.6363255410000193,
+            0.7225740419999909
+          ],
+          "peak_rss_bytes": [
+            174784512,
+            176046080,
+            176390144
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "7184e81922e34a83c7c75501cfec83f8fda0e4d2166f1754555608617e8bda55",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 771534,
+      "baseline_bytes": 771534,
+      "additional_seconds": [
+        2.5095374999999933,
+        2.5542319589999636,
+        2.584576792999968
+      ],
+      "name": "fixture-gradient-1.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 771534,
+          "output_sha256": "7184e81922e34a83c7c75501cfec83f8fda0e4d2166f1754555608617e8bda55",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1342823330000158,
+            0.13466704100000015,
+            0.1330487079999898
+          ],
+          "score_seconds": [
+            0.5238392079999983,
+            0.5309777500000052,
+            0.5558629579999774
+          ],
+          "peak_rss_bytes": [
+            180092928,
+            180781056,
+            180797440
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 26815,
+          "output_sha256": "542ddba6e8aee886358b080b564f8f78d908468b1e65ea4ad8967e6a12231fb3",
+          "scores": {
+            "ssim": 0.9662604233989871,
+            "black_background_ssim": 0.9662604233989871,
+            "white_background_ssim": 0.9662604233989871,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.137541208000016,
+            0.13832008299999643,
+            0.1435979590000045
+          ],
+          "score_seconds": [
+            0.5196546669999975,
+            0.5282372089999967,
+            0.5413170829999956
+          ],
+          "peak_rss_bytes": [
+            179945472,
+            180273152,
+            180731904
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 27134,
+          "output_sha256": "ad81f2e511a6b5cdcbe9a6de919eb5f9829c837f6059d20ca87d744dfb9bedb5",
+          "scores": {
+            "ssim": 0.9662604233989871,
+            "black_background_ssim": 0.9662604233989871,
+            "white_background_ssim": 0.9662604233989871,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14110141699998735,
+            0.138605124999998,
+            0.1424565419999908
+          ],
+          "score_seconds": [
+            0.5252199169999869,
+            0.549437958999988,
+            0.5365897920000009
+          ],
+          "peak_rss_bytes": [
+            179552256,
+            180371456,
+            180404224
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 27520,
+          "output_sha256": "11bda5901e7d03ee8e813a9da0b11d47dd89d57d30516ab9886a674422a55588",
+          "scores": {
+            "ssim": 0.9662604233989871,
+            "black_background_ssim": 0.9662604233989871,
+            "white_background_ssim": 0.9662604233989871,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1444319999999948,
+            0.14255191600000217,
+            0.14570658399998138
+          ],
+          "score_seconds": [
+            0.5177490830000124,
+            0.526101916999977,
+            0.5190458750000175
+          ],
+          "peak_rss_bytes": [
+            180748288,
+            180158464,
+            179879936
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "9663e07f77de69e2a05af5be88bfa8447b1f1a693722c281d77dad05f29dda95",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 816956,
+      "baseline_bytes": 816956,
+      "additional_seconds": [
+        2.54932387599996,
+        2.572198540999949,
+        2.5935264169999925
+      ],
+      "name": "fixture-gradient-2.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 816956,
+          "output_sha256": "9663e07f77de69e2a05af5be88bfa8447b1f1a693722c281d77dad05f29dda95",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1331840409999927,
+            0.13718491700001323,
+            0.13958254199999942
+          ],
+          "score_seconds": [
+            0.5283570419999819,
+            0.5409410409999964,
+            0.5477418749999856
+          ],
+          "peak_rss_bytes": [
+            184614912,
+            184844288,
+            185335808
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 27431,
+          "output_sha256": "7a1c8ac33e59b3d93d37b405ec09dbbea59bc98c75801ac687838766af30dd60",
+          "scores": {
+            "ssim": 0.9665579518497208,
+            "black_background_ssim": 0.9665579518497208,
+            "white_background_ssim": 0.9665579518497208,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13971041700000342,
+            0.13959795799999597,
+            0.14303662499997927
+          ],
+          "score_seconds": [
+            0.5329343749999964,
+            0.5373114169999837,
+            0.5477731660000131
+          ],
+          "peak_rss_bytes": [
+            185253888,
+            184795136,
+            185368576
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 27750,
+          "output_sha256": "0faa0c169ad3c3ef2ab6121694a7459b5b7e20381a8c73e96c1b0dc8fbe79310",
+          "scores": {
+            "ssim": 0.9665579518497208,
+            "black_background_ssim": 0.9665579518497208,
+            "white_background_ssim": 0.9665579518497208,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14189774999999827,
+            0.14040270899999996,
+            0.14265791700000818
+          ],
+          "score_seconds": [
+            0.5354114999999808,
+            0.5357230829999935,
+            0.5386501250000038
+          ],
+          "peak_rss_bytes": [
+            185335808,
+            184598528,
+            183975936
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 28136,
+          "output_sha256": "20c9ae03095f1d572b6a5c8a9fed78c5ec840d7503f0a9d5ff28f70806dfa8e0",
+          "scores": {
+            "ssim": 0.9665579518497208,
+            "black_background_ssim": 0.9665579518497208,
+            "white_background_ssim": 0.9665579518497208,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13807291699998814,
+            0.14100983299999825,
+            0.14222795899999596
+          ],
+          "score_seconds": [
+            0.5329398750000109,
+            0.5372124999999812,
+            0.5314387500000066
+          ],
+          "peak_rss_bytes": [
+            185040896,
+            185171968,
+            184729600
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "292143ccf8697d81b5ad61ec3cdfb810369f860c58802523564a07c4b23461e1",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 84600,
+      "baseline_bytes": 84600,
+      "additional_seconds": [
+        3.000115830999988,
+        2.9949663340000257,
+        2.9996324999999615
+      ],
+      "name": "fixture-alpha-0.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 84600,
+          "output_sha256": "a5e3eb5213f89dd6013c7aa099b117274392cdbdcf8d11cbd26c5b5070394598",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12115579200002458,
+            0.1171261669999808,
+            0.12180499999999483
+          ],
+          "score_seconds": [
+            0.6297061249999842,
+            0.675334792000001,
+            0.6372477920000108
+          ],
+          "peak_rss_bytes": [
+            176619520,
+            175800320,
+            176209920
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 18605,
+          "output_sha256": "5dde3522af57ee1a3d49b14ecaa6900049a0fa9aac78b63e092fcfedf0b13f05",
+          "scores": {
+            "ssim": 0.9873500599645171,
+            "black_background_ssim": 0.9873500599645171,
+            "white_background_ssim": 0.9938494452568589,
+            "alpha_max_difference": 56
+          },
+          "encode_seconds": [
+            0.1392241659999911,
+            0.1410650839999903,
+            0.13855404199998134
+          ],
+          "score_seconds": [
+            0.6320901249999906,
+            0.644345291999997,
+            0.6555435409999859
+          ],
+          "peak_rss_bytes": [
+            178880512,
+            175439872,
+            175128576
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 20510,
+          "output_sha256": "4c5c36880d96c85a3cf8cda71ae1b6b80052d874d7c9ccf13286baae0ad95549",
+          "scores": {
+            "ssim": 0.9900585146586903,
+            "black_background_ssim": 0.9900585146586903,
+            "white_background_ssim": 0.9963675719127641,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.13873845800000595,
+            0.13917420900000366,
+            0.14159175000000346
+          ],
+          "score_seconds": [
+            0.6590581659999941,
+            0.6186257080000246,
+            0.6325317079999877
+          ],
+          "peak_rss_bytes": [
+            175915008,
+            176177152,
+            176570368
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 20000,
+          "output_sha256": "6e39587547930cc988812e6e5711169e6b743e738b961eab5825f11744dd9127",
+          "scores": {
+            "ssim": 0.9900672246382823,
+            "black_background_ssim": 0.9900672246382823,
+            "white_background_ssim": 0.9963718191435382,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.14472916600001895,
+            0.14212629100001095,
+            0.13644570799999656
+          ],
+          "score_seconds": [
+            0.656569625000003,
+            0.6342949579999981,
+            0.6577179589999957
+          ],
+          "peak_rss_bytes": [
+            176111616,
+            175915008,
+            176144384
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "61cece7d58af3685c8ac43940949e0943c44568564873c44ff36abfe6ddf52d2",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 84979,
+      "baseline_bytes": 84979,
+      "additional_seconds": [
+        2.5169459190000225,
+        2.5588808749999714,
+        2.5930635010000174
+      ],
+      "name": "fixture-alpha-1.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 84979,
+          "output_sha256": "fdc628cdd14ae36061d7cac2cebf2a1d46019e2346c300eb89a928388f0ddab1",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1187977920000094,
+            0.12080783400000428,
+            0.11638483300001212
+          ],
+          "score_seconds": [
+            0.5207715420000056,
+            0.539461082999992,
+            0.5475281250000137
+          ],
+          "peak_rss_bytes": [
+            180191232,
+            179978240,
+            180142080
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 18776,
+          "output_sha256": "9ca0735c13088426e30e4b5d4de3b55ebd19055239008040afe12d245366af90",
+          "scores": {
+            "ssim": 0.9879514943034998,
+            "black_background_ssim": 0.9910939820927055,
+            "white_background_ssim": 0.9879514943034998,
+            "alpha_max_difference": 48
+          },
+          "encode_seconds": [
+            0.14188841699998989,
+            0.13926150000000348,
+            0.1373150409999937
+          ],
+          "score_seconds": [
+            0.5313641250000103,
+            0.5460218339999869,
+            0.5394632089999902
+          ],
+          "peak_rss_bytes": [
+            180486144,
+            179617792,
+            180256768
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 20445,
+          "output_sha256": "11253458b44825f219d0b9dfb2e44ed6e3ada0bf2e61857b21e74a927ed7bf4a",
+          "scores": {
+            "ssim": 0.989955144260707,
+            "black_background_ssim": 0.9944334737589512,
+            "white_background_ssim": 0.989955144260707,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.13879666700000826,
+            0.142421832999986,
+            0.14192699999998126
+          ],
+          "score_seconds": [
+            0.5188553339999942,
+            0.5274770409999974,
+            0.5531608340000105
+          ],
+          "peak_rss_bytes": [
+            180305920,
+            180813824,
+            180322304
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 19978,
+          "output_sha256": "0a964c1347dc3f2b6b6e5bc733266603cbc093fa328b995e697155a8aa62a0fb",
+          "scores": {
+            "ssim": 0.989955144260707,
+            "black_background_ssim": 0.9944334737589512,
+            "white_background_ssim": 0.989955144260707,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.1420510419999914,
+            0.13966216699998313,
+            0.14276633400001515
+          ],
+          "score_seconds": [
+            0.5232187920000229,
+            0.5245754170000225,
+            0.5309029580000129
+          ],
+          "peak_rss_bytes": [
+            180109312,
+            179290112,
+            180535296
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "bf0614cb381fb640d62a46613fdd3fcbbdd92b2a52fecf65d8f729ee8590bf40",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 85154,
+      "baseline_bytes": 85154,
+      "additional_seconds": [
+        2.5734896669999614,
+        2.5756560419999914,
+        2.6462517089999835
+      ],
+      "name": "fixture-alpha-2.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 85154,
+          "output_sha256": "a805477a848b1ea521f9207141ad12f6ec763163d5d4bf4506840e5a9d85ed57",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12040766699999494,
+            0.12374054099998943,
+            0.11984141699997508
+          ],
+          "score_seconds": [
+            0.5409845840000003,
+            0.5464854999999886,
+            0.5623502910000013
+          ],
+          "peak_rss_bytes": [
+            184123392,
+            184795136,
+            184401920
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 18787,
+          "output_sha256": "059c015816fff8f8a1e5cac48aff73902794b49b8962fe0920a516c06bc5d093",
+          "scores": {
+            "ssim": 0.9872846293437171,
+            "black_background_ssim": 0.9872846293437171,
+            "white_background_ssim": 0.9928656790143426,
+            "alpha_max_difference": 51
+          },
+          "encode_seconds": [
+            0.14029420899998968,
+            0.14021474999998418,
+            0.14344862499999067
+          ],
+          "score_seconds": [
+            0.5254569580000066,
+            0.523687625000008,
+            0.5555816670000127
+          ],
+          "peak_rss_bytes": [
+            185204736,
+            184762368,
+            184991744
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 20393,
+          "output_sha256": "0aef01ff1b7eae4be6af3c684ee10788a761bf38d2664b4de8b5fe7bac3b6cc4",
+          "scores": {
+            "ssim": 0.9912456928420026,
+            "black_background_ssim": 0.9912456928420026,
+            "white_background_ssim": 0.9956094146463217,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.1395630419999918,
+            0.14155216699998618,
+            0.14155762499999014
+          ],
+          "score_seconds": [
+            0.544142665999999,
+            0.538834584,
+            0.5483430419999991
+          ],
+          "peak_rss_bytes": [
+            184926208,
+            185106432,
+            184631296
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 19899,
+          "output_sha256": "ed71c24f6e33b7068437b2abbd47e0a0f632810984e1c860372c139388c9b4a9",
+          "scores": {
+            "ssim": 0.9912460592515312,
+            "black_background_ssim": 0.9912460592515312,
+            "white_background_ssim": 0.9956094742967562,
+            "alpha_max_difference": 31
+          },
+          "encode_seconds": [
+            0.14628504199998815,
+            0.14005158300000176,
+            0.14219854200001691
+          ],
+          "score_seconds": [
+            0.5367631659999859,
+            0.5448298330000227,
+            0.5527719169999727
+          ],
+          "peak_rss_bytes": [
+            185401344,
+            184254464,
+            184696832
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "4e1318770b9b8da62a92f61a2361448e56770b023ec09d9f1f2fb6b88df3cc37",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Caenorhabditis_elegans_hermaphrodite_adult-en.svg)",
+      "license": "CC BY-SA 3.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 187233,
+      "baseline_bytes": 187233,
+      "additional_seconds": [
+        3.0588655409999888,
+        2.981438668000038,
+        2.9731941240000026
+      ],
+      "name": "caenorhabditis-elegans-hermaphrodite-adult-en.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 187233,
+          "output_sha256": "4e1318770b9b8da62a92f61a2361448e56770b023ec09d9f1f2fb6b88df3cc37",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.11336341599999855,
+            0.11265387500000656,
+            0.11465520800001627
+          ],
+          "score_seconds": [
+            0.6445227909999858,
+            0.6228140419999875,
+            0.6331155000000024
+          ],
+          "peak_rss_bytes": [
+            194117632,
+            193937408,
+            194379776
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 36639,
+          "output_sha256": "056940023c3cfc77df50a0c44ee81985658945acd4b96abaa1402459482d528c",
+          "scores": {
+            "ssim": 0.9899667009038695,
+            "black_background_ssim": 0.9899667009038695,
+            "white_background_ssim": 0.995160248146362,
+            "alpha_max_difference": 62
+          },
+          "encode_seconds": [
+            0.146784958000012,
+            0.14439066700001035,
+            0.14164008300002706
+          ],
+          "score_seconds": [
+            0.640177499999993,
+            0.6472973749999937,
+            0.6524633749999964
+          ],
+          "peak_rss_bytes": [
+            194494464,
+            194215936,
+            194232320
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 43853,
+          "output_sha256": "d7ba2d22631dd582bb8fac26f2c4f950cd75ae2f0dc25ffa02bfc1c19450e061",
+          "scores": {
+            "ssim": 0.9924172472224875,
+            "black_background_ssim": 0.9924172472224875,
+            "white_background_ssim": 0.9973879833288738,
+            "alpha_max_difference": 62
+          },
+          "encode_seconds": [
+            0.14541941600000996,
+            0.14537395900001115,
+            0.13912204099997894
+          ],
+          "score_seconds": [
+            0.6429719999999861,
+            0.6412697500000206,
+            0.6299589170000104
+          ],
+          "peak_rss_bytes": [
+            193986560,
+            193937408,
+            194117632
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 45373,
+          "output_sha256": "fb1b8e222d2ab200ff402ebb2195a4251cf79a3a644b48a9ac7ae6976ef43d79",
+          "scores": {
+            "ssim": 0.9927417437698187,
+            "black_background_ssim": 0.9927417437698187,
+            "white_background_ssim": 0.9977051153328952,
+            "alpha_max_difference": 36
+          },
+          "encode_seconds": [
+            0.14150479200000632,
+            0.14142325000000255,
+            0.1386420409999971
+          ],
+          "score_seconds": [
+            0.6974840839999956,
+            0.6388696250000123,
+            0.6382521669999903
+          ],
+          "peak_rss_bytes": [
+            194363392,
+            193773568,
+            193085440
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "b7b50c31c3c3a2c1d1fa8320734ec61232776be80be9856445cd5ce7bfc5ad20",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:1865_Two_Cent_Reverse.png)",
+      "license": "Public domain",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 2338536,
+      "baseline_bytes": 2338536,
+      "additional_seconds": [
+        2.9256955420000565,
+        2.987068999999991,
+        2.9685740419999718
+      ],
+      "name": "1865-two-cent-reverse.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 2338536,
+          "output_sha256": "ba94e3ae0b6ea0fe3329c2d7683a0ca204ccdb08ebe33e830628a9450c394c5a",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.17756591600002025,
+            0.18184883399999308,
+            0.1732885000000124
+          ],
+          "score_seconds": [
+            0.6069258750000017,
+            0.6246250830000122,
+            0.6537325420000002
+          ],
+          "peak_rss_bytes": [
+            209993728,
+            210780160,
+            210157568
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 316916,
+          "output_sha256": "e06cbfe1c4968af71cb55ca4f36200881b8734f8b9250e7dcc8f8e2a5fbc268b",
+          "scores": {
+            "ssim": 0.9364121498137155,
+            "black_background_ssim": 0.9364121498137155,
+            "white_background_ssim": 0.9365155220876252,
+            "alpha_max_difference": 255
+          },
+          "encode_seconds": [
+            0.23027412500002242,
+            0.2262479169999949,
+            0.23253937499998756
+          ],
+          "score_seconds": [
+            0.5927445410000018,
+            0.5941933329999927,
+            0.583832000000001
+          ],
+          "peak_rss_bytes": [
+            210845696,
+            210239488,
+            210108416
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 509393,
+          "output_sha256": "d79ae11616d7c45026f6a7097ab80221f182ae466acbfda393a7818d7f27f97a",
+          "scores": {
+            "ssim": 0.9739967064637467,
+            "black_background_ssim": 0.9740124255191853,
+            "white_background_ssim": 0.9739967064637467,
+            "alpha_max_difference": 62
+          },
+          "encode_seconds": [
+            0.165133792000006,
+            0.16451250000000073,
+            0.17030195799998182
+          ],
+          "score_seconds": [
+            0.5813770830000067,
+            0.5979753750000043,
+            0.5776383330000101
+          ],
+          "peak_rss_bytes": [
+            210518016,
+            214024192,
+            210124800
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 524014,
+          "output_sha256": "5c5f19d3484d5e639fb189bee27dbef72a433f05d990bc4fa2c204f68f00e2c7",
+          "scores": {
+            "ssim": 0.9771953066875528,
+            "black_background_ssim": 0.977196547901488,
+            "white_background_ssim": 0.9771953066875528,
+            "alpha_max_difference": 47
+          },
+          "encode_seconds": [
+            0.16514108399999827,
+            0.16789495899999451,
+            0.1652867919999892
+          ],
+          "score_seconds": [
+            0.5840990420000196,
+            0.6116198329999918,
+            0.5852430420000019
+          ],
+          "peak_rss_bytes": [
+            209879040,
+            211615744,
+            210157568
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "594f33d6dfd95dc1c1eaf1eb0984faf4580aeb37d5ea621393d9deca8c61285b",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coins_of_the_Italian_Republic_(500_Lire)_silver_(Caravels).png)",
+      "license": "CC BY-SA 4.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 1553312,
+      "baseline_bytes": 1553312,
+      "additional_seconds": [
+        3.0100361669999813,
+        2.9845466650000105,
+        3.00224508200003
+      ],
+      "name": "coins-of-the-italian-republic-500-lire-silver-cara.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 1553312,
+          "output_sha256": "b19a7c8c2c6e0c9cd3d9273f41cb926f3067c8ae4b152121358da1acae392bae",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14717774999999733,
+            0.15020587499998328,
+            0.15575795800000947
+          ],
+          "score_seconds": [
+            0.6259852500000136,
+            0.6044719580000049,
+            0.6160149589999833
+          ],
+          "peak_rss_bytes": [
+            182992896,
+            182927360,
+            182468608
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 150359,
+          "output_sha256": "85f1fd230b81189ffbd2ecd5cb493d923de30a90c2210e82c3470ca306b0c2c9",
+          "scores": {
+            "ssim": 0.8123531747703231,
+            "black_background_ssim": 0.8123531747703231,
+            "white_background_ssim": 0.8124679523882191,
+            "alpha_max_difference": 253
+          },
+          "encode_seconds": [
+            0.20915666700000202,
+            0.20656787500001883,
+            0.20614441600000077
+          ],
+          "score_seconds": [
+            0.6152250830000128,
+            0.6165280830000199,
+            0.6101412910000192
+          ],
+          "peak_rss_bytes": [
+            182992896,
+            182272000,
+            182484992
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 317044,
+          "output_sha256": "378b890d27cd12feaa171be9ac96f9cc80e70944a938f6708487ddd7d33eb5b4",
+          "scores": {
+            "ssim": 0.972306736625387,
+            "black_background_ssim": 0.972306736625387,
+            "white_background_ssim": 0.9724099844519877,
+            "alpha_max_difference": 60
+          },
+          "encode_seconds": [
+            0.17296458299998108,
+            0.16662487499999656,
+            0.1690906249999955
+          ],
+          "score_seconds": [
+            0.6045497499999897,
+            0.6124638749999747,
+            0.6201599580000163
+          ],
+          "peak_rss_bytes": [
+            181567488,
+            182517760,
+            182779904
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 321697,
+          "output_sha256": "ae06f883935f38e4e325cd1bf93974a2b7055c64a0f86925bb1cdcb61c98ba2a",
+          "scores": {
+            "ssim": 0.9728585235966648,
+            "black_background_ssim": 0.9728585235966648,
+            "white_background_ssim": 0.9728723565124442,
+            "alpha_max_difference": 56
+          },
+          "encode_seconds": [
+            0.17063454199998773,
+            0.17008079100000373,
+            0.17588737500000207
+          ],
+          "score_seconds": [
+            0.6115202919999945,
+            0.6078092079999919,
+            0.604806458000013
+          ],
+          "peak_rss_bytes": [
+            182403072,
+            183009280,
+            182353920
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "png",
+      "sha256": "306ad6bf63a08ab576042285c2c07c6d44f6c0c19b0466433eecb3dc5f8d30a0",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg)",
+      "license": "CC BY-SA 3.0",
+      "split": "tuning",
+      "threshold": 0.995,
+      "selected": "baseline",
+      "effective_bytes": 155641,
+      "baseline_bytes": 155641,
+      "additional_seconds": [
+        3.143014251999972,
+        3.128163124999986,
+        3.163260541999989
+      ],
+      "name": "em-spectrum-properties-edit.png",
+      "candidates": [
+        {
+          "value": "baseline",
+          "bytes": 155641,
+          "output_sha256": "306ad6bf63a08ab576042285c2c07c6d44f6c0c19b0466433eecb3dc5f8d30a0",
+          "scores": {
+            "ssim": 1.0,
+            "black_background_ssim": 1.0,
+            "white_background_ssim": 1.0,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1063023749999843,
+            0.10301933400000962,
+            0.11091616699999918
+          ],
+          "score_seconds": [
+            0.6706077919999984,
+            0.6720972079999967,
+            0.6640885409999839
+          ],
+          "peak_rss_bytes": [
+            206618624,
+            205537280,
+            206110720
+          ]
+        },
+        {
+          "value": 64,
+          "bytes": 41740,
+          "output_sha256": "6e30d927c0ca9e3f323dbcfb6480643c473b76ec2406aca38fe8198cf52eeb09",
+          "scores": {
+            "ssim": 0.9663733331272021,
+            "black_background_ssim": 0.9663733331272021,
+            "white_background_ssim": 0.9667499993126806,
+            "alpha_max_difference": 60
+          },
+          "encode_seconds": [
+            0.15177574999998455,
+            0.15800520799999163,
+            0.15356345899999724
+          ],
+          "score_seconds": [
+            0.6693624170000021,
+            0.6590278750000209,
+            0.6788119999999935
+          ],
+          "peak_rss_bytes": [
+            205373440,
+            205946880,
+            208764928
+          ]
+        },
+        {
+          "value": 128,
+          "bytes": 48713,
+          "output_sha256": "e6cb30a6ab370cdedd771c5b60703f6314ed7fecc01cbf2d1370b117596041a0",
+          "scores": {
+            "ssim": 0.9718031420808249,
+            "black_background_ssim": 0.9857888728704999,
+            "white_background_ssim": 0.9718031420808249,
+            "alpha_max_difference": 60
+          },
+          "encode_seconds": [
+            0.15038462499998673,
+            0.15157049999999117,
+            0.14971091699999306
+          ],
+          "score_seconds": [
+            0.6828580840000029,
+            0.6610263750000058,
+            0.6730606250000051
+          ],
+          "peak_rss_bytes": [
+            205520896,
+            205717504,
+            206127104
+          ]
+        },
+        {
+          "value": 256,
+          "bytes": 50717,
+          "output_sha256": "297184518aac5b62deee2b6362ff07ad1a6e39efd02d1ebd1a1d2b44a06c25dc",
+          "scores": {
+            "ssim": 0.9737440254781872,
+            "black_background_ssim": 0.988585650001592,
+            "white_background_ssim": 0.9737440254781872,
+            "alpha_max_difference": 46
+          },
+          "encode_seconds": [
+            0.1548936249999997,
+            0.1517746250000016,
+            0.14890320899999665
+          ],
+          "score_seconds": [
+            0.6631319589999976,
+            0.6746613339999783,
+            0.6951217910000196
+          ],
+          "peak_rss_bytes": [
+            205291520,
+            205373440,
+            206012416
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim01.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 96432,
+      "baseline_bytes": 96432,
+      "additional_seconds": [
+        1.7324475009999998,
+        1.7929260850000013,
+        1.7337711659999995
+      ],
+      "name": "kodim01.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 96432,
+          "output_sha256": "bbf0598a616c5c7b12aa40ca2fcbde423eecd6d396d8d874ee7b7a367920b7b0",
+          "scores": {
+            "ssim": 0.9664094627937908,
+            "black_background_ssim": 0.9664094627937908,
+            "white_background_ssim": 0.9664094627937908,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.6009654580000001,
+            0.13487291599999995,
+            0.13051641599999986
+          ],
+          "score_seconds": [
+            0.4268875839999997,
+            0.4647703339999998,
+            0.42799279099999943
+          ],
+          "peak_rss_bytes": [
+            112066560,
+            112164864,
+            111312896
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 76000,
+          "output_sha256": "2ded5d9b4c3c6bbf64aa031c09a7922a7f211334039450f0b451bf20005edf7b",
+          "scores": {
+            "ssim": 0.9465924305791816,
+            "black_background_ssim": 0.9465924305791816,
+            "white_background_ssim": 0.9465924305791816,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16842175000000026,
+            0.1302857089999998,
+            0.1322294580000003
+          ],
+          "score_seconds": [
+            0.49733504199999956,
+            0.45656941700000075,
+            0.4663459579999998
+          ],
+          "peak_rss_bytes": [
+            112836608,
+            111738880,
+            112525312
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 79046,
+          "output_sha256": "3c205c91c57387224faec1fd4200c9067baf3cd518759a63e10ddecd20370279",
+          "scores": {
+            "ssim": 0.9505974980292168,
+            "black_background_ssim": 0.9505974980292168,
+            "white_background_ssim": 0.9505974980292168,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1380307080000005,
+            0.15186812500000002,
+            0.16835141700000023
+          ],
+          "score_seconds": [
+            0.5017724169999997,
+            0.5894325000000009,
+            0.5388515419999997
+          ],
+          "peak_rss_bytes": [
+            114114560,
+            115245056,
+            115261440
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim03.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 31296,
+      "baseline_bytes": 31296,
+      "additional_seconds": [
+        1.7505666250000012,
+        1.6921614589999976,
+        1.7374372929999993
+      ],
+      "name": "kodim03.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 31296,
+          "output_sha256": "4e2fcc918d34d6dfc36fe808620bbddc18eaab68cecd38549fd558e13ae9622f",
+          "scores": {
+            "ssim": 0.949110169957398,
+            "black_background_ssim": 0.949110169957398,
+            "white_background_ssim": 0.949110169957398,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.129397333,
+            0.13079408299999962,
+            0.137665084
+          ],
+          "score_seconds": [
+            0.5029560410000009,
+            0.4834341249999987,
+            0.4800708750000009
+          ],
+          "peak_rss_bytes": [
+            114393088,
+            113819648,
+            113459200
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 23366,
+          "output_sha256": "8ace4f25658d5c6f27a0a9b4a35f2c4e79584d138d6a9a4bc71c1bb27171b373",
+          "scores": {
+            "ssim": 0.9358766086493594,
+            "black_background_ssim": 0.9358766086493594,
+            "white_background_ssim": 0.9358766086493594,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16478787500000003,
+            0.15463370899999873,
+            0.13434445799999928
+          ],
+          "score_seconds": [
+            0.4674552089999988,
+            0.4832394999999998,
+            0.47034570900000006
+          ],
+          "peak_rss_bytes": [
+            112001024,
+            115982336,
+            115523584
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 24844,
+          "output_sha256": "48ee9800df58b3aa52155a381a787b883e153691b24fdd15dbb6ff125aeee5b6",
+          "scores": {
+            "ssim": 0.938716312337292,
+            "black_background_ssim": 0.938716312337292,
+            "white_background_ssim": 0.938716312337292,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13139541700000024,
+            0.12230308300000026,
+            0.13468845899999948
+          ],
+          "score_seconds": [
+            0.48397208300000116,
+            0.44855104200000007,
+            0.5179877919999996
+          ],
+          "peak_rss_bytes": [
+            113868800,
+            112902144,
+            112443392
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim05.png)",
+      "license": "free for unrestricted use",
+      "split": "tuning",
+      "threshold": 0.98,
+      "selected": 80,
+      "effective_bytes": 97580,
+      "baseline_bytes": 97580,
+      "additional_seconds": [
+        1.7383984170000044,
+        1.7151874160000027,
+        1.6823767520000033
+      ],
+      "name": "kodim05.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 97580,
+          "output_sha256": "b0f862b91d08cb700cc20cea9249a060dbfd4ad3897500aaff7b86c86075624f",
+          "scores": {
+            "ssim": 0.9657161899846192,
+            "black_background_ssim": 0.9657161899846192,
+            "white_background_ssim": 0.9657161899846192,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.16466924999999932,
+            0.14128399999999885,
+            0.12964991700000184
+          ],
+          "score_seconds": [
+            0.5001778750000003,
+            0.5036105410000005,
+            0.4689097500000017
+          ],
+          "peak_rss_bytes": [
+            114311168,
+            115359744,
+            112820224
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 78762,
+          "output_sha256": "db52fb7c281f19dec9594da33da4951879e9d02bbe2ed407064a21ec2ef90792",
+          "scores": {
+            "ssim": 0.951037333069062,
+            "black_background_ssim": 0.951037333069062,
+            "white_background_ssim": 0.951037333069062,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.14867337500000133,
+            0.13413462499999795,
+            0.13387595900000093
+          ],
+          "score_seconds": [
+            0.48273975000000036,
+            0.4694857500000005,
+            0.46158045900000033
+          ],
+          "peak_rss_bytes": [
+            112050176,
+            113393664,
+            113000448
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 82844,
+          "output_sha256": "71789ac601dabd55a9859529233e8e8eb0dc00ae079ac05e65881d41894e80f1",
+          "scores": {
+            "ssim": 0.9547237501438103,
+            "black_background_ssim": 0.9547237501438103,
+            "white_background_ssim": 0.9547237501438103,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13700350000000228,
+            0.13888195800000247,
+            0.13504558400000022
+          ],
+          "score_seconds": [
+            0.4698039170000001,
+            0.4690745420000013,
+            0.4829650000000001
+          ],
+          "peak_rss_bytes": [
+            113262592,
+            114278400,
+            112197632
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "5b49f4e5df11ba69414f8b890d9ffb922766565947f8c5d754707c2916a2136a",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9955159360961573,
+      "selected": 70,
+      "effective_bytes": 34256,
+      "baseline_bytes": 39180,
+      "additional_seconds": [
+        2.301975583000001,
+        2.2824166649999995,
+        2.2852144580000058
+      ],
+      "name": "fixture-text-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 39180,
+          "output_sha256": "8801b35df3fb02ca68e1701ffc6aae0ae3561a3df95839d58c15877bdeee74a9",
+          "scores": {
+            "ssim": 0.9975159360961573,
+            "black_background_ssim": 0.9975159360961573,
+            "white_background_ssim": 0.9975159360961573,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13482412500000152,
+            0.13342345799999933,
+            0.15044612500000198
+          ],
+          "score_seconds": [
+            0.6848553750000015,
+            0.684056666,
+            0.6779712500000024
+          ],
+          "peak_rss_bytes": [
+            179372032,
+            175718400,
+            176930816
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 34256,
+          "output_sha256": "88af2e1dbc8151366f3ce1bd5d7ac2f3a1b2bcba470af61be9b16587eb8589e7",
+          "scores": {
+            "ssim": 0.9956665329029399,
+            "black_background_ssim": 0.9956665329029399,
+            "white_background_ssim": 0.9956665329029399,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1325257079999993,
+            0.13381466599999925,
+            0.13640258299999886
+          ],
+          "score_seconds": [
+            0.6950725829999982,
+            0.6756706249999986,
+            0.6714014160000019
+          ],
+          "peak_rss_bytes": [
+            179175424,
+            176259072,
+            179322880
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 35404,
+          "output_sha256": "b23f74aeb746200df8b7bbe7f309295f1674ecee3f0cbfef38d1237b60161347",
+          "scores": {
+            "ssim": 0.9965688937487397,
+            "black_background_ssim": 0.9965688937487397,
+            "white_background_ssim": 0.9965688937487397,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12941691700000035,
+            0.13245566600000203,
+            0.13290891700000174
+          ],
+          "score_seconds": [
+            0.6601050000000015,
+            0.6564190419999996,
+            0.6665302920000009
+          ],
+          "peak_rss_bytes": [
+            176521216,
+            176406528,
+            178421760
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "6a78504a280a21ec57bd04287ce88c68323fa5c7b207adb5ae4b37e2c8905619",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9954612135200814,
+      "selected": 70,
+      "effective_bytes": 34652,
+      "baseline_bytes": 39640,
+      "additional_seconds": [
+        1.9473690829999981,
+        1.949246832999993,
+        1.899293709000002
+      ],
+      "name": "fixture-text-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 39640,
+          "output_sha256": "6085ce539b561a792eee879ab0cf4a884ff0fbcbb7f33172d4bd9e88dddc656e",
+          "scores": {
+            "ssim": 0.9974612135200814,
+            "black_background_ssim": 0.9974612135200814,
+            "white_background_ssim": 0.9974612135200814,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13114612500000078,
+            0.13587491699999887,
+            0.13930062500000062
+          ],
+          "score_seconds": [
+            0.5722432080000033,
+            0.5771425410000006,
+            0.5355181669999993
+          ],
+          "peak_rss_bytes": [
+            183599104,
+            180895744,
+            179732480
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 34652,
+          "output_sha256": "7feecdca6c01da5d549d4a77328ed6cb1153d21492e0c7c3af0d94ebbe8442c1",
+          "scores": {
+            "ssim": 0.995768430721553,
+            "black_background_ssim": 0.995768430721553,
+            "white_background_ssim": 0.995768430721553,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13606850000000037,
+            0.1294819579999995,
+            0.13601308299999815
+          ],
+          "score_seconds": [
+            0.552958083,
+            0.544800458000001,
+            0.5592254170000004
+          ],
+          "peak_rss_bytes": [
+            179716096,
+            182845440,
+            180568064
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 35788,
+          "output_sha256": "18a50b0b9fb97ba19b628d80c96063dcc2601b2f067c4176f1218b589e5903f1",
+          "scores": {
+            "ssim": 0.9961102912175246,
+            "black_background_ssim": 0.9961102912175246,
+            "white_background_ssim": 0.9961102912175246,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13738599999999934,
+            0.13404754199999758,
+            0.1355817080000037
+          ],
+          "score_seconds": [
+            0.5487132919999951,
+            0.5637743339999943,
+            0.5329553340000004
+          ],
+          "peak_rss_bytes": [
+            180600832,
+            181043200,
+            180928512
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "89f6eef54b6d249eb4494401fa777ede6b02e574b209283d289c66b8c697145d",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9955195107344953,
+      "selected": 70,
+      "effective_bytes": 34024,
+      "baseline_bytes": 39016,
+      "additional_seconds": [
+        2.0000415409999945,
+        1.9691090849999995,
+        1.9911344989999904
+      ],
+      "name": "fixture-text-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 39016,
+          "output_sha256": "e492c9e0b10fae1a83f8015a86068705512780b2d24854fd208c90567ad88134",
+          "scores": {
+            "ssim": 0.9975195107344953,
+            "black_background_ssim": 0.9975195107344953,
+            "white_background_ssim": 0.9975195107344953,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1340544159999979,
+            0.13503720799999996,
+            0.13591366700000407
+          ],
+          "score_seconds": [
+            0.5558177499999957,
+            0.5751286249999978,
+            0.5620819580000003
+          ],
+          "peak_rss_bytes": [
+            184729600,
+            185303040,
+            185237504
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 34024,
+          "output_sha256": "144b30d73e5cf12525d5538d9feec756d50cf5bb43e216769244674bfe6179dd",
+          "scores": {
+            "ssim": 0.9957328503135621,
+            "black_background_ssim": 0.9957328503135621,
+            "white_background_ssim": 0.9957328503135621,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1381718749999976,
+            0.1282106669999976,
+            0.12624295799999885
+          ],
+          "score_seconds": [
+            0.5687894160000013,
+            0.5715948340000025,
+            0.5660837499999971
+          ],
+          "peak_rss_bytes": [
+            184074240,
+            184434688,
+            185434112
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 34850,
+          "output_sha256": "480461578092210de86b55c4f7e865e55e8354c277c579eac51f0e72f7aaefab",
+          "scores": {
+            "ssim": 0.9961839729537911,
+            "black_background_ssim": 0.9961839729537911,
+            "white_background_ssim": 0.9961839729537911,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13266466700000024,
+            0.13172920899999951,
+            0.13106733299999718
+          ],
+          "score_seconds": [
+            0.6045978329999997,
+            0.562445750000002,
+            0.605658499999997
+          ],
+          "peak_rss_bytes": [
+            184893440,
+            185516032,
+            185319424
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "e15c806cfbcbb6db886cc8d730772e256fe4eb5d1798de827e10227b4ffa51e6",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.982626637780276,
+      "selected": 70,
+      "effective_bytes": 4504,
+      "baseline_bytes": 6260,
+      "additional_seconds": [
+        2.258978291999995,
+        2.2258877500000054,
+        2.216662501000002
+      ],
+      "name": "fixture-gradient-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 6260,
+          "output_sha256": "d89a5c1a66a57dabcea27392cbbe9c776a088f39fb02dbd07f1a96da87e985f1",
+          "scores": {
+            "ssim": 0.984626637780276,
+            "black_background_ssim": 0.984626637780276,
+            "white_background_ssim": 0.984626637780276,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1252422089999996,
+            0.12730545800000215,
+            0.123209082999999
+          ],
+          "score_seconds": [
+            0.6640330419999998,
+            0.660915082999999,
+            0.6487416249999995
+          ],
+          "peak_rss_bytes": [
+            175767552,
+            176685056,
+            175390720
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 4504,
+          "output_sha256": "a10da54d5b1df3fadc4cbc6563902126cc298a87dc233f133f84dbabee60708a",
+          "scores": {
+            "ssim": 0.984591027569373,
+            "black_background_ssim": 0.984591027569373,
+            "white_background_ssim": 0.984591027569373,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1288185829999975,
+            0.1253598750000009,
+            0.13033775000000247
+          ],
+          "score_seconds": [
+            0.667236250000002,
+            0.6546867500000033,
+            0.6602759169999999
+          ],
+          "peak_rss_bytes": [
+            177405952,
+            176750592,
+            176521216
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 5004,
+          "output_sha256": "80a60143c07a570c9a0f420319092ab39ece0685fec23c2b5c6c2389c4d45b59",
+          "scores": {
+            "ssim": 0.9837735301646191,
+            "black_background_ssim": 0.9837735301646191,
+            "white_background_ssim": 0.9837735301646191,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12897370900000027,
+            0.1292870420000014,
+            0.13100670899999756
+          ],
+          "score_seconds": [
+            0.6699167079999953,
+            0.6556390000000007,
+            0.6463005000000024
+          ],
+          "peak_rss_bytes": [
+            176504832,
+            176390144,
+            176209920
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "7184e81922e34a83c7c75501cfec83f8fda0e4d2166f1754555608617e8bda55",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9827574241199384,
+      "selected": 70,
+      "effective_bytes": 4556,
+      "baseline_bytes": 6526,
+      "additional_seconds": [
+        1.8876826260000001,
+        1.9890334979999835,
+        1.9534316670000038
+      ],
+      "name": "fixture-gradient-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 6526,
+          "output_sha256": "a75ee101391b0d8c7069e522c49d86dfd579216c1390bc1919832f270b86ef6a",
+          "scores": {
+            "ssim": 0.9847574241199384,
+            "black_background_ssim": 0.9847574241199384,
+            "white_background_ssim": 0.9847574241199384,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12755170900000223,
+            0.125853124999999,
+            0.1307633750000008
+          ],
+          "score_seconds": [
+            0.5441134169999984,
+            0.5516835409999956,
+            0.5795705000000027
+          ],
+          "peak_rss_bytes": [
+            180748288,
+            180355072,
+            180944896
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 4556,
+          "output_sha256": "7ee037e2bca109fa251a191cebe9cadb5565331cdf6d3b587162656d558d1edd",
+          "scores": {
+            "ssim": 0.9847241311804732,
+            "black_background_ssim": 0.9847241311804732,
+            "white_background_ssim": 0.9847241311804732,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13273725000000525,
+            0.13472008299999771,
+            0.13560841700000026
+          ],
+          "score_seconds": [
+            0.5390659999999983,
+            0.5882392079999974,
+            0.5572384580000005
+          ],
+          "peak_rss_bytes": [
+            179732480,
+            179601408,
+            183615488
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 5108,
+          "output_sha256": "03fa303aa43577a339a6a9b7e9daa401bf9c77a1ba231e6bff4a4321decf31d9",
+          "scores": {
+            "ssim": 0.9838551620356416,
+            "black_background_ssim": 0.9838551620356416,
+            "white_background_ssim": 0.9838551620356416,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1325202499999989,
+            0.14024362499999654,
+            0.13242887500000222
+          ],
+          "score_seconds": [
+            0.5392457089999994,
+            0.5741470409999962,
+            0.5485854169999982
+          ],
+          "peak_rss_bytes": [
+            180207616,
+            180224000,
+            180862976
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "9663e07f77de69e2a05af5be88bfa8447b1f1a693722c281d77dad05f29dda95",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9831771688860472,
+      "selected": 70,
+      "effective_bytes": 4592,
+      "baseline_bytes": 6546,
+      "additional_seconds": [
+        1.9486530400000106,
+        1.9830951259999878,
+        1.9442897919999993
+      ],
+      "name": "fixture-gradient-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 6546,
+          "output_sha256": "9f7e80b6a9abcec4a4d98131a1452ed9d232e37088823dd07700af6abb13c01b",
+          "scores": {
+            "ssim": 0.9851771688860472,
+            "black_background_ssim": 0.9851771688860472,
+            "white_background_ssim": 0.9851771688860472,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.12793724999999512,
+            0.13405124999999884,
+            0.13325662500000135
+          ],
+          "score_seconds": [
+            0.5471475000000012,
+            0.5626453339999955,
+            0.5582124579999999
+          ],
+          "peak_rss_bytes": [
+            185171968,
+            184598528,
+            184795136
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 4592,
+          "output_sha256": "420b583c66ee64d2aef7731bce6e8eaf67ad69aef0f4b7f6a838c394fcbb6cc1",
+          "scores": {
+            "ssim": 0.9848932922345893,
+            "black_background_ssim": 0.9848932922345893,
+            "white_background_ssim": 0.9848932922345893,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.13228858300000468,
+            0.147465167,
+            0.13958808399999612
+          ],
+          "score_seconds": [
+            0.5686857500000002,
+            0.5643328749999981,
+            0.5557355830000006
+          ],
+          "peak_rss_bytes": [
+            184877056,
+            188448768,
+            185532416
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 5108,
+          "output_sha256": "e57b9e903e77acd35ac6acb77c14556aa1169993212b06897614e947388837e6",
+          "scores": {
+            "ssim": 0.984325078634423,
+            "black_background_ssim": 0.984325078634423,
+            "white_background_ssim": 0.984325078634423,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1342359160000015,
+            0.13571433399999933,
+            0.1332423750000018
+          ],
+          "score_seconds": [
+            0.566295291000003,
+            0.5729374159999949,
+            0.5575112920000009
+          ],
+          "peak_rss_bytes": [
+            184926208,
+            185532416,
+            184762368
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "292143ccf8697d81b5ad61ec3cdfb810369f860c58802523564a07c4b23461e1",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9902229725650339,
+      "selected": 70,
+      "effective_bytes": 37790,
+      "baseline_bytes": 40288,
+      "additional_seconds": [
+        2.3748921250000095,
+        2.4137964999999966,
+        2.351708209000016
+      ],
+      "name": "fixture-alpha-0.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "scores": {
+            "ssim": 0.9922229725650339,
+            "black_background_ssim": 0.9939314987354271,
+            "white_background_ssim": 0.9922229725650339,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.19063658299999986,
+            0.1901527080000065,
+            0.18368229099999667
+          ],
+          "score_seconds": [
+            0.6645799589999939,
+            0.6981515000000016,
+            0.6743149169999967
+          ],
+          "peak_rss_bytes": [
+            176095232,
+            176291840,
+            175685632
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 37790,
+          "output_sha256": "2740c6003d47f5faf388b5a84d91bb9cea76d2aca1eb6ec80970e0df9160d9cc",
+          "scores": {
+            "ssim": 0.9907128057784297,
+            "black_background_ssim": 0.9926530156918433,
+            "white_background_ssim": 0.9907128057784297,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.19108966600000343,
+            0.18980929199999963,
+            0.1888100000000037
+          ],
+          "score_seconds": [
+            0.6708844999999997,
+            0.6666919159999978,
+            0.6608494170000085
+          ],
+          "peak_rss_bytes": [
+            176521216,
+            176095232,
+            176472064
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 38234,
+          "output_sha256": "d52044ccc85f2243b1bc350bb9a1c61733836413d5343386ee5dd19b471b75bc",
+          "scores": {
+            "ssim": 0.9909042831198432,
+            "black_background_ssim": 0.9928733228966479,
+            "white_background_ssim": 0.9909042831198432,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.18757795800000565,
+            0.19063487500000065,
+            0.19012766699999872
+          ],
+          "score_seconds": [
+            0.6607600420000068,
+            0.6685089169999969,
+            0.6376062080000082
+          ],
+          "peak_rss_bytes": [
+            176340992,
+            176717824,
+            176373760
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "61cece7d58af3685c8ac43940949e0943c44568564873c44ff36abfe6ddf52d2",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9903408973272535,
+      "selected": 70,
+      "effective_bytes": 37922,
+      "baseline_bytes": 40522,
+      "additional_seconds": [
+        2.0688494599999956,
+        2.109501000999984,
+        2.032651040999994
+      ],
+      "name": "fixture-alpha-1.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 40522,
+          "output_sha256": "c3210ef92eb1fdaf79c4d1732370a97b435b374600a106e699c9fe7567097d69",
+          "scores": {
+            "ssim": 0.9923408973272535,
+            "black_background_ssim": 0.9932811874705564,
+            "white_background_ssim": 0.9923408973272535,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.19890462499999728,
+            0.19958087500000943,
+            0.20182633400000327
+          ],
+          "score_seconds": [
+            0.5488472090000016,
+            0.570131707999991,
+            0.5512589580000054
+          ],
+          "peak_rss_bytes": [
+            180699136,
+            181026816,
+            183762944
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 37922,
+          "output_sha256": "176591a3ebb884834e01c17adb650afb0c11a6128de9a1b1aa1d4b3b7e064404",
+          "scores": {
+            "ssim": 0.9911224328478384,
+            "black_background_ssim": 0.9923276770101689,
+            "white_background_ssim": 0.9911224328478384,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.19719841699999563,
+            0.2016357919999905,
+            0.19735745799999904
+          ],
+          "score_seconds": [
+            0.5540211670000019,
+            0.5788720839999968,
+            0.5471560000000011
+          ],
+          "peak_rss_bytes": [
+            180830208,
+            180682752,
+            180715520
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 38464,
+          "output_sha256": "91a55bc044e5f29b8367a068d81884c535508f225947788d7bbf4ff0760c938e",
+          "scores": {
+            "ssim": 0.9913027989187307,
+            "black_background_ssim": 0.9925223049048592,
+            "white_background_ssim": 0.9913027989187307,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.199116042,
+            0.1967037920000081,
+            0.19403954199999873
+          ],
+          "score_seconds": [
+            0.5696666249999964,
+            0.5621576249999976,
+            0.5428390829999898
+          ],
+          "peak_rss_bytes": [
+            180355072,
+            180748288,
+            179847168
+          ]
+        }
+      ]
+    },
+    {
+      "experiment": "webp",
+      "sha256": "bf0614cb381fb640d62a46613fdd3fcbbdd92b2a52fecf65d8f729ee8590bf40",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "split": "tuning",
+      "threshold": 0.9907427954382381,
+      "selected": 70,
+      "effective_bytes": 37964,
+      "baseline_bytes": 40690,
+      "additional_seconds": [
+        2.0884649579999888,
+        2.081259039999992,
+        2.1182399559999965
+      ],
+      "name": "fixture-alpha-2.png",
+      "candidates": [
+        {
+          "value": 80,
+          "bytes": 40690,
+          "output_sha256": "ffd4583a2bc92b6157e3edb9cd854141b078c8f0d18ff31530b946e62a3ac497",
+          "scores": {
+            "ssim": 0.9927427954382381,
+            "black_background_ssim": 0.9940713626725378,
+            "white_background_ssim": 0.9927427954382381,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.1976767499999994,
+            0.19959020899999302,
+            0.20177420799998913
+          ],
+          "score_seconds": [
+            0.564419958000002,
+            0.5552994159999969,
+            0.5676663329999911
+          ],
+          "peak_rss_bytes": [
+            185483264,
+            184991744,
+            185122816
+          ]
+        },
+        {
+          "value": 70,
+          "bytes": 37964,
+          "output_sha256": "0d6f7d21fb952b5228254114bddc52bf886b4926386cb901988a626686153db6",
+          "scores": {
+            "ssim": 0.9916068337451384,
+            "black_background_ssim": 0.9931508905382743,
+            "white_background_ssim": 0.9916068337451384,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.2008649999999932,
+            0.19557749999999885,
+            0.20195433300000332
+          ],
+          "score_seconds": [
+            0.5594405420000044,
+            0.5663595409999971,
+            0.5658992909999938
+          ],
+          "peak_rss_bytes": [
+            184942592,
+            185040896,
+            185188352
+          ]
+        },
+        {
+          "value": 75,
+          "bytes": 38592,
+          "output_sha256": "4abf55ed8f1abb7d24dd0ded6ce55a81a8156757e8be389a4d7b01970b9413fb",
+          "scores": {
+            "ssim": 0.9918967726753894,
+            "black_background_ssim": 0.99336031085054,
+            "white_background_ssim": 0.9918967726753894,
+            "alpha_max_difference": 0
+          },
+          "encode_seconds": [
+            0.2006564999999938,
+            0.20195604100000253,
+            0.19389008299999944
+          ],
+          "score_seconds": [
+            0.5630829579999954,
+            0.5620665419999966,
+            0.5888299160000088
+          ],
+          "peak_rss_bytes": [
+            185040896,
+            184680448,
+            188088320
+          ]
+        }
+      ]
+    }
+  ]
+}

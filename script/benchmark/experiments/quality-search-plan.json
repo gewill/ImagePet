@@ -1,0 +1,71 @@
+{
+  "phase": "offline screening, all samples tuning; fresh holdout and human review required for adoption",
+  "jpeg": {
+    "encoder": "ImagePet CLI advanced mozjpeg, original Core snapshot abd637e",
+    "qualities": [
+      80,
+      70,
+      75
+    ],
+    "maximum_encodes": 3,
+    "threshold": "SSIM >= max(0.98, baseline SSIM - 0.002)",
+    "categories": [
+      "photos",
+      "text",
+      "gradient",
+      "palette"
+    ],
+    "alpha": "exclude nonopaque inputs",
+    "pixel_limit": 1000000
+  },
+  "png": {
+    "quantizer": "Pillow FASTOCTREE, no dithering; exploration only, not pngdeer's quantizer",
+    "colors": [
+      64,
+      128,
+      256
+    ],
+    "maximum_encodes": "3 quantized candidates plus 1 current PNG baseline",
+    "threshold": "minimum black/white background SSIM >= 0.995",
+    "categories": [
+      "photos",
+      "photos-alpha",
+      "icons",
+      "illustrations",
+      "text",
+      "gradient",
+      "alpha"
+    ],
+    "pixel_limit": 1000000
+  },
+  "metrics": "full-size ImageIO oriented sRGB premultiplied RGBA; existing SSIM proxy, not SSIMULACRA2; not visual acceptance",
+  "timing": "encoding and scoring both counted; SSIM subprocess RSS measured independently, not hidden in compression timing; repeat each candidate 3 times",
+  "adoption_gates": {
+    "real_asset_extra_savings": ">=5% in this screening and a fresh holdout",
+    "additional_search_seconds_p95": "<=0.5 s",
+    "peak_rss": "<=256 MiB per worker",
+    "human_review": "required: text, gradients, edges, transparency; no new automatic lossy PNG without opt-in"
+  },
+  "fallback": "Retain the current format-specific result/original when no smaller candidate passes. Baseline below threshold is retained, not relabeled as passing.",
+  "scope": "No production dependencies or product defaults change; a failed gate stops adoption of this candidate, not all possible future algorithms.",
+  "selection": "First 3 eligible PNG inputs per category in manifest order; <=1MP. JPEG excludes nonopaque images; PNG/WebP include alpha. All tuning.",
+  "webp": {
+    "encoder": "ImagePet CLI Swift-WebP picture",
+    "qualities": [
+      80,
+      70,
+      75
+    ],
+    "maximum_encodes": 3,
+    "threshold": "SSIM >= max(0.98, baseline SSIM - 0.002)",
+    "categories": [
+      "photos",
+      "text",
+      "gradient",
+      "alpha"
+    ],
+    "alpha": "include alpha, score on black and white",
+    "pixel_limit": 1000000
+  },
+  "protocol_note": "Consolidated reproduction protocol. Exact pre-run JPEG/PNG and WebP protocols are preserved in quality-search-results.json runs."
+}
