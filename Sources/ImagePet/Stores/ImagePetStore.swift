@@ -699,6 +699,9 @@ final class ImagePetStore: ObservableObject {
     }
 
     func promptForOutputFolderOnFirstLaunch() {
+        // A fresh hosted unit-test app has no saved folder. A modal panel here
+        // blocks XCTest's startup connection; UI tests run in a separate runner.
+        guard NSClassFromString("XCTestCase") == nil else { return }
         guard !didPromptForInitialFolder else { return }
         guard saveLocationMode == .designated else { return }
         didPromptForInitialFolder = true
