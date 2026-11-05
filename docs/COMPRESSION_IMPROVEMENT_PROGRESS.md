@@ -42,6 +42,7 @@
 
 ## 验证记录
 
+- PR 的 GitHub Actions 运行 Swift package 测试及 Release 构建、完整 Xcode App／UI 测试、评测测量与质量测试。Xcode 使用提交的 `.xcodeproj`，CI 以 ad-hoc 签名运行且保留沙盒权限；不需要发布证书，不进行分发。失败日志和 `.xcresult` 保存为 14 天 artifact。远端结果以 PR 当前 HEAD 为准，本节以下为历史本地验收。
 - 最终 `swift test` 通过：37 个 Core XCTest（2 个旧的本地素材性能测试按原规则跳过）、2 个 CLI XCTest，以及 6 个 PNG Swift Testing 方法及其参数用例。覆盖全部 PNG 过滤器、奇数行宽、精确调色板位深、隐藏 RGB、16 位数据、>256 色、键控透明、超限／损坏／不支持输入，以及非覆盖／覆盖的实际大小。
 - 完整 `xcodebuild ... test` 通过：17 个 App XCTest、6 个对比加载器 Swift Testing 方法、19 个 UI 测试。新加载器验证预览／完整尺寸、原图覆盖／丢失、EXIF、取消、WebP、结果丢失和大图限制。此后局部界面换行修复重新构建并完成下述实际 UI 验收；最终 PNG 策略另由完整 Swift 测试覆盖。
 - `./script/build_and_run.sh --verify` 通过；Python 测量／统计测试 4 项、质量评分测试 3 项通过；`git diff --check` 通过。
