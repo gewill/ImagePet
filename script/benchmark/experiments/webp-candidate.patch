@@ -1,18 +1,11 @@
 --- a/Sources/ImagePetCore/Services/SwiftWebPEngine.swift
 +++ b/Sources/ImagePetCore/Services/SwiftWebPEngine.swift
-@@ -52,7 +52,7 @@
- 
-         do {
-             let rgba = try Self.makeUnpremultipliedRGBA(from: image)
+@@ -55 +55 @@
 -            let data = try rgba.bytes.withUnsafeBufferPointer { buffer in
 +            var data = try rgba.bytes.withUnsafeBufferPointer { buffer in
-                 try WebPEncoder().encode(
-                     buffer,
-                     format: .rgba,
-@@ -67,6 +67,23 @@
-                 throw CompressionError.failedToWriteOutputFile
-             }
- 
+@@ -67,0 +68,17 @@
++            }
++
 +            // Offline experiment only; production source is unchanged.
 +            if let rawLevel = ProcessInfo.processInfo.environment["IMAGEPET_WEBP_LOSSLESS_PRESET"],
 +               let level = Int(rawLevel), (0...9).contains(level),
@@ -28,8 +21,3 @@
 +                let elapsed = ProcessInfo.processInfo.systemUptime - started
 +                let selected = candidate.map { !$0.isEmpty && $0.count < data.count && elapsed <= 0.25 } ?? false
 +                if selected, let candidate { data = candidate }
-+            }
-+
-             try data.write(to: destinationTemporaryURL, options: .atomic)
-         } catch let error as CompressionError {
-             throw error
