@@ -70,8 +70,12 @@ struct LosslessPNGOptimizerTests {
     @Test(arguments: [2, 4, 16, 256])
     func exactPalettePreservesUnassociatedRGBA(colorCount: Int) throws {
         let width = 1025, height = 17
-        let colors: [[UInt8]] = (0..<colorCount).map { i in
-            [UInt8(i), UInt8(255 - i), UInt8(i / 2), i % 3 == 0 ? 0 : UInt8(i % 2 == 0 ? 127 : 255)]
+        let colors: [[UInt8]] = (0..<colorCount).map { i -> [UInt8] in
+            let red = UInt8(i)
+            let green = UInt8(255 - i)
+            let blue = UInt8(i / 2)
+            let alpha: UInt8 = i % 3 == 0 ? 0 : (i % 2 == 0 ? 127 : 255)
+            return [red, green, blue, alpha]
         }
         var filtered: [UInt8] = []
         var expected: [UInt8] = []
