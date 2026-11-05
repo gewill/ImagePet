@@ -699,6 +699,9 @@ final class ImagePetStore: ObservableObject {
     }
 
     func promptForOutputFolderOnFirstLaunch() {
+        // A fresh hosted unit-test app has no saved folder. A modal panel here
+        // blocks XCTest's startup connection; UI tests run in a separate runner.
+        guard NSClassFromString("XCTestCase") == nil else { return }
         guard !didPromptForInitialFolder else { return }
         guard saveLocationMode == .designated else { return }
         didPromptForInitialFolder = true
@@ -886,6 +889,12 @@ final class ImagePetStore: ObservableObject {
             isCanceling = false
             petState = .idle
         }
+    }
+
+    func comparisonAccessDirectory(for job: ImageJob) -> URL? {
+        guard let output = job.outputURL else { return nil }
+        let parent = output.deletingLastPathComponent()
+        return bookmarkStore.restoreMulti(for: parent) ?? job.designatedOutputDirectory ?? outputDirectory
     }
 
     func revealInFinder(for job: ImageJob) {
@@ -1384,6 +1393,8 @@ final class ImagePetStore: ObservableObject {
             )
             updateJob(job.id) { updated in
                 updated.outputURL = result.outputURL
+                // Retain the actual granted destination for result viewing after settings change.
+                updated.designatedOutputDirectory = restoredBookmarkURL ?? targetOutputDir
                 updated.originalSize = result.originalSize
                 updated.compressedSize = result.compressedSize
                 updated.status = .done

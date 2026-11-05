@@ -67,7 +67,7 @@ final class WebPBenchmarkTests: XCTestCase {
         report += "# WebP Encoding Engines Benchmark\n\n"
         report += "Target OS: macOS 13+ / Sonoma+\n"
         report += "Apple native WebP write supported: \(appleSupported)\n\n"
-        report += "| File Size/Type | Engine | Avg Time (ms) | Output Size (bytes) | Loop Count | Peak Mem (MB) |\n"
+        report += "| File Size/Type | Engine | Avg Time (ms) | Output Size (bytes) | Loop Count | RSS Delta (MB) |\n"
         report += "| --- | --- | --- | --- | --- | --- |\n"
 
         for (name, w, h, alpha) in sizes {

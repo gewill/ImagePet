@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift:
+    name: Swift package tests and Release build
+    runs-on: macos-15
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - run: swift test
+      - run: swift build -c release
+
+  xcode:
+    name: Xcode app and UI tests
+    # AssetCatalogAgent from Xcode 26.2 crashes on the macOS 15 hosted image.
+    # Keep package compatibility coverage on 15; compile app assets on 26.
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable developer test tools
+        run: sudo DevToolsSecurity -enable
+      - name: Test committed Xcode project
+        run: |
+          set -o pipefail
+          xcodebuild -version
+          xcodebuild -project ImagePet.xcodeproj -scheme ImagePet \
+            -configuration Debug -derivedDataPath DerivedData \
+            -destination 'platform=macOS' -resultBundlePath TestResults.xcresult \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            test 2>&1 | tee xcode-test.log
+      - name: Save test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-test-results
+          path: |
+            TestResults.xcresult
+            xcode-test.log
+          retention-days: 14
+
+  benchmark:
+    name: Benchmark measurement and quality tests
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r script/benchmark/requirements-quality.txt
+      - run: python script/benchmark/test_runner.py
+      - run: python script/benchmark/test_quality.py
+      - run: git diff --check

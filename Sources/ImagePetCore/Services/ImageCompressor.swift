@@ -14,6 +14,7 @@ public protocol ImageCompressing: Sendable {
 
 public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
     private let allocator: OutputNameAllocator
+    private let pngOptimizationEnabled: Bool
     private let capabilities: EncoderCapabilities
     private let webPEncodingEngine: SwiftWebPEncodingEngine
     private let webPDecodingEngine: SwiftWebPDecodingEngine
@@ -21,12 +22,14 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
 
     public init(
         allocator: OutputNameAllocator = OutputNameAllocator(),
+        pngOptimizationEnabled: Bool = true,
         capabilities: EncoderCapabilities = .current,
         webPEncodingEngine: SwiftWebPEncodingEngine? = nil,
         webPDecodingEngine: SwiftWebPDecodingEngine? = nil,
         mozJPEGEncodingEngine: MozJPEGEncodingEngine? = nil
     ) {
         self.allocator = allocator
+        self.pngOptimizationEnabled = pngOptimizationEnabled
         self.capabilities = capabilities
         self.webPEncodingEngine = webPEncodingEngine ?? SwiftWebPEncodingEngine(capabilities: capabilities)
         self.webPDecodingEngine = webPDecodingEngine ?? SwiftWebPDecodingEngine(capabilities: capabilities)
@@ -67,7 +70,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         let options = CompressionOptions(lossyQuality: .preset(preset), format: .jpeg, maxDimension: .none, stripMetadata: true)
 
         do {
-            return try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
+            return try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine, pngOptimizationEnabled] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
@@ -76,6 +79,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                         options: options,
                         targetOutputFormat: .jpeg,
                         capabilities: capabilities,
+                        pngOptimizationEnabled: pngOptimizationEnabled,
                         webPEncodingEngine: webPEncodingEngine,
                         webPDecodingEngine: webPDecodingEngine,
                         mozJPEGEncodingEngine: mozJPEGEncodingEngine
@@ -179,7 +183,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         )
 
         do {
-            let result = try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine] in
+            let result = try await Task.detached(priority: .userInitiated) { [capabilities, webPEncodingEngine, webPDecodingEngine, mozJPEGEncodingEngine, pngOptimizationEnabled] in
                 try autoreleasepool {
                     try Self.compressSynchronously(
                         inputURL: inputURL,
@@ -188,6 +192,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
                         options: effectiveCompressionOptions,
                         targetOutputFormat: targetOutputFormat,
                         capabilities: capabilities,
+                        pngOptimizationEnabled: pngOptimizationEnabled,
                         webPEncodingEngine: webPEncodingEngine,
                         webPDecodingEngine: webPDecodingEngine,
                         mozJPEGEncodingEngine: mozJPEGEncodingEngine
@@ -230,6 +235,7 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
         options: CompressionOptions,
         targetOutputFormat: OutputFormat,
         capabilities: EncoderCapabilities,
+        pngOptimizationEnabled: Bool,
         webPEncodingEngine: SwiftWebPEncodingEngine,
         webPDecodingEngine: SwiftWebPDecodingEngine,
         mozJPEGEncodingEngine: MozJPEGEncodingEngine
@@ -254,6 +260,16 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
             mozJPEGEncodingEngine: mozJPEGEncodingEngine,
             capabilities: capabilities
         )
+
+        if pngOptimizationEnabled, targetOutputFormat == .png,
+           (try? fileSize(for: destinationTemporaryURL)) ?? Int64.max <= Int64(LosslessPNGOptimizer.maximumInflatedBytes),
+           let encoded = try? Data(contentsOf: destinationTemporaryURL) {
+            let optimized = LosslessPNGOptimizer.optimize(encoded)
+            if optimized.count < encoded.count {
+                // Atomic replacement keeps the valid ImageIO candidate if optimization cannot be written.
+                try? optimized.write(to: destinationTemporaryURL, options: .atomic)
+            }
+        }
 
         let compressedSize = try fileSize(for: destinationTemporaryURL)
         if compressedSize >= originalSize {
@@ -571,9 +587,10 @@ public final class ImageCompressor: ImageCompressing, @unchecked Sendable {
 
     private static func fileSize(for url: URL) throws -> Int64 {
         do {
-            let values = try url.resourceValues(forKeys: [.fileSizeKey])
-            if let fileSize = values.fileSize {
-                return Int64(fileSize)
+            // URL resource values can cache the pre-optimization/pre-replacement size.
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            if let fileSize = attributes[.size] as? NSNumber {
+                return fileSize.int64Value
             }
         } catch {
             throw CompressionError.map(error)

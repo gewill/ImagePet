@@ -853,6 +853,7 @@ private struct JobRowView: View {
     @ObservedObject var store: ImagePetStore
     let job: ImageJob
     @State private var isHovering = false
+    @State private var showingComparison = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -923,6 +924,16 @@ private struct JobRowView: View {
                 }
             }
 
+            if job.status == .done, job.outputURL != nil {
+                Button { showingComparison = true } label: {
+                    Image(systemName: "rectangle.lefthalf.inset.filled")
+                }
+                .buttonStyle(.borderless)
+                .help("Compare original and result")
+                .accessibilityLabel("Compare \(job.fileName)")
+                .accessibilityIdentifier("compareResult_\(job.fileName)")
+            }
+
             if (isHovering || job.status == .done) && job.status != .processing {
                 Button {
                     store.removeJob(id: job.id)
@@ -950,7 +961,13 @@ private struct JobRowView: View {
                 self.isHovering = hovering
             }
         }
+        .sheet(isPresented: $showingComparison) {
+            ImageComparisonView(job: job, accessDirectory: store.comparisonAccessDirectory(for: job))
+        }
         .contextMenu {
+            if job.status == .done, job.outputURL != nil {
+                Button("Compare Result") { showingComparison = true }
+            }
             if job.status != .processing {
                 Button {
                     store.revealInFinder(for: job)
