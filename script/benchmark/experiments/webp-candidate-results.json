@@ -1,0 +1,4210 @@
+{
+  "source_commit": "abd637e4755736557741ffd9c911e409de7ff771",
+  "plan": {
+    "format": "webp",
+    "quality": "balanced (80), current CLI defaults",
+    "repeats": 3,
+    "variants": [
+      "reference",
+      "level0",
+      "level3"
+    ],
+    "max_candidates_per_file": 2,
+    "max_candidate_pixels": 1000000,
+    "candidate_acceptance_budget_seconds": 0.25,
+    "candidate_time_limit": "effort budget; libwebp call cannot be preempted",
+    "manifest_sha256": "6dfbece78b665196ca3ca9b3b9b342e7ef0873a5b6e3ab15185222e2ac381930",
+    "executable_sha256": "7241305993c27d76ffa550b52de130b73c833e59b1632730cb73b62096ecbba1",
+    "phase": "tuning, not holdout. Background desktop activity may affect timing; remeasure adopted strategy in a quiet acceptance run.",
+    "source_snapshot": "snapshot.json and spike.patch; copied Core/CLI with experimental code, not repository working tree",
+    "adoption_gate": "fresh holdout, stable meaningful real-asset gains, no output enlargement or lossless pixel mismatch, <=250 ms extra candidate work observed, bounded <=1 MP, no new production dependency. Do not infer visual acceptance from SSIM.",
+    "instrumentation": "Removed concurrent stderr candidate diagnostics; v1 retained only for diagnosis."
+  },
+  "normalizer_sha256": "370b8ee3fbacbe6c7100ebb041e70abc9a5556636498b2d39c979169393afc21",
+  "variants": {
+    "reference": {
+      "effective_bytes_per_repeat": [
+        5888607,
+        5888607,
+        5888607
+      ],
+      "batch_seconds": [
+        3.384212583,
+        3.298345542,
+        3.290794584000004
+      ],
+      "batch_peak_rss_bytes": [
+        493813760,
+        483590144,
+        496861184
+      ],
+      "done_per_repeat": [
+        89,
+        89,
+        89
+      ],
+      "skipped_per_repeat": [
+        14,
+        14,
+        14
+      ],
+      "failures": 0
+    },
+    "level0": {
+      "effective_bytes_per_repeat": [
+        5827187,
+        5827187,
+        5827187
+      ],
+      "batch_seconds": [
+        3.695371999999999,
+        3.6938738750000013,
+        3.656733750000001
+      ],
+      "batch_peak_rss_bytes": [
+        516931584,
+        520175616,
+        509788160
+      ],
+      "done_per_repeat": [
+        92,
+        92,
+        92
+      ],
+      "skipped_per_repeat": [
+        11,
+        11,
+        11
+      ],
+      "failures": 0
+    },
+    "level3": {
+      "effective_bytes_per_repeat": [
+        5809174,
+        5809174,
+        5809174
+      ],
+      "batch_seconds": [
+        7.014858416999999,
+        7.029742875000004,
+        7.046996833999998
+      ],
+      "batch_peak_rss_bytes": [
+        517439488,
+        512458752,
+        527794176
+      ],
+      "done_per_repeat": [
+        102,
+        102,
+        102
+      ],
+      "skipped_per_repeat": [
+        1,
+        1,
+        1
+      ],
+      "failures": 0
+    }
+  },
+  "images": [
+    {
+      "sha256": "e64d4d09858960c0b09e3c7c6568ddff14db3207bec2d9d1d41d8cbf250085f2",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F308.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 17296,
+      "name": "openmoji-1f308.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 17296,
+          "output_sha256": "e64d4d09858960c0b09e3c7c6568ddff14db3207bec2d9d1d41d8cbf250085f2",
+          "seconds": [
+            2.204091417,
+            0.11183295800000081,
+            0.12751450000000375
+          ]
+        },
+        "level0": {
+          "effective_bytes": 17296,
+          "output_sha256": "e64d4d09858960c0b09e3c7c6568ddff14db3207bec2d9d1d41d8cbf250085f2",
+          "seconds": [
+            0.571049625,
+            0.11414087500000036,
+            0.11927379100000479
+          ]
+        },
+        "level3": {
+          "effective_bytes": 14796,
+          "output_sha256": "89f9e4842aca5b2df3540fce00ac3cfb7eea47877359f9d3aee421b17b4686bf",
+          "seconds": [
+            0.5794735420000001,
+            0.11627495800000176,
+            0.1232125840000009
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 618,
+            "input_pixel_sha256": "64478d61030b833ce93e63f3ad072361bd721178fa3d6eae64ca1ea8e8d9d882",
+            "input_width": 618,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "64478d61030b833ce93e63f3ad072361bd721178fa3d6eae64ca1ea8e8d9d882",
+            "output_width": 618,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "2bdb12b98b6c72a9e51ac1f57346e98f3e26826f68ad2714b720c6637862c9f1",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F30D.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 16904,
+      "name": "openmoji-1f30d.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 14590,
+          "output_sha256": "71f1f0f8cd9be02c082fb75e7ec87a5fbd2a61feb5c3a350223fa9639448ca68",
+          "seconds": [
+            0.1666829169999997,
+            0.10247695900000053,
+            0.10520866599999579
+          ]
+        },
+        "level0": {
+          "effective_bytes": 14590,
+          "output_sha256": "71f1f0f8cd9be02c082fb75e7ec87a5fbd2a61feb5c3a350223fa9639448ca68",
+          "seconds": [
+            0.11010587499999991,
+            0.11432170900000216,
+            0.11398504200000303
+          ]
+        },
+        "level3": {
+          "effective_bytes": 13918,
+          "output_sha256": "06a7b33d7c9c80beec313f1f505b58ba337f6dcc00a09ec0d00f3ae5ec2eebe9",
+          "seconds": [
+            0.10884116700000002,
+            0.11191191700000047,
+            0.10854400000000197
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 618,
+            "input_pixel_sha256": "993dd8f351e5ae03be9f0c33fe197f56b698f7c234c5e4ff29b6fec812df3acd",
+            "input_width": 618,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "993dd8f351e5ae03be9f0c33fe197f56b698f7c234c5e4ff29b6fec812df3acd",
+            "output_width": 618,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "8534c1bec8bde9d9641656508ab9476ad46acac394bd2de25bc0e6eeca4f5a72",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F34E.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 9919,
+      "name": "openmoji-1f34e.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 9919,
+          "output_sha256": "8534c1bec8bde9d9641656508ab9476ad46acac394bd2de25bc0e6eeca4f5a72",
+          "seconds": [
+            0.15609945800000036,
+            0.10115662500000155,
+            0.1188938749999977
+          ]
+        },
+        "level0": {
+          "effective_bytes": 9919,
+          "output_sha256": "8534c1bec8bde9d9641656508ab9476ad46acac394bd2de25bc0e6eeca4f5a72",
+          "seconds": [
+            0.10568350000000004,
+            0.1083276249999976,
+            0.11047091600000414
+          ]
+        },
+        "level3": {
+          "effective_bytes": 8134,
+          "output_sha256": "eedf84b6c4500bec5a27608d0c479b66534f20b789189ed38fb9cac2481568c0",
+          "seconds": [
+            0.11343079199999995,
+            0.11394050000000178,
+            0.11627366700000152
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 469,
+            "input_height": 618,
+            "input_pixel_sha256": "171b3b7adfaf329fd3ec28a43b7d53c4a6ecaf48e029d63dc82ce2d0f9752b2c",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "3c22a106c35f9ed0edb57ffcd1c27a98f5038098e9b8b98f383223ad318ecce4",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "fb6acda8be547106ad5bd5ee68ee29866dc952703c387590915f8babf80dca6f",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F389.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 9587,
+      "name": "openmoji-1f389.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 9587,
+          "output_sha256": "fb6acda8be547106ad5bd5ee68ee29866dc952703c387590915f8babf80dca6f",
+          "seconds": [
+            0.1490594999999999,
+            0.12065825000000174,
+            0.11095275000000271
+          ]
+        },
+        "level0": {
+          "effective_bytes": 9587,
+          "output_sha256": "fb6acda8be547106ad5bd5ee68ee29866dc952703c387590915f8babf80dca6f",
+          "seconds": [
+            0.11250670900000004,
+            0.10964062499999727,
+            0.11697541699999903
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7206,
+          "output_sha256": "816421e46f2229acea26f9ba3028d280fa99aea7ae866fd89abf4952f6211094",
+          "seconds": [
+            0.11823516599999984,
+            0.1343211249999996,
+            0.11992941700000159
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 156,
+            "input_height": 618,
+            "input_pixel_sha256": "ea2cc63eb73da0b62ed9839605205cef102282db132ee0e79224dca40ae15560",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "d869ad186aec417dde998fe8221201fa91163e9f0a462f60471730f5e3164f5c",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "ed043c8f1e420d9afca7598615a67d7f56a94963b9454d00f51996d8f1c9d84f",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F431.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 15548,
+      "name": "openmoji-1f431.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 15058,
+          "output_sha256": "e6bcd8e79a6cb38e89d7f340496c7db908a3f6780845a40caf79e5548a745ed1",
+          "seconds": [
+            0.15537154200000014,
+            0.1171049590000024,
+            0.10636650000000003
+          ]
+        },
+        "level0": {
+          "effective_bytes": 15058,
+          "output_sha256": "e6bcd8e79a6cb38e89d7f340496c7db908a3f6780845a40caf79e5548a745ed1",
+          "seconds": [
+            0.1039064580000002,
+            0.10873920799999937,
+            0.11310754099999798
+          ]
+        },
+        "level3": {
+          "effective_bytes": 12874,
+          "output_sha256": "0cbe5ef701b9099d4d07daa53cba86ed969068f6f7d96c33428ef94787c2b78d",
+          "seconds": [
+            0.11145520900000006,
+            0.12176125000000226,
+            0.13294587499999722
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 65,
+            "input_height": 618,
+            "input_pixel_sha256": "c63255c1c653937995928db3f99812f24b8d3888b512f41e41b5d4e5e6e01f18",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "181ec951bc20dc593e579e2f00ccf2481a579659f1b71d5aa2c1a97bd2ca7287",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "6751fa6b5b1bfbe5ca7b604b74e0b22be3f61f00ee63dfd5f64d72f237ed7c8a",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F4A1.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 9595,
+      "name": "openmoji-1f4a1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 8130,
+          "output_sha256": "abd6f3a36e6024d02a004ef032ae082bd8db0dfab7bb96b88580be53722f736f",
+          "seconds": [
+            0.1624697089999998,
+            0.11805791600000148,
+            0.10977079199999906
+          ]
+        },
+        "level0": {
+          "effective_bytes": 8130,
+          "output_sha256": "abd6f3a36e6024d02a004ef032ae082bd8db0dfab7bb96b88580be53722f736f",
+          "seconds": [
+            0.11529758299999981,
+            0.10492320799999888,
+            0.12077166699999964
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7422,
+          "output_sha256": "7510cabffc2cba731ce0b0f107bf064423107b0e90cb44f0fbff32615a3563e1",
+          "seconds": [
+            0.11517200000000005,
+            0.1110692499999999,
+            0.11391150000000039
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 23,
+            "input_height": 618,
+            "input_pixel_sha256": "4ce4cc6015b6db9e1996cb31335dbfe82b5e7d9a0403035c7aad03eb632b72d0",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "7e709fa3b842ab4399d3733ec5b3283de369bd0d6d906c03d0f376dedaa2b756",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "526f16895dee591111aa502e6a07e3a8cd6262b4189be7f670c82a76e702f4d2",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Avocado/3D/avocado_3d.png)",
+      "license": "MIT",
+      "input_bytes": 37151,
+      "name": "fluent-avocado.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 5200,
+          "output_sha256": "d3e4723fbf3ea89f2b3cab53868baa06431dd1d606becd332ebf3aa8de2b7d4a",
+          "seconds": [
+            0.1681895,
+            0.10906829099999982,
+            0.09531116699999842
+          ]
+        },
+        "level0": {
+          "effective_bytes": 5200,
+          "output_sha256": "d3e4723fbf3ea89f2b3cab53868baa06431dd1d606becd332ebf3aa8de2b7d4a",
+          "seconds": [
+            0.10045770799999998,
+            0.09182141600000193,
+            0.09454637500000018
+          ]
+        },
+        "level3": {
+          "effective_bytes": 5200,
+          "output_sha256": "d3e4723fbf3ea89f2b3cab53868baa06431dd1d606becd332ebf3aa8de2b7d4a",
+          "seconds": [
+            0.13180379100000006,
+            0.11908466600000267,
+            0.11850270900000481
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "5c5d6961fde0fa82d1aa2242f938ff10b0327e791674c625c912f13ff206933b",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Birthday%20cake/3D/birthday_cake_3d.png)",
+      "license": "MIT",
+      "input_bytes": 41229,
+      "name": "fluent-birthday-cake.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 5800,
+          "output_sha256": "a93d91953cc72bffadf32087952570806e18481912fba3c5555cfb0a9ff55e10",
+          "seconds": [
+            0.1535789999999997,
+            0.10083008400000182,
+            0.09380416700000183
+          ]
+        },
+        "level0": {
+          "effective_bytes": 5800,
+          "output_sha256": "a93d91953cc72bffadf32087952570806e18481912fba3c5555cfb0a9ff55e10",
+          "seconds": [
+            0.1043078340000001,
+            0.09858849999999819,
+            0.10307570800000576
+          ]
+        },
+        "level3": {
+          "effective_bytes": 5800,
+          "output_sha256": "a93d91953cc72bffadf32087952570806e18481912fba3c5555cfb0a9ff55e10",
+          "seconds": [
+            0.14690162499999992,
+            0.13544641600000062,
+            0.12219141599999972
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "d930f2aee8ae47cb3ca26f2594ddd15df42345d952b5903b776adf4a728860b5",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Cat%20face/3D/cat_face_3d.png)",
+      "license": "MIT",
+      "input_bytes": 37653,
+      "name": "fluent-cat-face.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4876,
+          "output_sha256": "1012c3e5df4f017c865498badd35af40f164946fa01a1c7d074d577a76fb9dc1",
+          "seconds": [
+            0.1494398330000002,
+            0.09191754099999727,
+            0.09483820799999876
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4876,
+          "output_sha256": "1012c3e5df4f017c865498badd35af40f164946fa01a1c7d074d577a76fb9dc1",
+          "seconds": [
+            0.11041195899999989,
+            0.09748212500000264,
+            0.10165270799999604
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4876,
+          "output_sha256": "1012c3e5df4f017c865498badd35af40f164946fa01a1c7d074d577a76fb9dc1",
+          "seconds": [
+            0.11460054200000003,
+            0.12303983299999999,
+            0.12263454200000012
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "f42c5484bea4f33f7ba8ee2b5c7e2a51d17a9fcec36f2ba92334f62b7f95eb43",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crystal%20ball/3D/crystal_ball_3d.png)",
+      "license": "MIT",
+      "input_bytes": 35475,
+      "name": "fluent-crystal-ball.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4262,
+          "output_sha256": "edff432ce9892c73fdf8b9c67c92af23ebdd0b4a52da52044df3269f7097b53f",
+          "seconds": [
+            0.12526349999999997,
+            0.09776462499999994,
+            0.09633895900000056
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4262,
+          "output_sha256": "edff432ce9892c73fdf8b9c67c92af23ebdd0b4a52da52044df3269f7097b53f",
+          "seconds": [
+            0.10653287499999986,
+            0.0975105410000019,
+            0.09110050000000314
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4262,
+          "output_sha256": "edff432ce9892c73fdf8b9c67c92af23ebdd0b4a52da52044df3269f7097b53f",
+          "seconds": [
+            0.12886779199999987,
+            0.11216633300000112,
+            0.11476199999999892
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "d56355132d73df1741edcf37cb4e21ad54f1c46eeb76fa17224607abf4128c3f",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fire/3D/fire_3d.png)",
+      "license": "MIT",
+      "input_bytes": 26826,
+      "name": "fluent-fire.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4076,
+          "output_sha256": "7ff37e02db44281d0036eb1139798e02770958c46fd23fb5ed21dd47931345a4",
+          "seconds": [
+            0.13309687500000056,
+            0.09690304100000091,
+            0.09651595799999768
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4076,
+          "output_sha256": "7ff37e02db44281d0036eb1139798e02770958c46fd23fb5ed21dd47931345a4",
+          "seconds": [
+            0.09128516699999989,
+            0.10532754199999772,
+            0.11360791699999595
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4076,
+          "output_sha256": "7ff37e02db44281d0036eb1139798e02770958c46fd23fb5ed21dd47931345a4",
+          "seconds": [
+            0.13312791700000015,
+            0.11417020800000088,
+            0.11888195799999579
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "50dd4109b524203fc9e208e24498f6f468c54f104b4eb41e914dec203e841820",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Gem%20stone/3D/gem_stone_3d.png)",
+      "license": "MIT",
+      "input_bytes": 18806,
+      "name": "fluent-gem-stone.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 3614,
+          "output_sha256": "3a52b96c7bb5492faa4bf3749eeaa72ed23e88222371ed17c8b3e03c508debf3",
+          "seconds": [
+            0.13304154199999996,
+            0.09464708300000169,
+            0.09781254199999978
+          ]
+        },
+        "level0": {
+          "effective_bytes": 3614,
+          "output_sha256": "3a52b96c7bb5492faa4bf3749eeaa72ed23e88222371ed17c8b3e03c508debf3",
+          "seconds": [
+            0.09234566700000002,
+            0.09366641599999781,
+            0.09054541699999419
+          ]
+        },
+        "level3": {
+          "effective_bytes": 3614,
+          "output_sha256": "3a52b96c7bb5492faa4bf3749eeaa72ed23e88222371ed17c8b3e03c508debf3",
+          "seconds": [
+            0.11769762499999992,
+            0.11848162499999759,
+            0.12608045800000411
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim01.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 736501,
+      "name": "kodim01.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 96432,
+          "output_sha256": "bbf0598a616c5c7b12aa40ca2fcbde423eecd6d396d8d874ee7b7a367920b7b0",
+          "seconds": [
+            0.19185420899999972,
+            0.14023095900000015,
+            0.13160362499999678
+          ]
+        },
+        "level0": {
+          "effective_bytes": 96432,
+          "output_sha256": "bbf0598a616c5c7b12aa40ca2fcbde423eecd6d396d8d874ee7b7a367920b7b0",
+          "seconds": [
+            0.13988004199999993,
+            0.1454326669999979,
+            0.13714729199999454
+          ]
+        },
+        "level3": {
+          "effective_bytes": 96432,
+          "output_sha256": "bbf0598a616c5c7b12aa40ca2fcbde423eecd6d396d8d874ee7b7a367920b7b0",
+          "seconds": [
+            0.31411750000000005,
+            0.309484458,
+            0.3129795830000006
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim03.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 502888,
+      "name": "kodim03.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 31296,
+          "output_sha256": "4e2fcc918d34d6dfc36fe808620bbddc18eaab68cecd38549fd558e13ae9622f",
+          "seconds": [
+            0.17180462500000004,
+            0.1207811250000006,
+            0.11818895900000115
+          ]
+        },
+        "level0": {
+          "effective_bytes": 31296,
+          "output_sha256": "4e2fcc918d34d6dfc36fe808620bbddc18eaab68cecd38549fd558e13ae9622f",
+          "seconds": [
+            0.1449200829999997,
+            0.15013466699999967,
+            0.13438716699999986
+          ]
+        },
+        "level3": {
+          "effective_bytes": 31296,
+          "output_sha256": "4e2fcc918d34d6dfc36fe808620bbddc18eaab68cecd38549fd558e13ae9622f",
+          "seconds": [
+            0.30341225000000005,
+            0.3050972909999956,
+            0.3010330830000001
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim05.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 785610,
+      "name": "kodim05.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 97580,
+          "output_sha256": "b0f862b91d08cb700cc20cea9249a060dbfd4ad3897500aaff7b86c86075624f",
+          "seconds": [
+            0.1876379590000008,
+            0.1266866670000013,
+            0.12776662499999958
+          ]
+        },
+        "level0": {
+          "effective_bytes": 97580,
+          "output_sha256": "b0f862b91d08cb700cc20cea9249a060dbfd4ad3897500aaff7b86c86075624f",
+          "seconds": [
+            0.14816937500000016,
+            0.14828137499999983,
+            0.14536704100000009
+          ]
+        },
+        "level3": {
+          "effective_bytes": 97580,
+          "output_sha256": "b0f862b91d08cb700cc20cea9249a060dbfd4ad3897500aaff7b86c86075624f",
+          "seconds": [
+            0.339521666,
+            0.31404133399999523,
+            0.3123155840000038
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "b77d3f006f42414bb242222e0482e750c0fb9e5ee8d4bed2f6f11c5605fe54a4",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim07.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 566322,
+      "name": "kodim07.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 38776,
+          "output_sha256": "a9016c0e8ff8ec946282cc6eb1a186af6c84459fe1f8c032b5132b523b7a1513",
+          "seconds": [
+            0.1723726250000004,
+            0.12388083300000119,
+            0.11882683299999997
+          ]
+        },
+        "level0": {
+          "effective_bytes": 38776,
+          "output_sha256": "a9016c0e8ff8ec946282cc6eb1a186af6c84459fe1f8c032b5132b523b7a1513",
+          "seconds": [
+            0.1331329590000001,
+            0.14271458300000006,
+            0.13809125000000222
+          ]
+        },
+        "level3": {
+          "effective_bytes": 38776,
+          "output_sha256": "a9016c0e8ff8ec946282cc6eb1a186af6c84459fe1f8c032b5132b523b7a1513",
+          "seconds": [
+            0.3039484159999999,
+            0.3037094170000003,
+            0.30845791699999836
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "ba23983c76b4832ee0e8af0592664756841a16779acd69f792e268fb6d13d6e7",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim08.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 788470,
+      "name": "kodim08.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 103504,
+          "output_sha256": "6bb0f648a1f265ce5faf96dc792bd0b3f7cbe99c959891115bb8ff48c67233d5",
+          "seconds": [
+            0.19130083299999967,
+            0.14533287500000114,
+            0.1391177920000004
+          ]
+        },
+        "level0": {
+          "effective_bytes": 103504,
+          "output_sha256": "6bb0f648a1f265ce5faf96dc792bd0b3f7cbe99c959891115bb8ff48c67233d5",
+          "seconds": [
+            0.1397799169999998,
+            0.14895854199999903,
+            0.14921762499999858
+          ]
+        },
+        "level3": {
+          "effective_bytes": 103504,
+          "output_sha256": "6bb0f648a1f265ce5faf96dc792bd0b3f7cbe99c959891115bb8ff48c67233d5",
+          "seconds": [
+            0.30964437499999997,
+            0.31241304199999576,
+            0.3038194589999961
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "bc34a3ce58dea09dce1704c997171602de90cb34d0c8503a988b77f473d39b08",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim13.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 822712,
+      "name": "kodim13.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 131248,
+          "output_sha256": "1d04596ebe1423f283d48e7c7f7018f59efef0945d111d7facebdf287a2e2934",
+          "seconds": [
+            0.1758902089999994,
+            0.1375427500000015,
+            0.13120816699999693
+          ]
+        },
+        "level0": {
+          "effective_bytes": 131248,
+          "output_sha256": "1d04596ebe1423f283d48e7c7f7018f59efef0945d111d7facebdf287a2e2934",
+          "seconds": [
+            0.15116441599999986,
+            0.1504257080000002,
+            0.14999016599999493
+          ]
+        },
+        "level3": {
+          "effective_bytes": 131248,
+          "output_sha256": "1d04596ebe1423f283d48e7c7f7018f59efef0945d111d7facebdf287a2e2934",
+          "seconds": [
+            0.3072392919999998,
+            0.31050929099999536,
+            0.30722008299999715
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "235393213c5caeb5bb8faefab6a1131a38cfdbf8ae865912669e78ca8ddd1e42",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Anime_Girl.svg)",
+      "license": "CC BY 3.0",
+      "input_bytes": 1123598,
+      "name": "anime-girl.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 100238,
+          "output_sha256": "fd146ba8fd4fd255a7aa94d7e8aec2801c5bee81ae68306ef57ac8bff201d86e",
+          "seconds": [
+            0.209915917,
+            0.1763642499999989,
+            0.17338987499999803
+          ]
+        },
+        "level0": {
+          "effective_bytes": 100238,
+          "output_sha256": "fd146ba8fd4fd255a7aa94d7e8aec2801c5bee81ae68306ef57ac8bff201d86e",
+          "seconds": [
+            0.17447649999999992,
+            0.17209812500000155,
+            0.1763480000000044
+          ]
+        },
+        "level3": {
+          "effective_bytes": 100238,
+          "output_sha256": "fd146ba8fd4fd255a7aa94d7e8aec2801c5bee81ae68306ef57ac8bff201d86e",
+          "seconds": [
+            0.17206812500000002,
+            0.17402383299999968,
+            0.17149675000000286
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "dd27c1c03fd0a9b02209d35fc2795ecfa7d5a8421871d1db5578fcd7b8f11b44",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Anoplogaster_cornuta_skeletal.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 341707,
+      "name": "anoplogaster-cornuta-skeletal.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 84706,
+          "output_sha256": "f3d24fd51fc84c6e5528cc79c29780ae3754a7ce54119566ae8484eaaa937cfc",
+          "seconds": [
+            0.1642203750000002,
+            0.15449562499999914,
+            0.1420730840000033
+          ]
+        },
+        "level0": {
+          "effective_bytes": 84706,
+          "output_sha256": "f3d24fd51fc84c6e5528cc79c29780ae3754a7ce54119566ae8484eaaa937cfc",
+          "seconds": [
+            0.14542483299999986,
+            0.14823808399999905,
+            0.14879183400000073
+          ]
+        },
+        "level3": {
+          "effective_bytes": 84706,
+          "output_sha256": "f3d24fd51fc84c6e5528cc79c29780ae3754a7ce54119566ae8484eaaa937cfc",
+          "seconds": [
+            0.15146870900000042,
+            0.1432083750000004,
+            0.1468315839999974
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "e9c6303162868848e4a614203d519294b5a87aaa69fb369763d49a8c5f90f69e",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Asterias_rubens,_dissection.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 716804,
+      "name": "asterias-rubens-dissection.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 206430,
+          "output_sha256": "cf0485963c6905674786fd3cab43f4ee17f4892960721451236adae503f9df2a",
+          "seconds": [
+            0.20215241599999967,
+            0.18879508400000233,
+            0.18346245800000105
+          ]
+        },
+        "level0": {
+          "effective_bytes": 206430,
+          "output_sha256": "cf0485963c6905674786fd3cab43f4ee17f4892960721451236adae503f9df2a",
+          "seconds": [
+            0.18694145800000017,
+            0.1739367499999993,
+            0.18178524999999723
+          ]
+        },
+        "level3": {
+          "effective_bytes": 206430,
+          "output_sha256": "cf0485963c6905674786fd3cab43f4ee17f4892960721451236adae503f9df2a",
+          "seconds": [
+            0.18233449999999962,
+            0.1770442079999981,
+            0.1820829580000023
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "e56359a83af72e5b9cec2393c0e774341d02f2945c0f8d3d3f02e573bb644a98",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bicycle_diagram-es.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 273122,
+      "name": "bicycle-diagram-es.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 111546,
+          "output_sha256": "f00f9e193c6f1e24501908e9babf2ee19a69fac7cee3656b7fc8c097edeae2f2",
+          "seconds": [
+            0.15487404199999943,
+            0.13998024999999714,
+            0.1390940839999999
+          ]
+        },
+        "level0": {
+          "effective_bytes": 111546,
+          "output_sha256": "f00f9e193c6f1e24501908e9babf2ee19a69fac7cee3656b7fc8c097edeae2f2",
+          "seconds": [
+            0.1539704999999998,
+            0.1496346250000009,
+            0.15832462499999878
+          ]
+        },
+        "level3": {
+          "effective_bytes": 111546,
+          "output_sha256": "f00f9e193c6f1e24501908e9babf2ee19a69fac7cee3656b7fc8c097edeae2f2",
+          "seconds": [
+            0.20231620900000014,
+            0.1804547910000025,
+            0.18900004200000353
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "99ad9b3fec46418fab83eebd7f28169904df10e983223b5588bc091364225ab3",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Mexico.svg)",
+      "license": "Public domain",
+      "input_bytes": 580634,
+      "name": "coat-of-arms-of-mexico.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 154642,
+          "output_sha256": "3072308b8162b2a7d19556df37b6af56e13e6e9179a696c4a8b895e893233c27",
+          "seconds": [
+            0.18671195800000007,
+            0.17696374999999875,
+            0.17814641700000067
+          ]
+        },
+        "level0": {
+          "effective_bytes": 154642,
+          "output_sha256": "3072308b8162b2a7d19556df37b6af56e13e6e9179a696c4a8b895e893233c27",
+          "seconds": [
+            0.18822037499999977,
+            0.17078470899999942,
+            0.18039691700000304
+          ]
+        },
+        "level3": {
+          "effective_bytes": 154642,
+          "output_sha256": "3072308b8162b2a7d19556df37b6af56e13e6e9179a696c4a8b895e893233c27",
+          "seconds": [
+            0.17374454099999959,
+            0.17905891699999898,
+            0.17682383300000026
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "22ac25c90781ce96edd69c3fa0db9792a6bf695b29715c52999e61ac67eb2b08",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Culex_pipiens_diagram_en.svg)",
+      "license": "Public domain",
+      "input_bytes": 485645,
+      "name": "culex-pipiens-diagram-en.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 128854,
+          "output_sha256": "39073ff4397217325baf463c62390ca9d8c2629d9026697ff0d69d0dfab63cac",
+          "seconds": [
+            0.2018025830000001,
+            0.18630470899999807,
+            0.17887233399999758
+          ]
+        },
+        "level0": {
+          "effective_bytes": 128854,
+          "output_sha256": "39073ff4397217325baf463c62390ca9d8c2629d9026697ff0d69d0dfab63cac",
+          "seconds": [
+            0.18129154099999978,
+            0.17960049999999939,
+            0.1779260839999992
+          ]
+        },
+        "level3": {
+          "effective_bytes": 128854,
+          "output_sha256": "39073ff4397217325baf463c62390ca9d8c2629d9026697ff0d69d0dfab63cac",
+          "seconds": [
+            0.1888485830000004,
+            0.17230999999999597,
+            0.1849756659999997
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "56f533f9729a14d5e908f3b65882563b9d79897ce55a079b8c93ad5237d94972",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:1979_Pontiac_Firebird_Esprit_illustration,_colour_on_transparent.png)",
+      "license": "CC0",
+      "input_bytes": 859009,
+      "name": "1979-pontiac-firebird-esprit-illustration-colour-o.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 38492,
+          "output_sha256": "9afb7fb0302415a1a713fce8d42abf6efb43b1eaad5930e400e1597fa000a1b8",
+          "seconds": [
+            0.1464306250000007,
+            0.1260264580000019,
+            0.12332012499999934
+          ]
+        },
+        "level0": {
+          "effective_bytes": 38492,
+          "output_sha256": "9afb7fb0302415a1a713fce8d42abf6efb43b1eaad5930e400e1597fa000a1b8",
+          "seconds": [
+            0.1411545839999997,
+            0.14446549999999903,
+            0.14319445799999642
+          ]
+        },
+        "level3": {
+          "effective_bytes": 38492,
+          "output_sha256": "9afb7fb0302415a1a713fce8d42abf6efb43b1eaad5930e400e1597fa000a1b8",
+          "seconds": [
+            0.28925379199999934,
+            0.2864859159999966,
+            0.29214329200000577
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "8427a81b69bff05d4d2026c99008e24b058dddf0748886abee905329a244e09b",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bringer_of_War_Planet.png)",
+      "license": "CC BY 3.0",
+      "input_bytes": 1448697,
+      "name": "bringer-of-war-planet.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 86760,
+          "output_sha256": "63b5d4eddc50de5459bd7edcc95fe571e82c7d7409a1d40cc0a0f957f4d7bc76",
+          "seconds": [
+            0.20379045900000037,
+            0.21107516600000054,
+            0.19522266700000301
+          ]
+        },
+        "level0": {
+          "effective_bytes": 86760,
+          "output_sha256": "63b5d4eddc50de5459bd7edcc95fe571e82c7d7409a1d40cc0a0f957f4d7bc76",
+          "seconds": [
+            0.18645591600000078,
+            0.17962212500000163,
+            0.1782391249999975
+          ]
+        },
+        "level3": {
+          "effective_bytes": 86760,
+          "output_sha256": "63b5d4eddc50de5459bd7edcc95fe571e82c7d7409a1d40cc0a0f957f4d7bc76",
+          "seconds": [
+            0.18622820799999928,
+            0.1836295000000021,
+            0.18634183300000018
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "2ac6881f42cd3f4643306367c55f1c4dbfb584ab27dc8a4e32afb5e5294f8272",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Commodore_116_Cont%C3%A9_(transparent_bg)_(shadow).png)",
+      "license": "CC BY-SA 2.0",
+      "input_bytes": 4691036,
+      "name": "commodore-116-cont\u00e9-transparent-bg-shadow.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 69174,
+          "output_sha256": "a32d0f128cbbdd9d888035d872def1a8d95592b11f3f3669102682e795c69401",
+          "seconds": [
+            0.2658824579999992,
+            0.2697717080000004,
+            0.26270254199999954
+          ]
+        },
+        "level0": {
+          "effective_bytes": 69174,
+          "output_sha256": "a32d0f128cbbdd9d888035d872def1a8d95592b11f3f3669102682e795c69401",
+          "seconds": [
+            0.27172666699999937,
+            0.26129991699999877,
+            0.26535600000000414
+          ]
+        },
+        "level3": {
+          "effective_bytes": 69174,
+          "output_sha256": "a32d0f128cbbdd9d888035d872def1a8d95592b11f3f3669102682e795c69401",
+          "seconds": [
+            0.25335224999999983,
+            0.25642645799999997,
+            0.2605988330000031
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "cf4ae66abc73d9bf4e0daeb84d5a209181f9845e8aef596b35aea80e36a39c46",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cup_of_tea.png)",
+      "license": "CC0",
+      "input_bytes": 1203990,
+      "name": "cup-of-tea.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 44960,
+          "output_sha256": "10676f56d8d2a795c0f6b14aa6189ae5a939136526d84e09e1e64c4382951bd2",
+          "seconds": [
+            0.17966420900000024,
+            0.17548645899999826,
+            0.18605570799999782
+          ]
+        },
+        "level0": {
+          "effective_bytes": 44960,
+          "output_sha256": "10676f56d8d2a795c0f6b14aa6189ae5a939136526d84e09e1e64c4382951bd2",
+          "seconds": [
+            0.17919216700000007,
+            0.1744170409999981,
+            0.19143975000000069
+          ]
+        },
+        "level3": {
+          "effective_bytes": 44960,
+          "output_sha256": "10676f56d8d2a795c0f6b14aa6189ae5a939136526d84e09e1e64c4382951bd2",
+          "seconds": [
+            0.17888087499999994,
+            0.16928987499999693,
+            0.19588491599999713
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "72aabb44b0b373d2fa164fa0c40447e8fa63d711ac3e4d11a5cbf35da880b472",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Helioceratops.jpg_transparent.png)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 800209,
+      "name": "helioceratops-jpg-transparent.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 74976,
+          "output_sha256": "6d9d4a98451733458c7485d616667f0162140842c13707ca579651a83942facb",
+          "seconds": [
+            0.16458512500000033,
+            0.16870175000000032,
+            0.1538622079999996
+          ]
+        },
+        "level0": {
+          "effective_bytes": 74976,
+          "output_sha256": "6d9d4a98451733458c7485d616667f0162140842c13707ca579651a83942facb",
+          "seconds": [
+            0.15318437500000037,
+            0.1638998330000021,
+            0.1536030420000003
+          ]
+        },
+        "level3": {
+          "effective_bytes": 74976,
+          "output_sha256": "6d9d4a98451733458c7485d616667f0162140842c13707ca579651a83942facb",
+          "seconds": [
+            0.15426412500000009,
+            0.15807795899999633,
+            0.16069854199999156
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "81b8c3cfb6b10548dc7c70e3f0c60f32db59bc9a600c8765f60acc85e464bb16",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K2_Style_Points_Bob_SPB-1998-Aggressive_Inline_Skates-A_Schneider-IMG_9485-Profile-bg.png)",
+      "license": "CC BY-SA 4.0",
+      "input_bytes": 1975638,
+      "name": "k2-style-points-bob-spb-1998-aggressive-inline-ska.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 216732,
+          "output_sha256": "c2ff8297df266633955971eca40f6e32f2997e90f89c6a09a2adb9e04fa8b6b8",
+          "seconds": [
+            0.22396670799999985,
+            0.20740400000000037,
+            0.21609362499999918
+          ]
+        },
+        "level0": {
+          "effective_bytes": 216732,
+          "output_sha256": "c2ff8297df266633955971eca40f6e32f2997e90f89c6a09a2adb9e04fa8b6b8",
+          "seconds": [
+            0.19825975000000007,
+            0.20535150000000257,
+            0.2073642499999977
+          ]
+        },
+        "level3": {
+          "effective_bytes": 216732,
+          "output_sha256": "c2ff8297df266633955971eca40f6e32f2997e90f89c6a09a2adb9e04fa8b6b8",
+          "seconds": [
+            0.2254659590000001,
+            0.2024693339999999,
+            0.210382457999998
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "5b49f4e5df11ba69414f8b890d9ffb922766565947f8c5d754707c2916a2136a",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 140217,
+      "name": "fixture-text-0.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39180,
+          "output_sha256": "8801b35df3fb02ca68e1701ffc6aae0ae3561a3df95839d58c15877bdeee74a9",
+          "seconds": [
+            0.12574599999999947,
+            0.15049712500000112,
+            0.1345910840000002
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39180,
+          "output_sha256": "8801b35df3fb02ca68e1701ffc6aae0ae3561a3df95839d58c15877bdeee74a9",
+          "seconds": [
+            0.13415900000000036,
+            0.15461537499999878,
+            0.13654758400000588
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39180,
+          "output_sha256": "8801b35df3fb02ca68e1701ffc6aae0ae3561a3df95839d58c15877bdeee74a9",
+          "seconds": [
+            0.14446358300000028,
+            0.1506213330000037,
+            0.14561654199999907
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "6a78504a280a21ec57bd04287ce88c68323fa5c7b207adb5ae4b37e2c8905619",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 139118,
+      "name": "fixture-text-1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39640,
+          "output_sha256": "6085ce539b561a792eee879ab0cf4a884ff0fbcbb7f33172d4bd9e88dddc656e",
+          "seconds": [
+            0.13059050000000028,
+            0.14617016599999744,
+            0.13729583300000314
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39640,
+          "output_sha256": "6085ce539b561a792eee879ab0cf4a884ff0fbcbb7f33172d4bd9e88dddc656e",
+          "seconds": [
+            0.13250920900000018,
+            0.1350527079999999,
+            0.14909983300000107
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39640,
+          "output_sha256": "6085ce539b561a792eee879ab0cf4a884ff0fbcbb7f33172d4bd9e88dddc656e",
+          "seconds": [
+            0.16092387499999994,
+            0.14719845800000542,
+            0.1624031669999937
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "89f6eef54b6d249eb4494401fa777ede6b02e574b209283d289c66b8c697145d",
+      "category": "text",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 141588,
+      "name": "fixture-text-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39016,
+          "output_sha256": "e492c9e0b10fae1a83f8015a86068705512780b2d24854fd208c90567ad88134",
+          "seconds": [
+            0.14547995800000013,
+            0.1376547919999993,
+            0.13543762500000156
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39016,
+          "output_sha256": "e492c9e0b10fae1a83f8015a86068705512780b2d24854fd208c90567ad88134",
+          "seconds": [
+            0.13918433300000022,
+            0.14036954100000187,
+            0.14825529200000176
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39016,
+          "output_sha256": "e492c9e0b10fae1a83f8015a86068705512780b2d24854fd208c90567ad88134",
+          "seconds": [
+            0.16047662500000026,
+            0.14883541599999717,
+            0.15047304099999792
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 20600,
+      "name": "fixture-palette-0.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 20600,
+          "output_sha256": "a5c8934cc8fb8ec6e3d330218c44aff610b2ec87aa499381780965b9fdb17765",
+          "seconds": [
+            0.15773537499999968,
+            0.14254929200000177,
+            0.1439340840000014
+          ]
+        },
+        "level0": {
+          "effective_bytes": 684,
+          "output_sha256": "c61aef75954987c652b07bc14c4facdd4aefbf7230b4b8b59f350c83c811a2e7",
+          "seconds": [
+            0.14377062500000015,
+            0.14009845800000065,
+            0.1443430420000027
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 768,
+            "input_pixel_sha256": "349e2db9f26232b646da8fa567f34ec963f48d96f9b07a1b17a26d91749ab571",
+            "input_width": 1024,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 768,
+            "output_pixel_sha256": "349e2db9f26232b646da8fa567f34ec963f48d96f9b07a1b17a26d91749ab571",
+            "output_width": 1024,
+            "pixels_equal": true
+          }
+        },
+        "level3": {
+          "effective_bytes": 622,
+          "output_sha256": "491435c8ff0c6cd068ae20537b77cc107191b54730dd9d181f90d0ae8d012c83",
+          "seconds": [
+            0.14815779200000012,
+            0.14756199999999353,
+            0.16402087500000562
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 768,
+            "input_pixel_sha256": "349e2db9f26232b646da8fa567f34ec963f48d96f9b07a1b17a26d91749ab571",
+            "input_width": 1024,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 768,
+            "output_pixel_sha256": "349e2db9f26232b646da8fa567f34ec963f48d96f9b07a1b17a26d91749ab571",
+            "output_width": 1024,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 21075,
+      "name": "fixture-palette-1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 21075,
+          "output_sha256": "19d8921827a388129301e53330d5334db61b13e0093c0f58705f075c7596fd17",
+          "seconds": [
+            0.14927620799999985,
+            0.14406137500000327,
+            0.14036083300000257
+          ]
+        },
+        "level0": {
+          "effective_bytes": 720,
+          "output_sha256": "d3e5aa6e4d53a11914674b03d6b2d506f0bfdd5fae9d8be1c54b2993b398cbf3",
+          "seconds": [
+            0.13970199999999977,
+            0.14134137499999966,
+            0.14970612500000158
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 781,
+            "input_pixel_sha256": "6bccc37ce341e944b59f5af6d1c0d54a00986b06fe79f0f4e95dcd49943d63ce",
+            "input_width": 1041,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 781,
+            "output_pixel_sha256": "6bccc37ce341e944b59f5af6d1c0d54a00986b06fe79f0f4e95dcd49943d63ce",
+            "output_width": 1041,
+            "pixels_equal": true
+          }
+        },
+        "level3": {
+          "effective_bytes": 672,
+          "output_sha256": "06780d46ad0a5b8d19af839456fa061e2a485e447c4109a5becab6092f070c52",
+          "seconds": [
+            0.14695779199999937,
+            0.1623591670000053,
+            0.15973833299999285
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 781,
+            "input_pixel_sha256": "6bccc37ce341e944b59f5af6d1c0d54a00986b06fe79f0f4e95dcd49943d63ce",
+            "input_width": 1041,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 781,
+            "output_pixel_sha256": "6bccc37ce341e944b59f5af6d1c0d54a00986b06fe79f0f4e95dcd49943d63ce",
+            "output_width": 1041,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+      "category": "palette",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 21831,
+      "name": "fixture-palette-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 21831,
+          "output_sha256": "731aed7be2539326d39e8592fb575da08d14339512a89aae3dbd12b505bf9272",
+          "seconds": [
+            0.15447970800000022,
+            0.1459969999999977,
+            0.15522504200000498
+          ]
+        },
+        "level0": {
+          "effective_bytes": 682,
+          "output_sha256": "9bcdd21ef816d4d278dff8d5734a9c443d398d706d169bd35bf9892ba39e9a60",
+          "seconds": [
+            0.1479955420000003,
+            0.1423074590000013,
+            0.14466479099999674
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 794,
+            "input_pixel_sha256": "529a2244f11bb8b3897190ce6170603f892c4ac02492fc79b7050fe78bad64b0",
+            "input_width": 1058,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 794,
+            "output_pixel_sha256": "529a2244f11bb8b3897190ce6170603f892c4ac02492fc79b7050fe78bad64b0",
+            "output_width": 1058,
+            "pixels_equal": true
+          }
+        },
+        "level3": {
+          "effective_bytes": 634,
+          "output_sha256": "fdf2c0bad952c16261786a19e2037774b5c24db30debb78c9b32df5c16dfce9b",
+          "seconds": [
+            0.1558558750000003,
+            0.15486295899999902,
+            0.15814324999999485
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 794,
+            "input_pixel_sha256": "529a2244f11bb8b3897190ce6170603f892c4ac02492fc79b7050fe78bad64b0",
+            "input_width": 1058,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 794,
+            "output_pixel_sha256": "529a2244f11bb8b3897190ce6170603f892c4ac02492fc79b7050fe78bad64b0",
+            "output_width": 1058,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "e15c806cfbcbb6db886cc8d730772e256fe4eb5d1798de827e10227b4ffa51e6",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 733136,
+      "name": "fixture-gradient-0.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6260,
+          "output_sha256": "d89a5c1a66a57dabcea27392cbbe9c776a088f39fb02dbd07f1a96da87e985f1",
+          "seconds": [
+            0.12092208299999996,
+            0.13567479099999957,
+            0.1270742919999961
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6260,
+          "output_sha256": "d89a5c1a66a57dabcea27392cbbe9c776a088f39fb02dbd07f1a96da87e985f1",
+          "seconds": [
+            0.1535269579999996,
+            0.15280529099999995,
+            0.15375270799999896
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6260,
+          "output_sha256": "d89a5c1a66a57dabcea27392cbbe9c776a088f39fb02dbd07f1a96da87e985f1",
+          "seconds": [
+            0.3441170419999997,
+            0.34635570800000437,
+            0.33993979099999194
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "7184e81922e34a83c7c75501cfec83f8fda0e4d2166f1754555608617e8bda55",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 771534,
+      "name": "fixture-gradient-1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6526,
+          "output_sha256": "a75ee101391b0d8c7069e522c49d86dfd579216c1390bc1919832f270b86ef6a",
+          "seconds": [
+            0.13096824999999868,
+            0.13389474999999962,
+            0.12889816699999557
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6526,
+          "output_sha256": "a75ee101391b0d8c7069e522c49d86dfd579216c1390bc1919832f270b86ef6a",
+          "seconds": [
+            0.15438762500000003,
+            0.16611625000000174,
+            0.15505079199999727
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6526,
+          "output_sha256": "a75ee101391b0d8c7069e522c49d86dfd579216c1390bc1919832f270b86ef6a",
+          "seconds": [
+            0.3462439170000007,
+            0.3610968750000012,
+            0.36055404200000396
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "9663e07f77de69e2a05af5be88bfa8447b1f1a693722c281d77dad05f29dda95",
+      "category": "gradient",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 816956,
+      "name": "fixture-gradient-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6546,
+          "output_sha256": "9f7e80b6a9abcec4a4d98131a1452ed9d232e37088823dd07700af6abb13c01b",
+          "seconds": [
+            0.13041279200000133,
+            0.1289782499999994,
+            0.12826791700000229
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6546,
+          "output_sha256": "9f7e80b6a9abcec4a4d98131a1452ed9d232e37088823dd07700af6abb13c01b",
+          "seconds": [
+            0.16427800000000037,
+            0.17263554100000178,
+            0.15955162499999886
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6546,
+          "output_sha256": "9f7e80b6a9abcec4a4d98131a1452ed9d232e37088823dd07700af6abb13c01b",
+          "seconds": [
+            0.34267195900000047,
+            0.35128674999999987,
+            0.35288054100000465
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "292143ccf8697d81b5ad61ec3cdfb810369f860c58802523564a07c4b23461e1",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 106562,
+      "name": "fixture-alpha-0.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.19037437499999932,
+            0.18655912499999872,
+            0.1856023329999985
+          ]
+        },
+        "level0": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.19066712500000005,
+            0.19763508300000154,
+            0.19354895899999747
+          ]
+        },
+        "level3": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.3567512500000003,
+            0.3424359999999993,
+            0.3441107500000129
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "61cece7d58af3685c8ac43940949e0943c44568564873c44ff36abfe6ddf52d2",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 107370,
+      "name": "fixture-alpha-1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 40522,
+          "output_sha256": "c3210ef92eb1fdaf79c4d1732370a97b435b374600a106e699c9fe7567097d69",
+          "seconds": [
+            0.19310337499999974,
+            0.19796166699999773,
+            0.19617487499999697
+          ]
+        },
+        "level0": {
+          "effective_bytes": 40522,
+          "output_sha256": "c3210ef92eb1fdaf79c4d1732370a97b435b374600a106e699c9fe7567097d69",
+          "seconds": [
+            0.2047431660000001,
+            0.20612341700000059,
+            0.21340454199999925
+          ]
+        },
+        "level3": {
+          "effective_bytes": 40522,
+          "output_sha256": "c3210ef92eb1fdaf79c4d1732370a97b435b374600a106e699c9fe7567097d69",
+          "seconds": [
+            0.3565933329999993,
+            0.3543803749999981,
+            0.3578675410000045
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "bf0614cb381fb640d62a46613fdd3fcbbdd92b2a52fecf65d8f729ee8590bf40",
+      "category": "alpha",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 107948,
+      "name": "fixture-alpha-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 40690,
+          "output_sha256": "ffd4583a2bc92b6157e3edb9cd854141b078c8f0d18ff31530b946e62a3ac497",
+          "seconds": [
+            0.19683162499999973,
+            0.20005370799999866,
+            0.200388083
+          ]
+        },
+        "level0": {
+          "effective_bytes": 40690,
+          "output_sha256": "ffd4583a2bc92b6157e3edb9cd854141b078c8f0d18ff31530b946e62a3ac497",
+          "seconds": [
+            0.21015854200000028,
+            0.20941812499999912,
+            0.2152087080000058
+          ]
+        },
+        "level3": {
+          "effective_bytes": 40690,
+          "output_sha256": "ffd4583a2bc92b6157e3edb9cd854141b078c8f0d18ff31530b946e62a3ac497",
+          "seconds": [
+            0.3673567920000007,
+            0.366061166999998,
+            0.4087233750000081
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "6ff2d677f92ea8ca5b8e9722a7bd4b88c1db087b30eaa56476f8e16571e7cc6b",
+      "category": "orientation",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 158252,
+      "name": "fixture-orientation-0.jpg",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39784,
+          "output_sha256": "81ba700e0ec1db8be46e4e53541f1959a120f15e461b7934822e9d520fcf0cbf",
+          "seconds": [
+            0.14522400000000069,
+            0.12524041700000055,
+            0.1240523750000051
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39784,
+          "output_sha256": "81ba700e0ec1db8be46e4e53541f1959a120f15e461b7934822e9d520fcf0cbf",
+          "seconds": [
+            0.1425536670000005,
+            0.13747054200000264,
+            0.14346987500000097
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39784,
+          "output_sha256": "81ba700e0ec1db8be46e4e53541f1959a120f15e461b7934822e9d520fcf0cbf",
+          "seconds": [
+            0.15479645899999994,
+            0.15379129099999744,
+            0.14729491699999642
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "ae4c2c298afb032293ed14059ed0fbdc6c8327b49148794b508adb36023f3238",
+      "category": "orientation",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 155120,
+      "name": "fixture-orientation-1.jpg",
+      "variants": {
+        "reference": {
+          "effective_bytes": 38848,
+          "output_sha256": "f47d2f8f530c01ae05b0ff0b59e2877ab547487c210d81b2597ace524d00276d",
+          "seconds": [
+            0.14501804100000015,
+            0.13332474999999988,
+            0.13041224999999912
+          ]
+        },
+        "level0": {
+          "effective_bytes": 38848,
+          "output_sha256": "f47d2f8f530c01ae05b0ff0b59e2877ab547487c210d81b2597ace524d00276d",
+          "seconds": [
+            0.1500106670000001,
+            0.1521694999999994,
+            0.15204362499999746
+          ]
+        },
+        "level3": {
+          "effective_bytes": 38848,
+          "output_sha256": "f47d2f8f530c01ae05b0ff0b59e2877ab547487c210d81b2597ace524d00276d",
+          "seconds": [
+            0.16278037499999876,
+            0.16618054099999569,
+            0.16939949999999726
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "dffac6d00a03ce2a4c4f494f95149e3f137e30e6e40d5eec6201c44b2f28c2a9",
+      "category": "orientation",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 158088,
+      "name": "fixture-orientation-2.jpg",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39006,
+          "output_sha256": "14587ca93098fb1e56b4a0601b4b54c92ce9c8789aba2713d19b52f7e4778bdf",
+          "seconds": [
+            0.15735433300000068,
+            0.13399174999999985,
+            0.1292967919999981
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39006,
+          "output_sha256": "14587ca93098fb1e56b4a0601b4b54c92ce9c8789aba2713d19b52f7e4778bdf",
+          "seconds": [
+            0.1692044579999994,
+            0.15219845800000087,
+            0.15299937500000027
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39006,
+          "output_sha256": "14587ca93098fb1e56b4a0601b4b54c92ce9c8789aba2713d19b52f7e4778bdf",
+          "seconds": [
+            0.16745908399999898,
+            0.18287750000000358,
+            0.17311025000000768
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "33c09396adc39d9e5ea819925c5a55c03e6e9c3022e9956fed0e8bf7f4d02328",
+      "category": "wide-gamut",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 733494,
+      "name": "fixture-wide-gamut-0.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 7016,
+          "output_sha256": "4529caa8adb1535a00ab7c7fbe9f8bcd40f403dc01a8a67cffded0e94d962e74",
+          "seconds": [
+            0.15673683300000008,
+            0.1251632909999998,
+            0.1327422089999999
+          ]
+        },
+        "level0": {
+          "effective_bytes": 7016,
+          "output_sha256": "4529caa8adb1535a00ab7c7fbe9f8bcd40f403dc01a8a67cffded0e94d962e74",
+          "seconds": [
+            0.16284566700000003,
+            0.152684292,
+            0.16247666600000343
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7016,
+          "output_sha256": "4529caa8adb1535a00ab7c7fbe9f8bcd40f403dc01a8a67cffded0e94d962e74",
+          "seconds": [
+            0.3412833329999998,
+            0.344474083999998,
+            0.3535298330000103
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "107815625d6786abdeb9b7fdc482000b3febab40ac5fccf1e4cce57675c264c2",
+      "category": "wide-gamut",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 771892,
+      "name": "fixture-wide-gamut-1.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 7402,
+          "output_sha256": "b97f76fc6781674bace814c8f4f78e2fdf7f72f35eba26251a2ff6d60b7005df",
+          "seconds": [
+            0.13511737499999832,
+            0.13850675000000123,
+            0.14022291599999903
+          ]
+        },
+        "level0": {
+          "effective_bytes": 7402,
+          "output_sha256": "b97f76fc6781674bace814c8f4f78e2fdf7f72f35eba26251a2ff6d60b7005df",
+          "seconds": [
+            0.1693848340000006,
+            0.16162525000000016,
+            0.16857074999999355
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7402,
+          "output_sha256": "b97f76fc6781674bace814c8f4f78e2fdf7f72f35eba26251a2ff6d60b7005df",
+          "seconds": [
+            0.3652762920000008,
+            0.36927354200000195,
+            0.378276666000005
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "08411b152cc55153bfea734e91666646930badb03a103f613dd14489c91ede10",
+      "category": "wide-gamut",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 817314,
+      "name": "fixture-wide-gamut-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 7526,
+          "output_sha256": "8bf87d26160c2684abaacc7a39980b0c80a55ab2386526c9bfc3ad50a1a31958",
+          "seconds": [
+            0.14601745799999932,
+            0.13135695800000136,
+            0.133260374999999
+          ]
+        },
+        "level0": {
+          "effective_bytes": 7526,
+          "output_sha256": "8bf87d26160c2684abaacc7a39980b0c80a55ab2386526c9bfc3ad50a1a31958",
+          "seconds": [
+            0.16685666600000015,
+            0.15896066700000233,
+            0.16832887499999316
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7526,
+          "output_sha256": "8bf87d26160c2684abaacc7a39980b0c80a55ab2386526c9bfc3ad50a1a31958",
+          "seconds": [
+            0.37622149999999976,
+            0.38843245800000403,
+            0.3714766659999924
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "a3f6c89b09a3245b7ede33b9a348820b64292f13f679cbd8369d53480d9945e2",
+      "category": "heic",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 0",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 109190,
+      "name": "fixture-heic-0.heic",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6640,
+          "output_sha256": "dfa615c20ce0d75d6e59c9414def57db14fa3095dfb914e943a6e4a40c9f4c2a",
+          "seconds": [
+            0.23965112499999996,
+            0.2103013330000003,
+            0.2080709999999968
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6640,
+          "output_sha256": "dfa615c20ce0d75d6e59c9414def57db14fa3095dfb914e943a6e4a40c9f4c2a",
+          "seconds": [
+            0.24502170800000034,
+            0.23773429199999896,
+            0.23494099999999918
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6640,
+          "output_sha256": "dfa615c20ce0d75d6e59c9414def57db14fa3095dfb914e943a6e4a40c9f4c2a",
+          "seconds": [
+            0.4253206669999994,
+            0.4342602910000011,
+            0.4430533329999946
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "e231c0ee30ab6de4c2d7399e85be695be5eb6d961fbbb9050188688bd293ce65",
+      "category": "heic",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 1",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 115993,
+      "name": "fixture-heic-1.heic",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6830,
+          "output_sha256": "ff2067ca9d67ba607a382ed6c590165c9bb88ecaf557bc7a1990936bb96e67f5",
+          "seconds": [
+            0.21804154199999992,
+            0.2119342919999987,
+            0.2314132500000028
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6830,
+          "output_sha256": "ff2067ca9d67ba607a382ed6c590165c9bb88ecaf557bc7a1990936bb96e67f5",
+          "seconds": [
+            0.2505127500000004,
+            0.25886249999999933,
+            0.24445795799999814
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6830,
+          "output_sha256": "ff2067ca9d67ba607a382ed6c590165c9bb88ecaf557bc7a1990936bb96e67f5",
+          "seconds": [
+            0.4497946250000009,
+            0.44676316599999666,
+            0.4457821670000044
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "6c6f9b55778a8900bcca61f0f092216b2d3438418639707edbc72c3af8bf7a89",
+      "category": "heic",
+      "source": "ImagePet script/benchmark/generate_fixtures.swift, procedural variant 2",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 111590,
+      "name": "fixture-heic-2.heic",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6998,
+          "output_sha256": "3f5ec01fd36c1a8269363b3ba189a1652641ebb9c5ec5b085a9ff47c0af5c141",
+          "seconds": [
+            0.22097000000000122,
+            0.20806620800000175,
+            0.2170207500000032
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6998,
+          "output_sha256": "3f5ec01fd36c1a8269363b3ba189a1652641ebb9c5ec5b085a9ff47c0af5c141",
+          "seconds": [
+            0.26805587499999994,
+            0.2574413749999991,
+            0.2496758750000012
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6998,
+          "output_sha256": "3f5ec01fd36c1a8269363b3ba189a1652641ebb9c5ec5b085a9ff47c0af5c141",
+          "seconds": [
+            0.45615324999999984,
+            0.4578074159999943,
+            0.45790841699999874
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "8801b35df3fb02ca68e1701ffc6aae0ae3561a3df95839d58c15877bdeee74a9",
+      "category": "webp",
+      "source": "ImagePet CLI WebP encoding of CC0 procedural fixture; source manifest procedural-v1/manifest.json",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 39180,
+      "name": "fixture-text-0_compressed.webp",
+      "variants": {
+        "reference": {
+          "effective_bytes": 39122,
+          "output_sha256": "e82390025c2920305167f80e093b963f4723bc654fe7a777c849e66af05ea610",
+          "seconds": [
+            0.12225570899999916,
+            0.1289941249999984,
+            0.13706570900000514
+          ]
+        },
+        "level0": {
+          "effective_bytes": 39122,
+          "output_sha256": "e82390025c2920305167f80e093b963f4723bc654fe7a777c849e66af05ea610",
+          "seconds": [
+            0.16932233399999852,
+            0.1337360409999988,
+            0.14361866699999837
+          ]
+        },
+        "level3": {
+          "effective_bytes": 39122,
+          "output_sha256": "e82390025c2920305167f80e093b963f4723bc654fe7a777c849e66af05ea610",
+          "seconds": [
+            0.15230204100000044,
+            0.15667516700000306,
+            0.1523476670000008
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+      "category": "webp",
+      "source": "ImagePet CLI WebP encoding of CC0 procedural fixture; source manifest procedural-v1/manifest.json",
+      "license": "CC0-1.0 (generated test content)",
+      "input_bytes": 40288,
+      "name": "fixture-alpha-0_compressed.webp",
+      "variants": {
+        "reference": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.18088508299999972,
+            0.1845578329999995,
+            0.1851649169999945
+          ]
+        },
+        "level0": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.1977501669999988,
+            0.19448749999999748,
+            0.193223291999999
+          ]
+        },
+        "level3": {
+          "effective_bytes": 40288,
+          "output_sha256": "da6476f31042644a70fbc1cb6a87a83610b5eecf93145b5b4c816af4eedcc722",
+          "seconds": [
+            0.3840957500000002,
+            0.34791516599999994,
+            0.3518785830000013
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "609bbeeaefbd972e8460c0df4d7cce930ba07ba6535426d2f169b116742645f9",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F30A.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 13122,
+      "name": "openmoji-1f30a.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 11324,
+          "output_sha256": "3a018752b75bcf771945e4fbb9a4895eac7c76759bd67f50fa68cac97cdbf32a",
+          "seconds": [
+            0.11696129199999916,
+            0.11609537500000044,
+            0.11565416700000242
+          ]
+        },
+        "level0": {
+          "effective_bytes": 11324,
+          "output_sha256": "3a018752b75bcf771945e4fbb9a4895eac7c76759bd67f50fa68cac97cdbf32a",
+          "seconds": [
+            0.099825375,
+            0.11042158300000082,
+            0.1184103750000034
+          ]
+        },
+        "level3": {
+          "effective_bytes": 10550,
+          "output_sha256": "d51b3d440b6e58a5641a3f26c84080fac7e0289f45d5dd3bcda1313c087d275b",
+          "seconds": [
+            0.11254862500000051,
+            0.11388433399999798,
+            0.10483866699999567
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 947,
+            "input_height": 618,
+            "input_pixel_sha256": "d6453d78205a873b83ff22314c86faf7cebaa5ed6ca69a3b365928fcb9600b64",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "9b1926839fd255bd3aac36995eed959c92960cbf108f40b59f2cdd853662bfb0",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "36beea286d028ba2ea621a893c3f205199284457edaece1d9807c9e68b345dd5",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F355.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 11029,
+      "name": "openmoji-1f355.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 11029,
+          "output_sha256": "36beea286d028ba2ea621a893c3f205199284457edaece1d9807c9e68b345dd5",
+          "seconds": [
+            0.11627337500000046,
+            0.10381625000000128,
+            0.1031269590000008
+          ]
+        },
+        "level0": {
+          "effective_bytes": 11029,
+          "output_sha256": "36beea286d028ba2ea621a893c3f205199284457edaece1d9807c9e68b345dd5",
+          "seconds": [
+            0.10524545899999893,
+            0.11303250000000276,
+            0.11665250000000071
+          ]
+        },
+        "level3": {
+          "effective_bytes": 8760,
+          "output_sha256": "c4977b9918a115467716091f5170fc2f73878cd7a82682346bfe187f4be04278",
+          "seconds": [
+            0.11538612500000056,
+            0.11973704199999702,
+            0.1135966659999923
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 0,
+            "input_height": 618,
+            "input_pixel_sha256": "e6bc504639f5962af1c177884577972d7f052e7c38bd9f89c0ae8cb01ef2fa84",
+            "input_width": 618,
+            "maximum_channel_difference": 0,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "e6bc504639f5962af1c177884577972d7f052e7c38bd9f89c0ae8cb01ef2fa84",
+            "output_width": 618,
+            "pixels_equal": true
+          }
+        }
+      }
+    },
+    {
+      "sha256": "1e891ba56941ead277457918ae8ee62429ac7626e2b18b6e4c104491211e0ae8",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F3B8.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 10003,
+      "name": "openmoji-1f3b8.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 9364,
+          "output_sha256": "afe127e663a6b29f1527e6eaa5c4488c77ae2d2c215883e314de687df460706d",
+          "seconds": [
+            0.11031220799999986,
+            0.11100954100000138,
+            0.11568541700000168
+          ]
+        },
+        "level0": {
+          "effective_bytes": 9364,
+          "output_sha256": "afe127e663a6b29f1527e6eaa5c4488c77ae2d2c215883e314de687df460706d",
+          "seconds": [
+            0.11014779200000113,
+            0.10747508300000064,
+            0.1240285419999978
+          ]
+        },
+        "level3": {
+          "effective_bytes": 8096,
+          "output_sha256": "c6a6fb23a42a324bd871f4a244b44e5eb45b151dcfddd1ff333e2a884d4e23a0",
+          "seconds": [
+            0.11343250000000005,
+            0.11114220799999686,
+            0.11059166699999423
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 156,
+            "input_height": 618,
+            "input_pixel_sha256": "3118af5ca1e3b4b0b924d8bf824cb8d678887c472b7f7fb58219912ba624a7ec",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "3fdcd36789082c36653054671f4e9e1d9be3c24e9516bced314f75a38341c8b4",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "0a71dcce68116cad0f5b821add6a73b6fdaeda8a811568de80eb2f4d0e684c8c",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F436.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 13915,
+      "name": "openmoji-1f436.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 12854,
+          "output_sha256": "732add84eb45f7cffc9fadaa89cc4fb752df2eb910ef371294477b5388a77b4c",
+          "seconds": [
+            0.10855779200000093,
+            0.12990254099999987,
+            0.10964770900000076
+          ]
+        },
+        "level0": {
+          "effective_bytes": 12854,
+          "output_sha256": "732add84eb45f7cffc9fadaa89cc4fb752df2eb910ef371294477b5388a77b4c",
+          "seconds": [
+            0.11054133300000046,
+            0.10949799999999854,
+            0.11788808300000397
+          ]
+        },
+        "level3": {
+          "effective_bytes": 11608,
+          "output_sha256": "e48be62fb6348d3e0f513dcf88a2ff650e12dadb1059b640de10f7e9a515b73c",
+          "seconds": [
+            0.11242370799999968,
+            0.11292545799999942,
+            0.10702170800000488
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 29,
+            "input_height": 618,
+            "input_pixel_sha256": "cbcb796c3c5af2bf3be8237836dcfcd2a514e707e8d834ff837ce206b51c6727",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "10b4149d20e742e13821284b5b36f3a4350f2274aafbb2665d1981d7ce5ea52e",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "3ddc07e24158d60fce27eb2fc739e08edb19ae6f8a24a58ca8d327b37e4b6e76",
+      "category": "icons",
+      "source": "[OpenMoji](https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/1F697.png)",
+      "license": "CC-BY-SA-4.0",
+      "input_bytes": 8510,
+      "name": "openmoji-1f697.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 8510,
+          "output_sha256": "3ddc07e24158d60fce27eb2fc739e08edb19ae6f8a24a58ca8d327b37e4b6e76",
+          "seconds": [
+            0.11795012500000013,
+            0.10403704200000163,
+            0.1271364580000025
+          ]
+        },
+        "level0": {
+          "effective_bytes": 8510,
+          "output_sha256": "3ddc07e24158d60fce27eb2fc739e08edb19ae6f8a24a58ca8d327b37e4b6e76",
+          "seconds": [
+            0.11117575000000102,
+            0.10716929199999825,
+            0.12244958400000172
+          ]
+        },
+        "level3": {
+          "effective_bytes": 7018,
+          "output_sha256": "b7448ec124de74b5c084c721486b8c22f3beaca57c8a241d85907f444a73761a",
+          "seconds": [
+            0.10490820800000122,
+            0.11395816699999983,
+            0.12719599999999787
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 336,
+            "input_height": 618,
+            "input_pixel_sha256": "ae06ab5551a7c740496f3430a72c334d2aaed099bfd41f3354c115322bd220ac",
+            "input_width": 618,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 618,
+            "output_pixel_sha256": "a8e004cd137d5a8df3a2c87e39618eb2f744f8728c51fc95794b03e4c8a57d76",
+            "output_width": 618,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "4a69c00ea80b023af25f19a556bf6d6512bfd40dddf1b4fe98aa39cb120f53e4",
+      "category": "icons",
+      "source": "[Twemoji (jdecked/twemoji)](https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f30a.png)",
+      "license": "CC-BY-4.0",
+      "input_bytes": 767,
+      "name": "twemoji-1f30a.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 767,
+          "output_sha256": "4a69c00ea80b023af25f19a556bf6d6512bfd40dddf1b4fe98aa39cb120f53e4",
+          "seconds": [
+            0.08780079199999946,
+            0.09563087500000123,
+            0.08783729199999613
+          ]
+        },
+        "level0": {
+          "effective_bytes": 767,
+          "output_sha256": "4a69c00ea80b023af25f19a556bf6d6512bfd40dddf1b4fe98aa39cb120f53e4",
+          "seconds": [
+            0.08596091699999953,
+            0.08252937500000002,
+            0.09198916699999415
+          ]
+        },
+        "level3": {
+          "effective_bytes": 612,
+          "output_sha256": "a86c018a59d0e209ebeab66a327efbfa1370558f132f9713b70ed888cf49c1cd",
+          "seconds": [
+            0.08745412499999894,
+            0.09358216699999389,
+            0.09078662500000689
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 67,
+            "input_height": 72,
+            "input_pixel_sha256": "f1beac4cf6d961549b0668530032609170988b640ce134194f95bccc280df644",
+            "input_width": 72,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 72,
+            "output_pixel_sha256": "67b40830c0cc9cd2d7c44147f57f830eb4b4f4cc5e5b7c06144716cca6eeedda",
+            "output_width": 72,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "1aa6929e1baa440db535fd321868dc76ddd888bf3e4f4333d37800ff2ec41c74",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Alarm%20clock/3D/alarm_clock_3d.png)",
+      "license": "MIT",
+      "input_bytes": 42751,
+      "name": "fluent-alarm-clock.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 5858,
+          "output_sha256": "55aa38e97a7e2a1138590af35a62373d3efce57901f7ddcc17e25231217721e6",
+          "seconds": [
+            0.09673020800000032,
+            0.1040987919999985,
+            0.1062441659999962
+          ]
+        },
+        "level0": {
+          "effective_bytes": 5858,
+          "output_sha256": "55aa38e97a7e2a1138590af35a62373d3efce57901f7ddcc17e25231217721e6",
+          "seconds": [
+            0.10291766699999982,
+            0.0963110829999998,
+            0.1111881249999982
+          ]
+        },
+        "level3": {
+          "effective_bytes": 5858,
+          "output_sha256": "55aa38e97a7e2a1138590af35a62373d3efce57901f7ddcc17e25231217721e6",
+          "seconds": [
+            0.1394478750000001,
+            0.1175251670000037,
+            0.11988491700000736
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "0fabb870cfe90fb7ba7cebfa689a0e62012ff5658fd6cab05898573d9d268b73",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Automobile/3D/automobile_3d.png)",
+      "license": "MIT",
+      "input_bytes": 33889,
+      "name": "fluent-automobile.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 3896,
+          "output_sha256": "66b2c4ca088c64ec60530ae72c41c78fae2bd3eabf0afe13662197fe794294b4",
+          "seconds": [
+            0.08927937500000027,
+            0.12429120799999893,
+            0.09475770899999958
+          ]
+        },
+        "level0": {
+          "effective_bytes": 3896,
+          "output_sha256": "66b2c4ca088c64ec60530ae72c41c78fae2bd3eabf0afe13662197fe794294b4",
+          "seconds": [
+            0.09600470799999883,
+            0.10011712499999703,
+            0.09699158399999419
+          ]
+        },
+        "level3": {
+          "effective_bytes": 3896,
+          "output_sha256": "66b2c4ca088c64ec60530ae72c41c78fae2bd3eabf0afe13662197fe794294b4",
+          "seconds": [
+            0.12831775000000079,
+            0.12097341700000186,
+            0.13123695799998814
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "36f75eaa1e1a849fc950f43962b447c206d96244858468240a6a81beaa97f7be",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Books/3D/books_3d.png)",
+      "license": "MIT",
+      "input_bytes": 26332,
+      "name": "fluent-books.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 2012,
+          "output_sha256": "7aa590eb1f434166156a6af13370cc2f3f8958c91144590de5d6366bd2aa3e71",
+          "seconds": [
+            0.09151920799999935,
+            0.0964546249999998,
+            0.09563804100000084
+          ]
+        },
+        "level0": {
+          "effective_bytes": 2012,
+          "output_sha256": "7aa590eb1f434166156a6af13370cc2f3f8958c91144590de5d6366bd2aa3e71",
+          "seconds": [
+            0.08873216699999986,
+            0.09750854099999984,
+            0.09402333300000265
+          ]
+        },
+        "level3": {
+          "effective_bytes": 2012,
+          "output_sha256": "7aa590eb1f434166156a6af13370cc2f3f8958c91144590de5d6366bd2aa3e71",
+          "seconds": [
+            0.1166081659999989,
+            0.1178859170000024,
+            0.13445741700000724
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "1b16f78a3feb212e66c0263b81d651347d702383e4a23f6e0211f83c79d3c7e3",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Camera/3D/camera_3d.png)",
+      "license": "MIT",
+      "input_bytes": 35211,
+      "name": "fluent-camera.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 2220,
+          "output_sha256": "1c0e0572daceb656b2c955dcdee69fc2f211614c661a19aae9b366eecfa4eed1",
+          "seconds": [
+            0.10110320800000139,
+            0.09848154200000181,
+            0.10806233400000309
+          ]
+        },
+        "level0": {
+          "effective_bytes": 2220,
+          "output_sha256": "1c0e0572daceb656b2c955dcdee69fc2f211614c661a19aae9b366eecfa4eed1",
+          "seconds": [
+            0.09637841700000038,
+            0.09601466700000216,
+            0.09300079100000147
+          ]
+        },
+        "level3": {
+          "effective_bytes": 2220,
+          "output_sha256": "1c0e0572daceb656b2c955dcdee69fc2f211614c661a19aae9b366eecfa4eed1",
+          "seconds": [
+            0.11614295899999938,
+            0.11811150000000481,
+            0.11893016700000203
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "7db4c311218a47053e490ec53e7b3995bb83246b0d6992e135868a5220bb32e7",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Dog%20face/3D/dog_face_3d.png)",
+      "license": "MIT",
+      "input_bytes": 43188,
+      "name": "fluent-dog-face.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4066,
+          "output_sha256": "6e93eaa57760670cd9313d990aa9e7668df89efbb936984638c2eb98414a10ed",
+          "seconds": [
+            0.09291404100000022,
+            0.10562679100000238,
+            0.10479750000000365
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4066,
+          "output_sha256": "6e93eaa57760670cd9313d990aa9e7668df89efbb936984638c2eb98414a10ed",
+          "seconds": [
+            0.11201383300000067,
+            0.1040614160000004,
+            0.09810291699999851
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4066,
+          "output_sha256": "6e93eaa57760670cd9313d990aa9e7668df89efbb936984638c2eb98414a10ed",
+          "seconds": [
+            0.11848062500000012,
+            0.12087387500000091,
+            0.12201074999998696
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "2a07c00a4af13532717a201e201b7219f02ce91232ea86abd7e74cbf1b5fb42f",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Ghost/3D/ghost_3d.png)",
+      "license": "MIT",
+      "input_bytes": 33215,
+      "name": "fluent-ghost.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4138,
+          "output_sha256": "55bdefa01030e3ad54c42d43717989848e94adfd26be561f7ea2382c3898d8e1",
+          "seconds": [
+            0.09098566699999999,
+            0.0992162090000015,
+            0.10004741600000244
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4138,
+          "output_sha256": "55bdefa01030e3ad54c42d43717989848e94adfd26be561f7ea2382c3898d8e1",
+          "seconds": [
+            0.11036933300000129,
+            0.0982582499999971,
+            0.09078037500000136
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4138,
+          "output_sha256": "55bdefa01030e3ad54c42d43717989848e94adfd26be561f7ea2382c3898d8e1",
+          "seconds": [
+            0.12313050000000025,
+            0.12051029100000221,
+            0.11959529199999963
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "4f4b74a79237e311d72cad958237b5f7088d8bce1c82305ebefe1a70e3022dfd",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim02.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 617995,
+      "name": "kodim02.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 45092,
+          "output_sha256": "907d788f752b8e76c99dd481b93ddf9bec9779b77c14a9f790d56885daeb3fa0",
+          "seconds": [
+            0.12838641699999975,
+            0.13869208300000224,
+            0.126753542000003
+          ]
+        },
+        "level0": {
+          "effective_bytes": 45092,
+          "output_sha256": "907d788f752b8e76c99dd481b93ddf9bec9779b77c14a9f790d56885daeb3fa0",
+          "seconds": [
+            0.13598833300000024,
+            0.14152812500000067,
+            0.1319177499999995
+          ]
+        },
+        "level3": {
+          "effective_bytes": 45092,
+          "output_sha256": "907d788f752b8e76c99dd481b93ddf9bec9779b77c14a9f790d56885daeb3fa0",
+          "seconds": [
+            0.2838357079999998,
+            0.2766790840000013,
+            0.2937387919999992
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "e3b946107c5d3441c022f678d0c3caf1e224d81b1604ba840a4f88e562de61aa",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim04.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 637432,
+      "name": "kodim04.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 49018,
+          "output_sha256": "b3c8e699e5c0d16295c4776eee11e7d8f3d1841469c0844c041304f114ab4e69",
+          "seconds": [
+            0.1287985840000001,
+            0.1356991249999986,
+            0.13261158400000284
+          ]
+        },
+        "level0": {
+          "effective_bytes": 49018,
+          "output_sha256": "b3c8e699e5c0d16295c4776eee11e7d8f3d1841469c0844c041304f114ab4e69",
+          "seconds": [
+            0.13625350000000047,
+            0.1507473339999983,
+            0.1404486659999975
+          ]
+        },
+        "level3": {
+          "effective_bytes": 49018,
+          "output_sha256": "b3c8e699e5c0d16295c4776eee11e7d8f3d1841469c0844c041304f114ab4e69",
+          "seconds": [
+            0.3029007089999993,
+            0.3002183340000002,
+            0.29477304199998855
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "363510303b715d4cbc384e1ce227e466b613a09e1b71ae985882bf8e7fbd9b18",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim06.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 618959,
+      "name": "kodim06.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 71320,
+          "output_sha256": "679b3ee713e643577fd76d2d2a0f3b99e77f62aac0c166e97aad9992393677a2",
+          "seconds": [
+            0.12776262499999902,
+            0.1302832909999978,
+            0.12545341699999568
+          ]
+        },
+        "level0": {
+          "effective_bytes": 71320,
+          "output_sha256": "679b3ee713e643577fd76d2d2a0f3b99e77f62aac0c166e97aad9992393677a2",
+          "seconds": [
+            0.14004429200000068,
+            0.14272983300000064,
+            0.14596608299999758
+          ]
+        },
+        "level3": {
+          "effective_bytes": 71320,
+          "output_sha256": "679b3ee713e643577fd76d2d2a0f3b99e77f62aac0c166e97aad9992393677a2",
+          "seconds": [
+            0.3225795419999997,
+            0.32098233299999634,
+            0.31743583300000466
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "6a4361c2fc194feb4edaa9f9a4a0620fb9943e460ac7fdf037fb0f6dd6607a7d",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim09.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 582899,
+      "name": "kodim09.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 32870,
+          "output_sha256": "19677b1651e4302bfb04255d26b8fd4f70453c6ccedd09914d3fdff07d70acbe",
+          "seconds": [
+            0.11611470899999965,
+            0.12207450000000009,
+            0.1267034580000015
+          ]
+        },
+        "level0": {
+          "effective_bytes": 32870,
+          "output_sha256": "19677b1651e4302bfb04255d26b8fd4f70453c6ccedd09914d3fdff07d70acbe",
+          "seconds": [
+            0.13446800000000003,
+            0.1376419999999996,
+            0.14215762500000295
+          ]
+        },
+        "level3": {
+          "effective_bytes": 32870,
+          "output_sha256": "19677b1651e4302bfb04255d26b8fd4f70453c6ccedd09914d3fdff07d70acbe",
+          "seconds": [
+            0.2804978330000001,
+            0.2855601249999964,
+            0.2693548329999942
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "9dfb70f5867c29ff9ed6313683f19b3d867849e40fbc0c4c54a4a89df341cf23",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim10.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 593463,
+      "name": "kodim10.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 38790,
+          "output_sha256": "c316674d9e6a6c3f72bb4933bbc5445a6add7a27c46219751fa7506424df1e1b",
+          "seconds": [
+            0.12671641699999903,
+            0.12871195800000024,
+            0.13710783300000173
+          ]
+        },
+        "level0": {
+          "effective_bytes": 38790,
+          "output_sha256": "c316674d9e6a6c3f72bb4933bbc5445a6add7a27c46219751fa7506424df1e1b",
+          "seconds": [
+            0.13744462500000054,
+            0.14083666700000208,
+            0.15270870900000233
+          ]
+        },
+        "level3": {
+          "effective_bytes": 38790,
+          "output_sha256": "c316674d9e6a6c3f72bb4933bbc5445a6add7a27c46219751fa7506424df1e1b",
+          "seconds": [
+            0.3009288340000005,
+            0.29794579200000015,
+            0.30308087499999203
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "7936814b58b5387fce2e4e2488b4ec830dadd95fa9520f358ddb30990b50f2b6",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim11.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 621023,
+      "name": "kodim11.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 62386,
+          "output_sha256": "6b3348735717df2da72ff3a46fb7b2bbcee16a619fba2f8e0e9aecce1df074c8",
+          "seconds": [
+            0.12551191699999897,
+            0.12781750000000258,
+            0.12391316600000124
+          ]
+        },
+        "level0": {
+          "effective_bytes": 62386,
+          "output_sha256": "6b3348735717df2da72ff3a46fb7b2bbcee16a619fba2f8e0e9aecce1df074c8",
+          "seconds": [
+            0.1442443339999997,
+            0.1411549170000015,
+            0.1490690420000007
+          ]
+        },
+        "level3": {
+          "effective_bytes": 62386,
+          "output_sha256": "6b3348735717df2da72ff3a46fb7b2bbcee16a619fba2f8e0e9aecce1df074c8",
+          "seconds": [
+            0.31004104199999816,
+            0.31742933299999976,
+            0.31272012499999846
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "8a563e5ef68f9554200117d8ee39be02f7d661082ea0be4fcaf84ac390a27c8f",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Blood_vessels-en.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 236666,
+      "name": "blood-vessels-en.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 97750,
+          "output_sha256": "535662c1a8deda463c9abf171d22d5abfbe17dfe1174022cbcfff8143bd39256",
+          "seconds": [
+            0.14428254099999904,
+            0.16176141600000093,
+            0.15537658399999543
+          ]
+        },
+        "level0": {
+          "effective_bytes": 97750,
+          "output_sha256": "535662c1a8deda463c9abf171d22d5abfbe17dfe1174022cbcfff8143bd39256",
+          "seconds": [
+            0.13674712499999941,
+            0.1511220840000007,
+            0.1511935830000013
+          ]
+        },
+        "level3": {
+          "effective_bytes": 97750,
+          "output_sha256": "535662c1a8deda463c9abf171d22d5abfbe17dfe1174022cbcfff8143bd39256",
+          "seconds": [
+            0.1459517080000019,
+            0.14256270799999982,
+            0.15055495800000074
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "25896805b63c5516904dcbc9cf3075d2c09a0a1b8a6956a8485931eb16137d83",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_elegans_male.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 559411,
+      "name": "c-elegans-male.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 105104,
+          "output_sha256": "e53b471e4464c9e0ae522c94aa4d2b42ce838503dd6cfdb168364ba56ea77418",
+          "seconds": [
+            0.20936720799999975,
+            0.22358491600000363,
+            0.20978845799999846
+          ]
+        },
+        "level0": {
+          "effective_bytes": 105104,
+          "output_sha256": "e53b471e4464c9e0ae522c94aa4d2b42ce838503dd6cfdb168364ba56ea77418",
+          "seconds": [
+            0.2164934590000005,
+            0.20648687499999951,
+            0.20680829100000153
+          ]
+        },
+        "level3": {
+          "effective_bytes": 105104,
+          "output_sha256": "e53b471e4464c9e0ae522c94aa4d2b42ce838503dd6cfdb168364ba56ea77418",
+          "seconds": [
+            0.20729266600000074,
+            0.21741204200000652,
+            0.21236174999999946
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "4e1318770b9b8da62a92f61a2361448e56770b023ec09d9f1f2fb6b88df3cc37",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Caenorhabditis_elegans_hermaphrodite_adult-en.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 187233,
+      "name": "caenorhabditis-elegans-hermaphrodite-adult-en.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 50082,
+          "output_sha256": "a82887c9efbae375027404d023d69b8703594d4d64020f142fea6671422190ae",
+          "seconds": [
+            0.12430683399999864,
+            0.13418958299999417,
+            0.12678237499999767
+          ]
+        },
+        "level0": {
+          "effective_bytes": 50082,
+          "output_sha256": "a82887c9efbae375027404d023d69b8703594d4d64020f142fea6671422190ae",
+          "seconds": [
+            0.1447589589999989,
+            0.14132158299999986,
+            0.15921937499999927
+          ]
+        },
+        "level3": {
+          "effective_bytes": 50082,
+          "output_sha256": "a82887c9efbae375027404d023d69b8703594d4d64020f142fea6671422190ae",
+          "seconds": [
+            0.3213887910000004,
+            0.3119656660000061,
+            0.32100270799999464
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "cea641ff4b3caf250122edc72f4b3d5ef0af82ebc704ac7e0d0135b47a802f87",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:College_of_Arms-Lant%27s_Roll.svg)",
+      "license": "CC BY 3.0",
+      "input_bytes": 830497,
+      "name": "college-of-arms-lant-s-roll.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 199382,
+          "output_sha256": "90bf788c7e3ec399c10fa290ccd632c32ff10f8f1118d3e63a5e28af7c475ecb",
+          "seconds": [
+            0.18685499999999955,
+            0.2048221669999961,
+            0.18373470899999944
+          ]
+        },
+        "level0": {
+          "effective_bytes": 199382,
+          "output_sha256": "90bf788c7e3ec399c10fa290ccd632c32ff10f8f1118d3e63a5e28af7c475ecb",
+          "seconds": [
+            0.1940350000000013,
+            0.18347691700000013,
+            0.1872127080000041
+          ]
+        },
+        "level3": {
+          "effective_bytes": 199382,
+          "output_sha256": "90bf788c7e3ec399c10fa290ccd632c32ff10f8f1118d3e63a5e28af7c475ecb",
+          "seconds": [
+            0.2347823329999983,
+            0.18369662500000317,
+            0.18122179200000232
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "93aa9f7587bea69311ab1585d435f296d7583d071184d0ab07b7b2e7039e0aa5",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Compass_rose_Cantino.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 580012,
+      "name": "compass-rose-cantino.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 151918,
+          "output_sha256": "55b8fcddc5739931cf8368d853563fe046efa9740a334a623e08ce84de9eb601",
+          "seconds": [
+            0.20437329099999957,
+            0.19652808300000402,
+            0.19699641699999404
+          ]
+        },
+        "level0": {
+          "effective_bytes": 151918,
+          "output_sha256": "55b8fcddc5739931cf8368d853563fe046efa9740a334a623e08ce84de9eb601",
+          "seconds": [
+            0.18334237499999873,
+            0.185499042,
+            0.18682700000000096
+          ]
+        },
+        "level3": {
+          "effective_bytes": 151918,
+          "output_sha256": "55b8fcddc5739931cf8368d853563fe046efa9740a334a623e08ce84de9eb601",
+          "seconds": [
+            0.19961387500000072,
+            0.18787183300000265,
+            0.18808974999998895
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "c9662ef3438b3b5be268da629ef7e6bd7730fe0eb7cffaebf4794eba6b7dbfc3",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Easter_Island_map-en.svg)",
+      "license": "CC BY-SA 2.5",
+      "input_bytes": 592138,
+      "name": "easter-island-map-en.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 112754,
+          "output_sha256": "0095879ad75b3f084708f53c2948d2988182232c4a2f5d93b3e87e64f16e8885",
+          "seconds": [
+            0.1652343750000007,
+            0.18116333300000065,
+            0.16144670799999972
+          ]
+        },
+        "level0": {
+          "effective_bytes": 112754,
+          "output_sha256": "0095879ad75b3f084708f53c2948d2988182232c4a2f5d93b3e87e64f16e8885",
+          "seconds": [
+            0.15926145799999958,
+            0.15992079199999765,
+            0.1649074999999982
+          ]
+        },
+        "level3": {
+          "effective_bytes": 112754,
+          "output_sha256": "0095879ad75b3f084708f53c2948d2988182232c4a2f5d93b3e87e64f16e8885",
+          "seconds": [
+            0.1684184999999978,
+            0.16802270899999883,
+            0.16169291699999633
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "b7b50c31c3c3a2c1d1fa8320734ec61232776be80be9856445cd5ce7bfc5ad20",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:1865_Two_Cent_Reverse.png)",
+      "license": "Public domain",
+      "input_bytes": 2384225,
+      "name": "1865-two-cent-reverse.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 329482,
+          "output_sha256": "3013a7d8c1b66c89dbcd8153a7154948ee9a807c2371d2f0528d0b16c8e766fc",
+          "seconds": [
+            0.19792325000000055,
+            0.21116670800000037,
+            0.20208512499999642
+          ]
+        },
+        "level0": {
+          "effective_bytes": 329482,
+          "output_sha256": "3013a7d8c1b66c89dbcd8153a7154948ee9a807c2371d2f0528d0b16c8e766fc",
+          "seconds": [
+            0.22623954200000007,
+            0.23039345799999822,
+            0.22575174999999348
+          ]
+        },
+        "level3": {
+          "effective_bytes": 329482,
+          "output_sha256": "3013a7d8c1b66c89dbcd8153a7154948ee9a807c2371d2f0528d0b16c8e766fc",
+          "seconds": [
+            0.5050165,
+            0.508923541999998,
+            0.5059182910000004
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "7f2f5d1c4ddbcf659ba1b335b130d15630ba30e83bc24e6b0b2e622375c53df3",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:1axc_tricolor.png)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 595472,
+      "name": "1axc-tricolor.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 149896,
+          "output_sha256": "f1805fad13b842f7793e5108315d11f0d4415ffda5a5118444909a4d4b91e388",
+          "seconds": [
+            0.16725100000000026,
+            0.21812883399999805,
+            0.1700377079999953
+          ]
+        },
+        "level0": {
+          "effective_bytes": 149896,
+          "output_sha256": "f1805fad13b842f7793e5108315d11f0d4415ffda5a5118444909a4d4b91e388",
+          "seconds": [
+            0.1706554589999989,
+            0.17047229199999947,
+            0.1662127499999997
+          ]
+        },
+        "level3": {
+          "effective_bytes": 149896,
+          "output_sha256": "f1805fad13b842f7793e5108315d11f0d4415ffda5a5118444909a4d4b91e388",
+          "seconds": [
+            0.16131220799999824,
+            0.17019620800000013,
+            0.17375312500000462
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "b95c947819fd9aa3af5440099007ecb30c1bda6bc6c34984968c1cba621f7a61",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Antep_erased2.png)",
+      "license": "Public domain",
+      "input_bytes": 1825426,
+      "name": "antep-erased2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 191926,
+          "output_sha256": "341c41a32b8b19a48407f05ded42d4dcb500a6d9910c4fa1349b8228f8fad963",
+          "seconds": [
+            0.18707829100000062,
+            0.2740940830000014,
+            0.18784062499999976
+          ]
+        },
+        "level0": {
+          "effective_bytes": 191926,
+          "output_sha256": "341c41a32b8b19a48407f05ded42d4dcb500a6d9910c4fa1349b8228f8fad963",
+          "seconds": [
+            0.18129341699999912,
+            0.18391779199999903,
+            0.19483820800000018
+          ]
+        },
+        "level3": {
+          "effective_bytes": 191926,
+          "output_sha256": "341c41a32b8b19a48407f05ded42d4dcb500a6d9910c4fa1349b8228f8fad963",
+          "seconds": [
+            0.18283779200000083,
+            0.18056658400000458,
+            0.19049358399999505
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "594f33d6dfd95dc1c1eaf1eb0984faf4580aeb37d5ea621393d9deca8c61285b",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coins_of_the_Italian_Republic_(500_Lire)_silver_(Caravels).png)",
+      "license": "CC BY-SA 4.0",
+      "input_bytes": 1560055,
+      "name": "coins-of-the-italian-republic-500-lire-silver-cara.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 168898,
+          "output_sha256": "a234fe0099a18b236c1141e7c7f2c7d31a231522b7a4f814b8d9a1c9f527f2e7",
+          "seconds": [
+            0.17047270900000022,
+            0.1697924999999998,
+            0.16775900000000377
+          ]
+        },
+        "level0": {
+          "effective_bytes": 168898,
+          "output_sha256": "a234fe0099a18b236c1141e7c7f2c7d31a231522b7a4f814b8d9a1c9f527f2e7",
+          "seconds": [
+            0.19487991699999974,
+            0.19226679100000155,
+            0.18649487500000106
+          ]
+        },
+        "level3": {
+          "effective_bytes": 168898,
+          "output_sha256": "a234fe0099a18b236c1141e7c7f2c7d31a231522b7a4f814b8d9a1c9f527f2e7",
+          "seconds": [
+            0.37591854100000077,
+            0.3816761250000056,
+            0.3834699169999993
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "847ae85a0189db8c26203b3ac20bf11fb57cc9b0b5a9afea2b9d35ab1e3ddba9",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coronavirus._SARS-CoV-2.png)",
+      "license": "CC BY-SA 4.0",
+      "input_bytes": 2220947,
+      "name": "coronavirus-sars-cov-2.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 362518,
+          "output_sha256": "b376ea55f4c61a45f8b928eea3e2e3d4a28ffb73cab151ad5133d04160ecbd09",
+          "seconds": [
+            0.21915616599999943,
+            0.23416424999999919,
+            0.2157178339999959
+          ]
+        },
+        "level0": {
+          "effective_bytes": 362518,
+          "output_sha256": "b376ea55f4c61a45f8b928eea3e2e3d4a28ffb73cab151ad5133d04160ecbd09",
+          "seconds": [
+            0.21782608400000036,
+            0.2195420420000005,
+            0.21981275000000267
+          ]
+        },
+        "level3": {
+          "effective_bytes": 362518,
+          "output_sha256": "b376ea55f4c61a45f8b928eea3e2e3d4a28ffb73cab151ad5133d04160ecbd09",
+          "seconds": [
+            0.22317108400000052,
+            0.21511337499999428,
+            0.223957458000001
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "ca2174ed994b356ffd89750025141d4074f028bf4fd48df49ac24676dca9d318",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mahr_MarCator_810_A_dial_indicator.png)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 1539580,
+      "name": "mahr-marcator-810-a-dial-indicator.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 103088,
+          "output_sha256": "58d2d5041ed142ba4c7a77e371f18b468e3c28726f061d50547ae888fa626dd8",
+          "seconds": [
+            0.24234825000000093,
+            0.26289062499999716,
+            0.24142562499999798
+          ]
+        },
+        "level0": {
+          "effective_bytes": 103088,
+          "output_sha256": "58d2d5041ed142ba4c7a77e371f18b468e3c28726f061d50547ae888fa626dd8",
+          "seconds": [
+            0.24035974999999965,
+            0.23487120800000127,
+            0.25029241699999716
+          ]
+        },
+        "level3": {
+          "effective_bytes": 103088,
+          "output_sha256": "58d2d5041ed142ba4c7a77e371f18b468e3c28726f061d50547ae888fa626dd8",
+          "seconds": [
+            0.23429845800000138,
+            0.23175591700000098,
+            0.23219987500000627
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "26e001fabb2015c16ff79d93574c8ec0597892d4818cc3beb4551b1fe0a47caf",
+      "category": "icons",
+      "source": "[Twemoji (jdecked/twemoji)](https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f355.png)",
+      "license": "CC-BY-4.0",
+      "input_bytes": 942,
+      "name": "twemoji-1f355.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 942,
+          "output_sha256": "26e001fabb2015c16ff79d93574c8ec0597892d4818cc3beb4551b1fe0a47caf",
+          "seconds": [
+            0.08771987499999945,
+            0.17274579200000062,
+            0.09416958299999578
+          ]
+        },
+        "level0": {
+          "effective_bytes": 942,
+          "output_sha256": "26e001fabb2015c16ff79d93574c8ec0597892d4818cc3beb4551b1fe0a47caf",
+          "seconds": [
+            0.09056770900000011,
+            0.09539962499999888,
+            0.0996040409999992
+          ]
+        },
+        "level3": {
+          "effective_bytes": 822,
+          "output_sha256": "aa84c9a7cab8a852d35935b305ae8ae9a4384fcd036318f74d43a9c14279a63d",
+          "seconds": [
+            0.09986229100000088,
+            0.09722004200000356,
+            0.09092508400000554
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 67,
+            "input_height": 72,
+            "input_pixel_sha256": "ef548835dc41cefe3e88c564d7cb8600a4d6049c21df77570020cb423a955658",
+            "input_width": 72,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 72,
+            "output_pixel_sha256": "82ddccbac386d11488caf7377ab057f38e29d9d9e6fd177383d34b7481556050",
+            "output_width": 72,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "9024f30371f99e85fb48784b1bfab9b8d9b90e4e53713e4b5fb6612e34c6c5ae",
+      "category": "icons",
+      "source": "[Twemoji (jdecked/twemoji)](https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f3b8.png)",
+      "license": "CC-BY-4.0",
+      "input_bytes": 1022,
+      "name": "twemoji-1f3b8.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 1022,
+          "output_sha256": "9024f30371f99e85fb48784b1bfab9b8d9b90e4e53713e4b5fb6612e34c6c5ae",
+          "seconds": [
+            0.08862812499999961,
+            0.10269895899999426,
+            0.0894984170000015
+          ]
+        },
+        "level0": {
+          "effective_bytes": 1022,
+          "output_sha256": "9024f30371f99e85fb48784b1bfab9b8d9b90e4e53713e4b5fb6612e34c6c5ae",
+          "seconds": [
+            0.08847979099999925,
+            0.09247162500000172,
+            0.10633741599999524
+          ]
+        },
+        "level3": {
+          "effective_bytes": 942,
+          "output_sha256": "2da5a06ecbc86fc7acb40bf3cd5e14a54452622f2da06f41bc3b090ced6c6c0d",
+          "seconds": [
+            0.09258695799999828,
+            0.09476724999999675,
+            0.0908759999999944
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 163,
+            "input_height": 72,
+            "input_pixel_sha256": "922bc0fb2d78324b7d81e0e5e9671f7b0c2e5140a567231556d712c1ddd3babc",
+            "input_width": 72,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 72,
+            "output_pixel_sha256": "f38696f2e149514bccb075db3ccb97b2708565164e8eb810d8d8e7daed35155e",
+            "output_width": 72,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "ac8393e853a619d8cd2b502abb1cee1f79af97fd511b24f0a7cf99d102b2d02f",
+      "category": "icons",
+      "source": "[Twemoji (jdecked/twemoji)](https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f436.png)",
+      "license": "CC-BY-4.0",
+      "input_bytes": 1089,
+      "name": "twemoji-1f436.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 1089,
+          "output_sha256": "ac8393e853a619d8cd2b502abb1cee1f79af97fd511b24f0a7cf99d102b2d02f",
+          "seconds": [
+            0.0843102499999997,
+            0.11063166699999982,
+            0.0904697499999969
+          ]
+        },
+        "level0": {
+          "effective_bytes": 1089,
+          "output_sha256": "ac8393e853a619d8cd2b502abb1cee1f79af97fd511b24f0a7cf99d102b2d02f",
+          "seconds": [
+            0.09261529100000132,
+            0.10771508399999874,
+            0.10240937500000058
+          ]
+        },
+        "level3": {
+          "effective_bytes": 988,
+          "output_sha256": "a8ef577df72da4046d3c65a430b7ca290a9433713ed18b42b60859011edf5959",
+          "seconds": [
+            0.0872144999999982,
+            0.08768329200000125,
+            0.09070133299999839
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 100,
+            "input_height": 72,
+            "input_pixel_sha256": "b01eed2c687145f3ec1e87a43f382bb6b2e7db5464443e07cf7bc5955a062c91",
+            "input_width": 72,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 72,
+            "output_pixel_sha256": "cac71a0d003d5a0b1f154dd0bace457279a0d633c25663f97914ed2c53892622",
+            "output_width": 72,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "7dadbe94d34dd81e2d146075dc409de0a4b05c4268785e2d61a738b7dd804f55",
+      "category": "icons",
+      "source": "[Twemoji (jdecked/twemoji)](https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f697.png)",
+      "license": "CC-BY-4.0",
+      "input_bytes": 646,
+      "name": "twemoji-1f697.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 646,
+          "output_sha256": "7dadbe94d34dd81e2d146075dc409de0a4b05c4268785e2d61a738b7dd804f55",
+          "seconds": [
+            0.08606595799999894,
+            0.09699912499999641,
+            0.09711412499999739
+          ]
+        },
+        "level0": {
+          "effective_bytes": 646,
+          "output_sha256": "7dadbe94d34dd81e2d146075dc409de0a4b05c4268785e2d61a738b7dd804f55",
+          "seconds": [
+            0.08646916600000054,
+            0.0936114169999982,
+            0.09444383400000333
+          ]
+        },
+        "level3": {
+          "effective_bytes": 526,
+          "output_sha256": "332aeb16f43f9f3f4098e110fa6ad82c23e66acc588187e0b9c34582434225d4",
+          "seconds": [
+            0.09646187499999925,
+            0.09151329200000191,
+            0.08593150000000094
+          ],
+          "pixel_check": {
+            "alpha_equal": true,
+            "different_channels": 83,
+            "input_height": 72,
+            "input_pixel_sha256": "ec634c16eaf59a8fa269d500a755ede0cedecece6d7f2b768490e319bdd3029b",
+            "input_width": 72,
+            "maximum_channel_difference": 1,
+            "normalization": "ImageIO orientation transform, sRGB, 8-bit premultiplied RGBA",
+            "output_height": 72,
+            "output_pixel_sha256": "aed97a8f90528e962172faa31953b9579154f83d48604d2f98118ce2d95d5065",
+            "output_width": 72,
+            "pixels_equal": false
+          }
+        }
+      }
+    },
+    {
+      "sha256": "a993e9066855f890c1c89eaa0295e75fbc5a1accb17db41fcb3b05c888fb9b27",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Guitar/3D/guitar_3d.png)",
+      "license": "MIT",
+      "input_bytes": 25002,
+      "name": "fluent-guitar.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 5170,
+          "output_sha256": "725629cd77a01f77fdb7e66247da1dd12ee029c1719c8f6c34ef1093cbb20870",
+          "seconds": [
+            0.09170537500000009,
+            0.09829649999999646,
+            0.09393037499999934
+          ]
+        },
+        "level0": {
+          "effective_bytes": 5170,
+          "output_sha256": "725629cd77a01f77fdb7e66247da1dd12ee029c1719c8f6c34ef1093cbb20870",
+          "seconds": [
+            0.08434129200000129,
+            0.09351166600000482,
+            0.09469245799999726
+          ]
+        },
+        "level3": {
+          "effective_bytes": 5170,
+          "output_sha256": "725629cd77a01f77fdb7e66247da1dd12ee029c1719c8f6c34ef1093cbb20870",
+          "seconds": [
+            0.12948937499999857,
+            0.12551091699999972,
+            0.11953587500001106
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "5a078744b30da58e854ab7700c501180e0b11337c9d64e33b70585c8b98088a5",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hamburger/3D/hamburger_3d.png)",
+      "license": "MIT",
+      "input_bytes": 36673,
+      "name": "fluent-hamburger.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 3972,
+          "output_sha256": "23e0928be323e13600b1344134f9a64ac063474504009bb4d4846499dc961b7c",
+          "seconds": [
+            0.09673108300000166,
+            0.09811945799999933,
+            0.09241254100000162
+          ]
+        },
+        "level0": {
+          "effective_bytes": 3972,
+          "output_sha256": "23e0928be323e13600b1344134f9a64ac063474504009bb4d4846499dc961b7c",
+          "seconds": [
+            0.09956879200000124,
+            0.09148962500000124,
+            0.09845312499999892
+          ]
+        },
+        "level3": {
+          "effective_bytes": 3972,
+          "output_sha256": "23e0928be323e13600b1344134f9a64ac063474504009bb4d4846499dc961b7c",
+          "seconds": [
+            0.11971062499999974,
+            0.11778779100000492,
+            0.11230833399999085
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "beb2d1ac000003d96711ea8364815641442523285fa59007dd5b589059c74b9a",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Pizza/3D/pizza_3d.png)",
+      "license": "MIT",
+      "input_bytes": 31368,
+      "name": "fluent-pizza.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 4120,
+          "output_sha256": "37f0412b13df2f50ce59f25cf6fc11f908e512e81be784406ac7f6ea96be7f0a",
+          "seconds": [
+            0.08592491699999982,
+            0.12340316600000278,
+            0.09818079200000085
+          ]
+        },
+        "level0": {
+          "effective_bytes": 4120,
+          "output_sha256": "37f0412b13df2f50ce59f25cf6fc11f908e512e81be784406ac7f6ea96be7f0a",
+          "seconds": [
+            0.10242137500000048,
+            0.09463216700000032,
+            0.09496099999999785
+          ]
+        },
+        "level3": {
+          "effective_bytes": 4120,
+          "output_sha256": "37f0412b13df2f50ce59f25cf6fc11f908e512e81be784406ac7f6ea96be7f0a",
+          "seconds": [
+            0.12766441700000186,
+            0.1163924589999965,
+            0.12014229100000762
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "c0f47e02e87bd61118985d8ab7b5f40fe302c82e6bb7ae6a7b7add2eefc6de7a",
+      "category": "3d",
+      "source": "[Microsoft Fluent Emoji](https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Puzzle%20piece/3D/puzzle_piece_3d.png)",
+      "license": "MIT",
+      "input_bytes": 31517,
+      "name": "fluent-puzzle-piece.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 6150,
+          "output_sha256": "27ae786573dda678307efd52e50d40d6cfbccff79d181234085b86cf2df29b4e",
+          "seconds": [
+            0.10849404200000023,
+            0.08977845799999784,
+            0.09485795800000574
+          ]
+        },
+        "level0": {
+          "effective_bytes": 6150,
+          "output_sha256": "27ae786573dda678307efd52e50d40d6cfbccff79d181234085b86cf2df29b4e",
+          "seconds": [
+            0.09618433300000007,
+            0.10115312499999618,
+            0.09850070899999963
+          ]
+        },
+        "level3": {
+          "effective_bytes": 6150,
+          "output_sha256": "27ae786573dda678307efd52e50d40d6cfbccff79d181234085b86cf2df29b4e",
+          "seconds": [
+            0.11548699999999812,
+            0.12036987500000151,
+            0.1267457080000014
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "d78c37c2f04f23761ed2367dd77e2db584ddd4c3950833fecf89f199a8126980",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim12.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 531024,
+      "name": "kodim12.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 37460,
+          "output_sha256": "b4c4958ef895d04e1933e39e17b1d7267f3cf16cc04c3eb2271125bae509b2e6",
+          "seconds": [
+            0.12244729100000029,
+            0.11901770799999412,
+            0.13151662500000327
+          ]
+        },
+        "level0": {
+          "effective_bytes": 37460,
+          "output_sha256": "b4c4958ef895d04e1933e39e17b1d7267f3cf16cc04c3eb2271125bae509b2e6",
+          "seconds": [
+            0.13845658299999997,
+            0.13879691700000052,
+            0.13332133399999435
+          ]
+        },
+        "level3": {
+          "effective_bytes": 37460,
+          "output_sha256": "b4c4958ef895d04e1933e39e17b1d7267f3cf16cc04c3eb2271125bae509b2e6",
+          "seconds": [
+            0.30684449999999686,
+            0.3038695839999974,
+            0.294640957999988
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "55a94550ff18f3246c4074fd32b77b0c74447c26b6ad274d564d999c0450ba6e",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim14.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 692201,
+      "name": "kodim14.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 84850,
+          "output_sha256": "20cba1f63dd82d7b85492ffbf3a1a59ee41e03b31ae003068e64c31b502cff40",
+          "seconds": [
+            0.1287085420000018,
+            0.1306464160000047,
+            0.13816079100000422
+          ]
+        },
+        "level0": {
+          "effective_bytes": 84850,
+          "output_sha256": "20cba1f63dd82d7b85492ffbf3a1a59ee41e03b31ae003068e64c31b502cff40",
+          "seconds": [
+            0.13561424999999971,
+            0.1429222920000015,
+            0.14221112499999577
+          ]
+        },
+        "level3": {
+          "effective_bytes": 84850,
+          "output_sha256": "20cba1f63dd82d7b85492ffbf3a1a59ee41e03b31ae003068e64c31b502cff40",
+          "seconds": [
+            0.30193037499999775,
+            0.3070688749999988,
+            0.29755945799999495
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "a89c7268ccd4718ba424a99fc4643c572cf692ca6eae887185ceb4e9f11d2e54",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim16.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 534247,
+      "name": "kodim16.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 49096,
+          "output_sha256": "1ab31b7c707b586c329602c81764f01214537adcc91178cbf761771f6107ed9a",
+          "seconds": [
+            0.12896295800000246,
+            0.11809312500000146,
+            0.1313170000000028
+          ]
+        },
+        "level0": {
+          "effective_bytes": 49096,
+          "output_sha256": "1ab31b7c707b586c329602c81764f01214537adcc91178cbf761771f6107ed9a",
+          "seconds": [
+            0.13301812499999954,
+            0.14539383299999997,
+            0.14269987499999814
+          ]
+        },
+        "level3": {
+          "effective_bytes": 49096,
+          "output_sha256": "1ab31b7c707b586c329602c81764f01214537adcc91178cbf761771f6107ed9a",
+          "seconds": [
+            0.297299584000001,
+            0.2937944580000007,
+            0.29935029199999974
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "37afcc89fbdcb76d9518e04b2fc011027e2f4cd14b3b2f83cefd721641a47c5b",
+      "category": "photos",
+      "source": "[Kodak Lossless True Color Image Suite](https://r0k.us/graphics/kodak/kodak/kodim17.png)",
+      "license": "free for unrestricted use",
+      "input_bytes": 602078,
+      "name": "kodim17.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 43272,
+          "output_sha256": "9b5a5242d70343d0e6a33fa339ef547ab9358c22438df85834491f1d583bfba4",
+          "seconds": [
+            0.1234783749999977,
+            0.12154629100000136,
+            0.12978037500000283
+          ]
+        },
+        "level0": {
+          "effective_bytes": 43272,
+          "output_sha256": "9b5a5242d70343d0e6a33fa339ef547ab9358c22438df85834491f1d583bfba4",
+          "seconds": [
+            0.12808791700000022,
+            0.1396236249999987,
+            0.13524095800000424
+          ]
+        },
+        "level3": {
+          "effective_bytes": 43272,
+          "output_sha256": "9b5a5242d70343d0e6a33fa339ef547ab9358c22438df85834491f1d583bfba4",
+          "seconds": [
+            0.29592683299999933,
+            0.30413687499999753,
+            0.3030758339999977
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "306ad6bf63a08ab576042285c2c07c6d44f6c0c19b0466433eecb3dc5f8d30a0",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 155641,
+      "name": "em-spectrum-properties-edit.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 92198,
+          "output_sha256": "cfe978ae84902bc35c1439bdf4e0a4f429c74be069456af30f81640914cb4d03",
+          "seconds": [
+            0.13321879099999734,
+            0.13227908300000024,
+            0.1328173750000019
+          ]
+        },
+        "level0": {
+          "effective_bytes": 92198,
+          "output_sha256": "cfe978ae84902bc35c1439bdf4e0a4f429c74be069456af30f81640914cb4d03",
+          "seconds": [
+            0.14553887499999973,
+            0.14729045900000415,
+            0.15072975000000355
+          ]
+        },
+        "level3": {
+          "effective_bytes": 92198,
+          "output_sha256": "cfe978ae84902bc35c1439bdf4e0a4f429c74be069456af30f81640914cb4d03",
+          "seconds": [
+            0.17500770799999898,
+            0.18156866700000052,
+            0.17071766699999102
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "906e2ac920b591dae54dfa4f0d4e974845ac87095eba781b05394654f9807960",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Emblem_of_the_Papacy_SE.svg)",
+      "license": "Public domain",
+      "input_bytes": 666668,
+      "name": "emblem-of-the-papacy-se.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 221432,
+          "output_sha256": "b62515020f46528384702f53d32145b42448c343f3976467a54a50a0613e57b6",
+          "seconds": [
+            0.2099338330000009,
+            0.2100284160000001,
+            0.213765875
+          ]
+        },
+        "level0": {
+          "effective_bytes": 221432,
+          "output_sha256": "b62515020f46528384702f53d32145b42448c343f3976467a54a50a0613e57b6",
+          "seconds": [
+            0.20989379199999902,
+            0.21064758400000017,
+            0.2197535419999994
+          ]
+        },
+        "level3": {
+          "effective_bytes": 221432,
+          "output_sha256": "b62515020f46528384702f53d32145b42448c343f3976467a54a50a0613e57b6",
+          "seconds": [
+            0.2373202499999998,
+            0.21275899999999837,
+            0.20872958399999675
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "30a98c58d5b6123f14be0d23ff622cf583bc5101a09c2517e59bc97f494478d8",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Falkland_Islands_topographic_map-en.svg)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 747335,
+      "name": "falkland-islands-topographic-map-en.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 139356,
+          "output_sha256": "5db856fe3fa2981146d838f28ebddd08adca1dab03aa5ee3f5420087e2b925ea",
+          "seconds": [
+            0.19250079099999695,
+            0.18065133300000014,
+            0.18106620800000428
+          ]
+        },
+        "level0": {
+          "effective_bytes": 139356,
+          "output_sha256": "5db856fe3fa2981146d838f28ebddd08adca1dab03aa5ee3f5420087e2b925ea",
+          "seconds": [
+            0.18028362500000128,
+            0.1786327089999986,
+            0.18091283300000072
+          ]
+        },
+        "level3": {
+          "effective_bytes": 139356,
+          "output_sha256": "5db856fe3fa2981146d838f28ebddd08adca1dab03aa5ee3f5420087e2b925ea",
+          "seconds": [
+            0.1731204169999998,
+            0.17605145799999633,
+            0.1771726250000114
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "37c6aca6556510136ff7285fa5efb128be5ed46025fcf0c472849b7b1c6158d7",
+      "category": "illustrations",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Floppy_disk_internal_diagram.svg)",
+      "license": "Public domain",
+      "input_bytes": 472503,
+      "name": "floppy-disk-internal-diagram.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 143172,
+          "output_sha256": "04785f25386e9137869e57a1e92afa3cea774811ab5fad2ca183a2d9a3d8354d",
+          "seconds": [
+            0.24806087500000018,
+            0.25818583299999887,
+            0.25408216699999997
+          ]
+        },
+        "level0": {
+          "effective_bytes": 143172,
+          "output_sha256": "04785f25386e9137869e57a1e92afa3cea774811ab5fad2ca183a2d9a3d8354d",
+          "seconds": [
+            0.2537227090000016,
+            0.25819562500000615,
+            0.2544807089999992
+          ]
+        },
+        "level3": {
+          "effective_bytes": 143172,
+          "output_sha256": "04785f25386e9137869e57a1e92afa3cea774811ab5fad2ca183a2d9a3d8354d",
+          "seconds": [
+            0.25290504200000186,
+            0.26159941699999933,
+            0.25582237499999394
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "b98b0792127c1c6ca60e2c509f9b9f0cfd1a7dcf36f4aaaff975af10aa915d66",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oval_Photo-Mirror_Frame_with_Transparent_Background_780%C3%971040.png)",
+      "license": "CC0",
+      "input_bytes": 549713,
+      "name": "oval-photo-mirror-frame-with-transparent-backgroun.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 78236,
+          "output_sha256": "75b5a043730b37ac2a5c916855f58ae237f76771ccf4ce7c41ef1634050f55d6",
+          "seconds": [
+            0.14141370900000183,
+            0.13268862500000012,
+            0.13104212500000045
+          ]
+        },
+        "level0": {
+          "effective_bytes": 78236,
+          "output_sha256": "75b5a043730b37ac2a5c916855f58ae237f76771ccf4ce7c41ef1634050f55d6",
+          "seconds": [
+            0.14625212500000018,
+            0.1413918750000036,
+            0.15071316699999926
+          ]
+        },
+        "level3": {
+          "effective_bytes": 78236,
+          "output_sha256": "75b5a043730b37ac2a5c916855f58ae237f76771ccf4ce7c41ef1634050f55d6",
+          "seconds": [
+            0.33762729100000044,
+            0.35530629199999453,
+            0.34738254100000177
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "9d6c9774349b5304336eb7fbaf503361c97343d11cfee5c983c2270635eab51a",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Roman_gladius-transparent.png)",
+      "license": "CC BY-SA 3.0",
+      "input_bytes": 396432,
+      "name": "roman-gladius-transparent.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 32630,
+          "output_sha256": "59c03527ff9629305fed3108b55ab83c7e8ce816ed347a22da947f5dc0b7d006",
+          "seconds": [
+            0.15567641600000215,
+            0.16105929199999736,
+            0.1645487079999981
+          ]
+        },
+        "level0": {
+          "effective_bytes": 32630,
+          "output_sha256": "59c03527ff9629305fed3108b55ab83c7e8ce816ed347a22da947f5dc0b7d006",
+          "seconds": [
+            0.16022712500000047,
+            0.16227629199999427,
+            0.1653465000000054
+          ]
+        },
+        "level3": {
+          "effective_bytes": 32630,
+          "output_sha256": "59c03527ff9629305fed3108b55ab83c7e8ce816ed347a22da947f5dc0b7d006",
+          "seconds": [
+            0.16259241599999896,
+            0.1646502500000011,
+            0.16814883400000724
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "3706aaafb1e280ed3aea5e4952e1ba42d37293f739391d484c36b30eec12c495",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Saturn_from_Hubble.png)",
+      "license": "Public domain",
+      "input_bytes": 234189,
+      "name": "saturn-from-hubble.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 18222,
+          "output_sha256": "8629b438a482638bc51c0ddebf5f51c9530c7c07eccf24d769a243c3304a50e7",
+          "seconds": [
+            0.1317250829999992,
+            0.12608558299999828,
+            0.12327295800000115
+          ]
+        },
+        "level0": {
+          "effective_bytes": 18222,
+          "output_sha256": "8629b438a482638bc51c0ddebf5f51c9530c7c07eccf24d769a243c3304a50e7",
+          "seconds": [
+            0.1460959589999984,
+            0.155864416,
+            0.1491110409999976
+          ]
+        },
+        "level3": {
+          "effective_bytes": 18222,
+          "output_sha256": "8629b438a482638bc51c0ddebf5f51c9530c7c07eccf24d769a243c3304a50e7",
+          "seconds": [
+            0.31814595899999887,
+            0.31003762499999965,
+            0.33131408399999884
+          ]
+        }
+      }
+    },
+    {
+      "sha256": "311cd7cbdf378d3fb764425ef05c83b6b4c657cae4ad5e20990392fb44efb8aa",
+      "category": "photos-alpha",
+      "source": "[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Scho%C3%9Frechner_Medion_Akoya_S6445_MD61280_20220821_HOF01354.png)",
+      "license": "CC BY 4.0",
+      "input_bytes": 674131,
+      "name": "scho\u00dfrechner-medion-akoya-s6445-md61280-20220821-h.png",
+      "variants": {
+        "reference": {
+          "effective_bytes": 46872,
+          "output_sha256": "08c9c45d79b1bf700e220e28e2ae989fbbbf2798f7fb69773a311364ab5f8682",
+          "seconds": [
+            0.17066695899999829,
+            0.14988991599999935,
+            0.14868133300000608
+          ]
+        },
+        "level0": {
+          "effective_bytes": 46872,
+          "output_sha256": "08c9c45d79b1bf700e220e28e2ae989fbbbf2798f7fb69773a311364ab5f8682",
+          "seconds": [
+            0.15451029199999944,
+            0.1611685840000021,
+            0.15283812500000238
+          ]
+        },
+        "level3": {
+          "effective_bytes": 46872,
+          "output_sha256": "08c9c45d79b1bf700e220e28e2ae989fbbbf2798f7fb69773a311364ab5f8682",
+          "seconds": [
+            0.1616667079999985,
+            0.15474016699999993,
+            0.16171220900000094
+          ]
+        }
+      }
+    }
+  ],
+  "decision": "Do not adopt: level0 no real-asset gains; level3 real-asset gains too small for observed batch overhead, and 13 selected images differ by 1 channel level after normalization. Fresh holdout not consumed after screening failure."
+}
