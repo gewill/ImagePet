@@ -1,0 +1,23 @@
+--- a/Sources/ImagePetCore/Services/SwiftWebPEngine.swift
++++ b/Sources/ImagePetCore/Services/SwiftWebPEngine.swift
+@@ -55 +55 @@
+-            let data = try rgba.bytes.withUnsafeBufferPointer { buffer in
++            var data = try rgba.bytes.withUnsafeBufferPointer { buffer in
+@@ -67,0 +68,17 @@
++            }
++
++            // Offline experiment only; production source is unchanged.
++            if let rawLevel = ProcessInfo.processInfo.environment["IMAGEPET_WEBP_LOSSLESS_PRESET"],
++               let level = Int(rawLevel), (0...9).contains(level),
++               rgba.width > 0, rgba.height > 0, rgba.width <= 1_000_000 / rgba.height {
++                let started = ProcessInfo.processInfo.systemUptime
++                var lossless = try WebPEncoderConfig.losslessPreset(level: level)
++                lossless.exact = 1
++                lossless.threadLevel = 1
++                let candidate = try? rgba.bytes.withUnsafeBufferPointer { buffer in
++                    try WebPEncoder().encode(buffer, format: .rgba, config: lossless,
++                        originWidth: rgba.width, originHeight: rgba.height, stride: rgba.bytesPerRow)
++                }
++                let elapsed = ProcessInfo.processInfo.systemUptime - started
++                let selected = candidate.map { !$0.isEmpty && $0.count < data.count && elapsed <= 0.25 } ?? false
++                if selected, let candidate { data = candidate }
